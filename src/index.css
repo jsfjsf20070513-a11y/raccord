@@ -1,0 +1,101 @@
+:root {
+  --paper: #fdfcf8;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #8b0000;
+  --rule: rgba(26, 26, 26, 0.14);
+  --page-width: 680px;
+  --header-width: 920px;
+  --section-gap: 80px;
+  --paragraph-gap: 24px;
+  font-family: "EB Garamond", "Noto Serif SC", "Source Han Serif SC", serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 18px;
+  line-height: 1.7;
+  font-kerning: normal;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a,
+a:visited {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+p {
+  margin: 0 0 var(--paragraph-gap);
+}
+
+ol,
+ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}

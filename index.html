@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Math Class Website is a deployed class knowledge hub and hackathon showcase built by a freshman mathematics student with AI assisted development."
+    />
+    <meta name="color-scheme" content="light" />
+    <meta property="og:title" content="Math Class Website · Hackathon Showcase" />
+    <meta
+      property="og:description"
+      content="A lightweight class website for schedules, albums, resources, collaboration drafts, and AI assisted student product building."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://149.28.69.75/hackathon" />
+    <meta property="og:image" content="http://149.28.69.75/placeholders/class-archive.svg" />
+    <title>Math Class Website · 2025 级数学班</title>
+    <link rel="stylesheet" href="/src/vendor.css" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000000'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='40' fill='%23ffffff' font-family='serif'%3E%E2%88%91%3C/text%3E%3C/svg%3E"
+    />
+    <script>
+      window.__MATH_CLASS_BOOT_STARTED_AT__ = Date.now()
+    </script>
+    <style>
+      :root {
+        --boot-paper: #fdfcf8;
+        --boot-ink: #1a1a1a;
+        --boot-muted: #6b6b6b;
+        --boot-accent: #8b0000;
+        --boot-rule: rgba(26, 26, 26, 0.14);
+        --boot-page-width: 680px;
+        --loading-accent: #8b0000;
+        --loading-muted: #6f5a56;
+        --loading-ink: #241816;
+        --loading-overlay-start: rgba(139, 0, 0, 0.16);
+        --loading-overlay-end: rgba(92, 58, 42, 0.1);
+        --loading-background-top: #fdfaf4;
+        --loading-background-bottom: #f6efe6;
+        --loading-glow-primary: rgba(139, 0, 0, 0.22);
+        --loading-glow-secondary: rgba(92, 58, 42, 0.16);
+        --loading-border: rgba(66, 38, 28, 0.09);
+        --loading-rule: rgba(66, 38, 28, 0.18);
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        background: var(--boot-paper);
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        color: var(--boot-ink);
+      }
+
+      #root {
+        min-height: 100vh;
+      }
+
+      .page-column {
+        max-width: var(--boot-page-width);
+        margin: 0 auto;
+        padding: 72px 24px 0;
+      }
+
+      .page-loading-overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background:
+          radial-gradient(circle at 18% 22%, var(--loading-overlay-start), transparent 30%),
+          radial-gradient(circle at 82% 70%, var(--loading-overlay-end), transparent 36%),
+          linear-gradient(180deg, var(--loading-background-top), var(--loading-background-bottom));
+        overflow: hidden;
+      }
+
+      .page-loading-overlay::before {
+        content: "";
+        position: absolute;
+        inset: 26px;
+        border: 1px solid var(--loading-border);
+        pointer-events: none;
+      }
+
+      .page-loading-shell {
+        width: 100%;
+        min-height: auto;
+        display: flex;
+        align-items: center;
+        font-family: "EB Garamond", "Noto Serif SC", "Source Han Serif SC", serif;
+      }
+
+      .page-loading-card {
+        position: relative;
+        width: min(100%, 42rem);
+        padding-top: 24px;
+        border-top: 1px solid var(--loading-rule);
+      }
+
+      .page-loading-card::before,
+      .page-loading-card::after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .page-loading-atmosphere {
+        position: absolute;
+        inset: -56px -32px auto auto;
+        pointer-events: none;
+      }
+
+      .page-loading-orb {
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(10px);
+        animation: boot-loading-float 8s ease-in-out infinite;
+      }
+
+      .page-loading-orb.is-primary {
+        top: -12px;
+        right: 14px;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, var(--loading-glow-primary), transparent);
+      }
+
+      .page-loading-orb.is-secondary {
+        top: 82px;
+        right: 132px;
+        width: 112px;
+        height: 112px;
+        background: radial-gradient(circle, var(--loading-glow-secondary), transparent);
+        animation-delay: -3s;
+      }
+
+      .page-loading-eyebrow {
+        margin: 0 0 8px;
+        color: var(--loading-muted);
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .page-loading-theme-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 14px;
+      }
+
+      .page-loading-badge {
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--loading-rule);
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--loading-accent);
+        background: rgba(255, 255, 255, 0.28);
+        font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+        font-size: 20px;
+      }
+
+      .page-loading-motto {
+        margin: 0;
+        color: var(--loading-muted);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .page-loading-kicker {
+        margin: 0 0 12px;
+        color: var(--loading-accent);
+        font-size: 14px;
+        font-style: italic;
+        letter-spacing: 0.08em;
+      }
+
+      .page-loading-title {
+        margin: 0;
+        color: var(--loading-muted);
+        font-size: 18px;
+        font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .page-loading-quote-frame {
+        min-height: 7.8rem;
+        margin-top: 22px;
+        display: flex;
+        align-items: flex-end;
+      }
+
+      .page-loading-quote {
+        margin: 0;
+        font-size: 36px;
+        line-height: 1.42;
+        letter-spacing: 0.02em;
+        color: var(--loading-ink);
+      }
+
+      .page-loading-note {
+        margin: 16px 0 0;
+        color: var(--loading-muted);
+        font-size: 17px;
+        line-height: 1.6;
+      }
+
+      .page-loading-footer {
+        margin-top: 26px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .page-loading-meter {
+        flex: 1 1 auto;
+        height: 1px;
+        background: var(--loading-border);
+        overflow: hidden;
+      }
+
+      .page-loading-meter span {
+        display: block;
+        width: 42%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, var(--loading-accent), transparent);
+        transform: translateX(-140%);
+        animation: boot-loading-sweep 1.5s ease-in-out infinite;
+      }
+
+      .page-loading-index {
+        margin: 0;
+        color: var(--loading-muted);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        white-space: nowrap;
+      }
+
+      .page-loading-ledger {
+        margin: 14px 0 0;
+        color: var(--loading-muted);
+        font-size: 13px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      .page-loading-card.theme-home::after {
+        content: "§";
+        top: 16px;
+        right: 2px;
+        color: var(--loading-border);
+        font-family: "EB Garamond", serif;
+        font-size: 106px;
+        line-height: 1;
+      }
+
+      .page-loading-card.theme-home .page-loading-badge {
+        border-radius: 14px;
+      }
+
+      .page-loading-card.theme-gallery::before {
+        top: 32px;
+        right: 8px;
+        width: 124px;
+        height: 162px;
+        border: 1px solid var(--loading-border);
+        transform: rotate(-4deg);
+        opacity: 0.32;
+      }
+
+      .page-loading-card.theme-gallery::after {
+        top: 42px;
+        right: 24px;
+        width: 124px;
+        height: 162px;
+        border: 1px solid var(--loading-rule);
+        box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.3);
+        transform: rotate(4deg);
+        opacity: 0.48;
+      }
+
+      .page-loading-card.theme-gallery .page-loading-badge {
+        border-radius: 10px;
+      }
+
+      .page-loading-card.theme-resources::before {
+        top: 34px;
+        right: 18px;
+        width: 118px;
+        height: 156px;
+        background:
+          linear-gradient(90deg, transparent 0 14px, var(--loading-border) 14px 17px, transparent 17px 37px, var(--loading-border) 37px 39px, transparent 39px 62px, var(--loading-border) 62px 66px, transparent 66px 100%);
+        opacity: 0.5;
+      }
+
+      .page-loading-card.theme-resources::after {
+        top: 26px;
+        right: 0;
+        width: 156px;
+        height: 170px;
+        background:
+          linear-gradient(var(--loading-rule), var(--loading-rule)) 0 0 / 100% 1px no-repeat,
+          linear-gradient(var(--loading-rule), var(--loading-rule)) 0 100% / 100% 1px no-repeat,
+          repeating-linear-gradient(180deg, transparent 0 27px, var(--loading-border) 27px 28px);
+        opacity: 0.42;
+      }
+
+      .page-loading-card.theme-resources .page-loading-badge {
+        border-radius: 8px;
+      }
+
+      .page-loading-card.theme-manage::before {
+        top: 26px;
+        right: 4px;
+        width: 160px;
+        height: 160px;
+        border: 1px solid var(--loading-rule);
+        transform: rotate(-2deg);
+        opacity: 0.34;
+      }
+
+      .page-loading-card.theme-manage::after {
+        top: 34px;
+        right: 16px;
+        width: 160px;
+        height: 160px;
+        background:
+          linear-gradient(var(--loading-border) 1px, transparent 1px) 0 0 / 100% 26px,
+          linear-gradient(90deg, var(--loading-border) 1px, transparent 1px) 0 0 / 26px 100%;
+        opacity: 0.36;
+      }
+
+      .page-loading-card.theme-manage .page-loading-badge {
+        border-radius: 12px;
+      }
+
+      @keyframes boot-loading-sweep {
+        from {
+          transform: translateX(-140%);
+        }
+
+        to {
+          transform: translateX(240%);
+        }
+      }
+
+      @keyframes boot-loading-float {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+
+        50% {
+          transform: translate3d(0, 14px, 0) scale(1.06);
+        }
+      }
+
+      @media (max-width: 720px) {
+        .page-loading-overlay {
+          padding: 18px;
+        }
+
+        .page-loading-overlay::before {
+          inset: 18px;
+        }
+
+        .page-column {
+          padding-top: 44px;
+        }
+
+        .page-loading-card {
+          width: 100%;
+        }
+
+        .page-loading-card::before,
+        .page-loading-card::after {
+          opacity: 0.26;
+        }
+
+        .page-loading-theme-meta {
+          margin-bottom: 12px;
+        }
+
+        .page-loading-badge {
+          width: 38px;
+          height: 38px;
+          font-size: 18px;
+        }
+
+        .page-loading-motto {
+          font-size: 11px;
+        }
+
+        .page-loading-card.theme-gallery::before,
+        .page-loading-card.theme-gallery::after {
+          width: 92px;
+          height: 122px;
+        }
+
+        .page-loading-card.theme-resources::before {
+          width: 88px;
+          height: 120px;
+        }
+
+        .page-loading-card.theme-resources::after,
+        .page-loading-card.theme-manage::before,
+        .page-loading-card.theme-manage::after {
+          width: 112px;
+          height: 118px;
+        }
+
+        .page-loading-quote-frame {
+          min-height: 6.4rem;
+          margin-top: 18px;
+        }
+
+        .page-loading-title {
+          font-size: 16px;
+        }
+
+        .page-loading-quote {
+          font-size: 28px;
+        }
+
+        .page-loading-note {
+          font-size: 15px;
+        }
+
+        .page-loading-footer {
+          gap: 12px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .page-loading-overlay {
+          padding: 14px;
+        }
+
+        .page-loading-overlay::before {
+          inset: 14px;
+        }
+
+        .page-loading-kicker {
+          font-size: 13px;
+        }
+
+        .page-loading-theme-meta {
+          gap: 10px;
+          margin-bottom: 10px;
+        }
+
+        .page-loading-badge {
+          width: 34px;
+          height: 34px;
+          font-size: 17px;
+        }
+
+        .page-loading-motto {
+          font-size: 10px;
+          letter-spacing: 0.14em;
+        }
+
+        .page-loading-title {
+          font-size: 15px;
+        }
+
+        .page-loading-card::before,
+        .page-loading-card::after {
+          opacity: 0.18;
+        }
+
+        .page-loading-card.theme-home::after {
+          font-size: 72px;
+          top: 28px;
+        }
+
+        .page-loading-quote {
+          font-size: 19px;
+        }
+
+        .page-loading-quote-frame {
+          min-height: 5rem;
+        }
+
+        .page-loading-note {
+          font-size: 14px;
+        }
+
+        .page-loading-ledger {
+          font-size: 12px;
+          letter-spacing: 0.14em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="page-loading-overlay">
+        <article class="page-column page-loading-shell" aria-live="polite" aria-busy="true">
+          <section class="page-loading-card theme-home" role="status">
+            <div class="page-loading-atmosphere" aria-hidden="true">
+              <span class="page-loading-orb is-primary"></span>
+              <span class="page-loading-orb is-secondary"></span>
+            </div>
+            <div class="page-loading-theme-meta">
+              <span class="page-loading-badge" data-boot-badge aria-hidden="true">扉</span>
+              <p class="page-loading-motto" data-boot-motto>序章展开 · Prologue</p>
+            </div>
+            <p class="page-loading-eyebrow" data-boot-eyebrow>扉页</p>
+            <p class="page-loading-kicker" data-boot-kicker>Avant-propos</p>
+            <p class="page-loading-title" data-boot-title>扉页正在徐徐展开</p>
+            <div class="page-loading-quote-frame">
+              <p class="page-loading-quote" data-boot-quote>每一次开始，都像在纸页上重新安放世界。</p>
+            </div>
+            <p class="page-loading-note" data-boot-note>扉页正在舒展开来，请稍候片刻。</p>
+            <div class="page-loading-footer">
+              <div class="page-loading-meter" aria-hidden="true">
+                <span></span>
+              </div>
+              <p class="page-loading-index" data-boot-index>01 / 06</p>
+            </div>
+            <p class="page-loading-ledger" data-boot-ledger>Prelude · Memoire · Presence</p>
+          </section>
+        </article>
+      </div>
+    </div>
+    <script>
+      window.__MATH_CLASS_LOADING_THEMES__ = {
+        home: {
+          id: 'home',
+          badge: '扉',
+          motto: '序章展开 · Prologue',
+          kicker: 'Avant-propos',
+          eyebrow: '扉页',
+          title: '扉页正在徐徐展开',
+          ledger: 'Prelude · Memoire · Presence',
+          palette: {
+            accent: '#8b0000',
+            muted: '#6f5a56',
+            ink: '#241816',
+            overlayStart: 'rgba(139, 0, 0, 0.16)',
+            overlayEnd: 'rgba(92, 58, 42, 0.1)',
+            backgroundTop: '#fdfaf4',
+            backgroundBottom: '#f6efe6',
+            glowPrimary: 'rgba(139, 0, 0, 0.22)',
+            glowSecondary: 'rgba(92, 58, 42, 0.16)',
+            border: 'rgba(66, 38, 28, 0.09)',
+            rule: 'rgba(66, 38, 28, 0.18)',
+          },
+          phrases: [
+            { text: '每一次开始，都像在纸页上重新安放世界。', note: '扉页正在舒展开来，请稍候片刻。' },
+            { text: '在第一句话抵达以前，沉默也在替它预备位置。', note: '这一页正从留白中慢慢显影。' },
+            { text: '真正的开端并不喧哗，它只缓慢地把秩序带来。', note: '页面正在调入，请让它从容抵达。' },
+            { text: '扉页不是答案，它只是邀请你进入那些仍在生长的问题。', note: '首页即将展开。' },
+            { text: '思想往往先于页面到场，像晨光先落在窗沿。', note: '内容正在徐徐就位。' },
+            { text: '所有目录的前面，总该为静默留出一瞬间的席位。', note: '请稍候，页面正在展开它的前奏。' },
+          ],
+        },
+        gallery: {
+          id: 'gallery',
+          badge: '影',
+          motto: '光影与留念 · Memoire',
+          kicker: 'Chambre claire',
+          eyebrow: '相册',
+          title: '图像正在显影',
+          ledger: 'Image · Memoire · Lumiere',
+          palette: {
+            accent: '#2f6a63',
+            muted: '#51655f',
+            ink: '#162321',
+            overlayStart: 'rgba(47, 106, 99, 0.16)',
+            overlayEnd: 'rgba(70, 99, 92, 0.1)',
+            backgroundTop: '#f6fbf8',
+            backgroundBottom: '#edf4f0',
+            glowPrimary: 'rgba(47, 106, 99, 0.22)',
+            glowSecondary: 'rgba(70, 99, 92, 0.16)',
+            border: 'rgba(38, 74, 68, 0.09)',
+            rule: 'rgba(38, 74, 68, 0.18)',
+          },
+          phrases: [
+            { text: '图像并不是把时间留下，而是让时间重新发光。', note: '相册正在显影，请稍候片刻。' },
+            { text: '一张照片之所以重要，是因为它替记忆保住了表情和光线。', note: '这一页正在调入图版与影像。' },
+            { text: '光照过的瞬间不会回来，但它能被妥善显影与保存。', note: '图片正在展开。' },
+            { text: '真正的留念，不是停住生活，而是让生活继续可被回望。', note: '相册目录正在就位。' },
+            { text: '有些记忆先成为颜色，之后才慢慢获得语言。', note: '请稍候，图像正在抵达。' },
+            { text: '当镜头留下人群，时间就不再只属于经过，而开始属于留念。', note: '页面正在显现它的光影部分。' },
+          ],
+        },
+        resources: {
+          id: 'resources',
+          badge: '卷',
+          motto: '书页与路径 · Bibliotheque',
+          kicker: 'Bibliotheque',
+          eyebrow: '资源',
+          title: '书页正在归架',
+          ledger: 'Rayon · Etude · Methode',
+          palette: {
+            accent: '#7b651f',
+            muted: '#6a5d45',
+            ink: '#252014',
+            overlayStart: 'rgba(123, 101, 31, 0.16)',
+            overlayEnd: 'rgba(106, 93, 69, 0.1)',
+            backgroundTop: '#fcfaf2',
+            backgroundBottom: '#f3efdf',
+            glowPrimary: 'rgba(123, 101, 31, 0.22)',
+            glowSecondary: 'rgba(106, 93, 69, 0.16)',
+            border: 'rgba(88, 75, 35, 0.09)',
+            rule: 'rgba(88, 75, 35, 0.18)',
+          },
+          phrases: [
+            { text: '知识真正变得可用，是在它被放进一条清楚的路径之后。', note: '书目与资源正在归架。' },
+            { text: '阅读不是堆积材料，而是替思想保留反复返回的入口。', note: '这一页正在整理学习路径。' },
+            { text: '方法像书架，看似安静，却支撑着长期的学习生活。', note: '资源页即将展开。' },
+            { text: '能被再次找到的知识，才真正配叫作积累。', note: '内容正在归类与编目。' },
+            { text: '所有目录的意义，都是让一时迷路的人重新辨认方向。', note: '请稍候，书页正在归位。' },
+            { text: '分类不是终点，它只是让道路仍然清晰并且可走。', note: '页面正在展开资料与书目。' },
+          ],
+        },
+        manage: {
+          id: 'manage',
+          badge: '案',
+          motto: '草稿与编修 · Atelier',
+          kicker: 'Table de redaction',
+          eyebrow: '协作',
+          title: '案头正在整理',
+          ledger: 'Brouillon · Ordre · Travail',
+          palette: {
+            accent: '#74493b',
+            muted: '#6c584f',
+            ink: '#261b17',
+            overlayStart: 'rgba(116, 73, 59, 0.16)',
+            overlayEnd: 'rgba(108, 88, 79, 0.1)',
+            backgroundTop: '#fbf7f4',
+            backgroundBottom: '#f3ebe6',
+            glowPrimary: 'rgba(116, 73, 59, 0.22)',
+            glowSecondary: 'rgba(108, 88, 79, 0.16)',
+            border: 'rgba(84, 58, 49, 0.09)',
+            rule: 'rgba(84, 58, 49, 0.18)',
+          },
+          phrases: [
+            { text: '真正的协作，不是同时发声，而是让彼此的工作能够接续。', note: '案头正在整理，请稍候片刻。' },
+            { text: '草稿的意义，不在于未完成，而在于它允许思想继续修订。', note: '这一页正在汇集协作内容。' },
+            { text: '写作与编修都需要耐心，因为秩序总比灵感更晚抵达。', note: '协作页即将展开。' },
+            { text: '被妥善记录的修改，才会成为后来人的道路与依据。', note: '请稍候，案头正在归整。' },
+            { text: '工作台之所以重要，是因为它让零散努力终于彼此相遇。', note: '内容正在排列与装订。' },
+            { text: '所有成品都曾是案头上一份尚未定稿的纸。', note: '页面正在显现协作流转。' },
+          ],
+        },
+      }
+
+      function resolveLoadingThemeKey(pathname) {
+        if (pathname.startsWith('/gallery') || pathname.startsWith('/album/')) return 'gallery'
+        if (pathname.startsWith('/timeline')) return 'gallery'
+        if (pathname.startsWith('/announcements')) return 'gallery'
+        if (pathname.startsWith('/resources')) return 'resources'
+        if (pathname.startsWith('/manage') || pathname.startsWith('/login') || pathname.startsWith('/reset-password')) return 'manage'
+        return 'home'
+      }
+
+      function getShanghaiDateKey() {
+        return new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Shanghai',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).format(new Date())
+      }
+
+      function hashString(value) {
+        return Array.from(value).reduce((sum, character) => sum + character.charCodeAt(0), 0)
+      }
+
+      const pathname = window.location.pathname || '/'
+      const themeKey = resolveLoadingThemeKey(pathname)
+      const theme = window.__MATH_CLASS_LOADING_THEMES__[themeKey] || window.__MATH_CLASS_LOADING_THEMES__.home
+      const phrases = theme.phrases || []
+      const bootIndex = phrases.length ? hashString(`${theme.id}:${getShanghaiDateKey()}`) % phrases.length : 0
+      const entry = phrases[bootIndex] || phrases[0]
+      const overlay = document.querySelector('.page-loading-overlay')
+      const card = document.querySelector('.page-loading-card')
+      const badge = document.querySelector('[data-boot-badge]')
+      const motto = document.querySelector('[data-boot-motto]')
+      const eyebrow = document.querySelector('[data-boot-eyebrow]')
+      const kicker = document.querySelector('[data-boot-kicker]')
+      const title = document.querySelector('[data-boot-title]')
+      const quote = document.querySelector('[data-boot-quote]')
+      const note = document.querySelector('[data-boot-note]')
+      const ledger = document.querySelector('[data-boot-ledger]')
+      const index = document.querySelector('[data-boot-index]')
+
+      if (overlay && theme.palette) {
+        overlay.classList.add(`theme-${theme.id}`)
+        overlay.style.setProperty('--loading-accent', theme.palette.accent)
+        overlay.style.setProperty('--loading-muted', theme.palette.muted)
+        overlay.style.setProperty('--loading-ink', theme.palette.ink)
+        overlay.style.setProperty('--loading-overlay-start', theme.palette.overlayStart)
+        overlay.style.setProperty('--loading-overlay-end', theme.palette.overlayEnd)
+        overlay.style.setProperty('--loading-background-top', theme.palette.backgroundTop)
+        overlay.style.setProperty('--loading-background-bottom', theme.palette.backgroundBottom)
+        overlay.style.setProperty('--loading-glow-primary', theme.palette.glowPrimary)
+        overlay.style.setProperty('--loading-glow-secondary', theme.palette.glowSecondary)
+        overlay.style.setProperty('--loading-border', theme.palette.border)
+        overlay.style.setProperty('--loading-rule', theme.palette.rule)
+      }
+
+      if (card) {
+        card.className = `page-loading-card theme-${theme.id}`
+      }
+
+      if (badge) badge.textContent = theme.badge
+      if (motto) motto.textContent = theme.motto
+      if (eyebrow) eyebrow.textContent = theme.eyebrow
+      if (kicker) kicker.textContent = theme.kicker
+      if (title) title.textContent = theme.title
+      if (quote) quote.textContent = entry.text
+      if (note) note.textContent = entry.note
+      if (ledger) ledger.textContent = theme.ledger
+      if (index) index.textContent = `${String(bootIndex + 1).padStart(2, '0')} / ${String(phrases.length).padStart(2, '0')}`
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

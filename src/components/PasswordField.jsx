@@ -1,0 +1,38 @@
+import { useState } from 'react'
+
+export default function PasswordField({
+  label,
+  value,
+  onChange,
+  required = false,
+  placeholder = '',
+  autoComplete = 'current-password',
+}) {
+  const [visible, setVisible] = useState(false)
+
+  return (
+    <label className="password-field">
+      <span>{label}</span>
+      <span className="password-field-control">
+        <input
+          type={visible ? 'text' : 'password'}
+          value={value}
+          onChange={onChange}
+          required={required}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+        />
+        <button
+          type="button"
+          className="password-toggle"
+          onClick={() => setVisible((current) => !current)}
+          aria-pressed={visible}
+          aria-label={visible ? `隐藏${label}` : `显示${label}`}
+          title={visible ? `隐藏${label}` : `显示${label}`}
+        >
+          {visible ? '隐藏' : '显示'}
+        </button>
+      </span>
+    </label>
+  )
+}

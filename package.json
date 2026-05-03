@@ -1,0 +1,41 @@
+{
+  "name": "math-class-website",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/render-theorems.mjs && node scripts/generate-health.mjs",
+    "prebuild": "node scripts/render-theorems.mjs && node scripts/generate-health.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "health:generate": "node scripts/generate-health.mjs",
+    "theorems:render": "node scripts/render-theorems.mjs",
+    "pages:deploy": "npm run build && wrangler pages deploy dist",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource/eb-garamond": "^5.2.7",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@fontsource/noto-serif-sc": "^5.2.9",
+    "@supabase/supabase-js": "^2.97.0",
+    "classnames": "^2.5.1",
+    "katex": "^0.16.45",
+    "lucide-react": "^0.574.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^7.13.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "vercel": "^53.1.0",
+    "vite": "^5.2.0",
+    "wrangler": "^4.87.0"
+  }
+}
