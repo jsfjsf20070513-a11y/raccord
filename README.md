@@ -240,8 +240,7 @@ The goal is to present a credible student-builder profile: mathematics backgroun
 
 Before hackathon:
 
-- Record and link a 60-second demo video.
-- Add final screenshots to this README.
+- Record demo video and add screenshots.
 - Submit the project to hackathon platforms.
 - Review Supabase RLS policies carefully.
 - Apply the `/health` Nginx exact-match config on the server.
