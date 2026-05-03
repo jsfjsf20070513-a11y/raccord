@@ -6,8 +6,8 @@ Add the following screenshots before the repository is shared widely or submitte
 - `homepage-mobile.png`
 - `hackathon-showcase-desktop.png`
 - `hackathon-showcase-mobile.png`
-- `collaboration-feature.png`
-- `supabase-feature.png`
+- `github-repository.png`
+- `health-check.png`
 
 Recommended notes:
 
