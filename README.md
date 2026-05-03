@@ -11,7 +11,7 @@ A deployed class knowledge hub and hackathon showcase built by a freshman mathem
 
 - Showcase page: [http://149.28.69.75/hackathon](http://149.28.69.75/hackathon)
 - This page is designed for hackathon judges, teammate matching, and portfolio review.
-- GitHub repository: TODO: Add GitHub repository URL
+- GitHub repository: [https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public](https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public)
 
 ## Demo Video
 

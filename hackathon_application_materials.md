@@ -3,7 +3,7 @@
 ## Public Contact Placeholders
 
 - Email: TODO: Add contact email
-- GitHub: TODO: Add GitHub repository URL
+- GitHub: https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public
 - Demo video: TODO: Add demo video URL
 
 ## 30 Second Self Introduction

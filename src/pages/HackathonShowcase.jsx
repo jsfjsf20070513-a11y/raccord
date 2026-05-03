@@ -230,7 +230,7 @@ export default function HackathonShowcase() {
             </div>
             <div>
               <dt>GitHub</dt>
-              <dd>TODO: Add GitHub repository URL</dd>
+              <dd>https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public</dd>
             </div>
             <div>
               <dt>Project link</dt>
