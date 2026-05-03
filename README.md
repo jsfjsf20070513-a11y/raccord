@@ -19,7 +19,29 @@ TODO: Add demo video URL
 
 ## Screenshots
 
-TODO: Add screenshots
+### Homepage Desktop
+
+![Homepage desktop](docs/screenshots/homepage-desktop.png)
+
+### Homepage Mobile
+
+![Homepage mobile](docs/screenshots/homepage-mobile.png)
+
+### Hackathon Showcase Desktop
+
+![Hackathon showcase desktop](docs/screenshots/hackathon-showcase-desktop.png)
+
+### Hackathon Showcase Mobile
+
+![Hackathon showcase mobile](docs/screenshots/hackathon-showcase-mobile.png)
+
+### GitHub Repository
+
+![GitHub repository](docs/screenshots/github-repository.png)
+
+### Health Check
+
+![Health check](docs/screenshots/health-check.png)
 
 ## Problem
 
