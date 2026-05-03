@@ -15,7 +15,7 @@ A deployed class knowledge hub and hackathon showcase built by a freshman mathem
 
 ## Demo Video
 
-TODO: Add demo video URL
+[https://youtu.be/kz9K5mWtC20](https://youtu.be/kz9K5mWtC20)
 
 ## Screenshots
 

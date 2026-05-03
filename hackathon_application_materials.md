@@ -4,7 +4,7 @@
 
 - Email: TODO: Add contact email
 - GitHub: https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public
-- Demo video: TODO: Add demo video URL
+- Demo video: https://youtu.be/kz9K5mWtC20
 
 ## 30 Second Self Introduction
 

@@ -2,7 +2,7 @@ export const showcaseLinks = {
   liveDemo: '/',
   projectUrl: 'http://149.28.69.75/hackathon',
   github: 'https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public',
-  demoVideo: 'TODO: Add demo video URL',
+  demoVideo: 'https://youtu.be/kz9K5mWtC20',
 }
 
 export const showcaseStats = [

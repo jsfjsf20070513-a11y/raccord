@@ -67,7 +67,10 @@ export default function HackathonShowcase() {
               Live Demo
             </Link>
             <PlaceholderButton icon={Github}>GitHub pending</PlaceholderButton>
-            <PlaceholderButton icon={PlayCircle}>Demo video pending</PlaceholderButton>
+            <a className="hackathon-button" href={showcaseLinks.demoVideo} target="_blank" rel="noreferrer">
+              <PlayCircle size={17} aria-hidden="true" />
+              Demo Video
+            </a>
           </div>
           <p className="hackathon-ai-badge">
             <Sparkles size={15} aria-hidden="true" />
@@ -187,10 +190,10 @@ export default function HackathonShowcase() {
             <span>GitHub repository</span>
             <strong>{showcaseLinks.github}</strong>
           </span>
-          <span className="demo-link-row is-placeholder">
+          <a className="demo-link-row" href={showcaseLinks.demoVideo} target="_blank" rel="noreferrer">
             <span>Demo video</span>
             <strong>{showcaseLinks.demoVideo}</strong>
-          </span>
+          </a>
         </div>
       </ShowcaseSection>
 
