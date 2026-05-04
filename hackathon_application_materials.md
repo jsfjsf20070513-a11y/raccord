@@ -6,6 +6,10 @@
 - GitHub: https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public
 - Demo video: https://youtu.be/kz9K5mWtC20
 
+## Dev3pack Solo Direction
+
+AI-assisted student collaboration website with Solana wallet-based identity and contribution records. The first MVP adds a `/web3-profile` page in demo mode: no private keys, no seed phrases, no service role key, no smart contract, and no mainnet transaction. The next phase will connect a real Solana wallet through Solana Wallet Adapter or compatible wallet integration.
+
 ## 30 Second Self Introduction
 
 Hi, I am a first-year Mathematics student at Renmin University of China, Sino-French Institute in Suzhou. I am interested in AI assisted development, mathematical modeling, and fast product prototyping. I have independently vibe coded and deployed a class website, then started turning it into a more formal project for hackathon review. In a team, I hope to contribute to product logic, math modeling, AI-collaborative development, debugging, deployment, and clear demo storytelling.

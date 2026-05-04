@@ -13,6 +13,15 @@ A deployed class knowledge hub and hackathon showcase built by a freshman mathem
 - This page is designed for hackathon judges, teammate matching, and portfolio review.
 - GitHub repository: [https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public](https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public)
 
+## Web3 Student Profile MVP
+
+- MVP page: `/web3-profile`
+- This is the first Dev3pack preparation feature: an AI-assisted student collaboration website with Solana wallet-based identity and contribution records.
+- Current status: demo mode / wallet-ready MVP.
+- It is Solana wallet-ready but does not perform real wallet connection, smart contract calls, devnet transactions, or mainnet transactions yet.
+- Future phase: integrate Solana Wallet Adapter or compatible wallet integration and connect wallet identity to verified contribution records.
+- Safety notes: no private keys, no seed phrases, no service role key, and no mainnet transaction are handled in this stage. The demo wallet address is a placeholder.
+
 ## Demo Video
 
 [https://youtu.be/kz9K5mWtC20](https://youtu.be/kz9K5mWtC20)

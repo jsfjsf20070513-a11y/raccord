@@ -194,6 +194,10 @@ export default function HackathonShowcase() {
             <span>Demo video</span>
             <strong>{showcaseLinks.demoVideo}</strong>
           </a>
+          <Link className="demo-link-row" to="/web3-profile">
+            <span>Web3 Student Profile</span>
+            <strong>Open Solana-ready MVP page</strong>
+          </Link>
         </div>
       </ShowcaseSection>
 

@@ -21,6 +21,7 @@ import './App.css'
 const Gallery = lazy(() => import('./pages/Gallery'))
 const AlbumDetail = lazy(() => import('./pages/AlbumDetail'))
 const HackathonShowcase = lazy(() => import('./pages/HackathonShowcase'))
+const Web3StudentProfile = lazy(() => import('./pages/Web3StudentProfile'))
 const Resources = lazy(() => import('./pages/Resources'))
 const ResourceDetail = lazy(() => import('./pages/ResourceDetail'))
 const ResourceCurate = lazy(() => import('./pages/ResourceCurate'))
@@ -163,6 +164,7 @@ function AppRoutes() {
       <Route path="/" element={<Layout />}>
         <Route index element={<ReadyPage><Home /></ReadyPage>} />
         <Route path="hackathon" element={<DeferredPage><HackathonShowcase /></DeferredPage>} />
+        <Route path="web3-profile" element={<DeferredPage><Web3StudentProfile /></DeferredPage>} />
         <Route path="class-info" element={<Navigate to="/" replace />} />
         <Route path="gallery" element={<DeferredPage><Gallery /></DeferredPage>} />
         <Route path="gallery/contribute" element={<DeferredPage><GalleryContribute /></DeferredPage>} />
