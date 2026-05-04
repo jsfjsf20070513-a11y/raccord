@@ -5,12 +5,12 @@ export const web3ProfileLinks = {
 }
 
 export const walletIdentity = {
-  status: 'Demo Mode',
-  network: 'Solana Devnet Ready',
-  address: 'Demo wallet address placeholder',
-  nextStep: 'Real wallet connection with Solana Wallet Adapter',
+  status: 'Real wallet connection MVP',
+  network: 'Solana Devnet target, no transaction',
+  address: 'Connect a wallet to display the public address.',
+  nextStep: 'Link wallet identity to the existing student collaboration profile.',
   safety:
-    'No private keys, seed phrases, service role key, or mainnet transaction are handled. The demo wallet address is a placeholder, and future real wallet connection will use Solana Wallet Adapter or a compatible wallet integration only as a non-financial identity layer.',
+    'No private keys, seed phrases, service role key, signatures, or mainnet transactions are handled. This stage only requests a public wallet connection and displays the public address as a non-financial identity layer.',
 }
 
 export const contributionRecords = [
@@ -40,8 +40,8 @@ export const contributionSummary =
   'This student profile summarizes contributions across class collaboration, documentation, deployment, and hackathon preparation. The next version will connect wallet identity to real contribution records and optionally generate AI-assisted summaries from verified project activity.'
 
 export const stretchGoals = [
-  'Real Solana wallet connection',
   'Wallet-linked Supabase profile',
+  'Wallet ownership proof with message signing',
   'Devnet contribution proof',
   'On-chain contribution badge',
   'Stronger AI-generated contribution summaries',

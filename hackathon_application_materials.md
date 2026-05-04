@@ -8,7 +8,7 @@
 
 ## Dev3pack Solo Direction
 
-AI-assisted student collaboration website with Solana wallet-based identity and contribution records. The first MVP adds a `/web3-profile` page in demo mode: no private keys, no seed phrases, no service role key, no smart contract, and no mainnet transaction. The next phase will connect a real Solana wallet through Solana Wallet Adapter or compatible wallet integration.
+AI-assisted student collaboration website with Solana wallet-based identity and contribution records. The `/web3-profile` page now supports a real injected Solana wallet connection, such as Phantom, and displays the public wallet address only. It uses no private keys, no seed phrases, no service role key, no smart contract, no signature request, and no mainnet transaction. The next phase can evaluate Solana Wallet Adapter or compatible wallet integration for a broader wallet-selection flow.
 
 ## 30 Second Self Introduction
 

@@ -1661,20 +1661,21 @@
   background: var(--ink);
 }
 
-.hackathon-button.is-disabled {
+.hackathon-button.is-disabled,
+.hackathon-button:disabled {
   color: var(--muted);
   cursor: default;
 }
 
-.hackathon-button:not(.is-disabled):hover,
-.hackathon-button:not(.is-disabled):focus-visible {
+.hackathon-button:not(.is-disabled):not(:disabled):hover,
+.hackathon-button:not(.is-disabled):not(:disabled):focus-visible {
   border-color: var(--accent);
   color: var(--accent);
   background: transparent;
 }
 
-.hackathon-button.is-primary:hover,
-.hackathon-button.is-primary:focus-visible {
+.hackathon-button.is-primary:not(:disabled):hover,
+.hackathon-button.is-primary:not(:disabled):focus-visible {
   border-color: var(--accent);
   color: var(--paper);
   background: var(--accent);
@@ -1897,6 +1898,12 @@
 
 .contact-panel dd {
   margin: 4px 0 0;
+}
+
+.wallet-address-value {
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono);
+  font-size: 14px;
 }
 
 .contact-sentence {

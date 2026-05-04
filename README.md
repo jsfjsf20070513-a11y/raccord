@@ -17,10 +17,10 @@ A deployed class knowledge hub and hackathon showcase built by a freshman mathem
 
 - MVP page: `/web3-profile`
 - This is the first Dev3pack preparation feature: an AI-assisted student collaboration website with Solana wallet-based identity and contribution records.
-- Current status: demo mode / wallet-ready MVP.
-- It is Solana wallet-ready but does not perform real wallet connection, smart contract calls, devnet transactions, or mainnet transactions yet.
-- Future phase: integrate Solana Wallet Adapter or compatible wallet integration and connect wallet identity to verified contribution records.
-- Safety notes: no private keys, no seed phrases, no service role key, and no mainnet transaction are handled in this stage. The demo wallet address is a placeholder.
+- Current status: real browser wallet connection MVP using an injected Solana wallet provider such as Phantom.
+- It displays the public wallet address only. It does not request signatures, perform smart contract calls, send devnet transactions, or send mainnet transactions.
+- Future phase: evaluate Solana Wallet Adapter or compatible wallet integration and connect wallet identity to verified contribution records.
+- Safety notes: no private keys, no seed phrases, no service role key, and no mainnet transaction are handled in this stage.
 
 ## Demo Video
 
