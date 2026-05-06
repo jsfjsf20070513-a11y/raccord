@@ -10,9 +10,40 @@
 
 AI-assisted student collaboration website with Solana wallet-based identity and contribution records. The `/web3-profile` page now supports a real injected Solana wallet connection, such as Phantom, and displays the public wallet address only. It uses no private keys, no seed phrases, no service role key, no smart contract, no signature request, and no mainnet transaction. The next phase can evaluate Solana Wallet Adapter or compatible wallet integration for a broader wallet-selection flow.
 
+## Dev3pack Final Submission Draft
+
+### Project Name
+
+Math Class Website: Web3 Student Profile
+
+### One-liner
+
+A calm, text-first class collaboration website extended with a Solana-compatible wallet identity layer for non-financial student contribution profiles.
+
+### Description
+
+Math Class Website is a class collaboration and knowledge-sharing website for a bilingual mathematics cohort. It keeps class information, learning resources, activity records, collaboration drafts, and public project materials in one minimal, readable interface. For Dev3pack, I prepared a Web3 Student Profile page that connects the existing class collaboration story with a Solana-compatible wallet identity layer.
+
+The Web3 feature is intentionally small and safe. It uses an injected Solana wallet provider such as Phantom to request a wallet connection and display the public wallet address only. The wallet is treated as a non-financial identity signal for future contribution records, not as a payment or trading feature. The MVP does not handle private keys, seed phrases, balances, signatures, smart contracts, service role keys, devnet proof transactions, or mainnet transactions.
+
+This project is not a claim that I independently built the entire system from scratch. My role was to help shape the product direction, maintain and organize content, support AI-assisted implementation and debugging, participate in deployment preparation, clean the public GitHub repository, write documentation, prepare screenshots, and create the demo material. The result is a practical student-builder project that shows how a beginner Web3 builder can responsibly add a small Solana-compatible identity layer to an existing AI-assisted web product.
+
+### Tech Stack
+
+- Frontend: React, Vite, React Router, JavaScript
+- UI: custom CSS, lucide-react icons, KaTeX, local fonts
+- Backend services: optional Supabase Auth, Postgres, and storage-related workflows
+- Web3 layer: injected Solana wallet provider such as Phantom
+- Deployment: static Vite build, Nginx/VPS deployment, public-safe GitHub repository
+- AI-assisted workflow: used for product planning, implementation support, debugging, documentation, and demo preparation
+
+### Honest Contribution Wording
+
+I am a first-year mathematics student and AI-assisted builder. I did not independently build the entire project from scratch. My contribution was to clarify the product direction, maintain and organize class-facing content, use AI tools to support implementation and debugging, participate in deployment and public repository preparation, write README and application materials, prepare screenshots, and create the demo narrative. For the Dev3pack version, I helped frame the Web3 extension as a small Solana-compatible identity layer that displays only a public wallet address and keeps financial or on-chain functionality out of scope.
+
 ## 30 Second Self Introduction
 
-Hi, I am a first-year Mathematics student at Renmin University of China, Sino-French Institute in Suzhou. I am interested in AI assisted development, mathematical modeling, and fast product prototyping. I have independently vibe coded and deployed a class website, then started turning it into a more formal project for hackathon review. In a team, I hope to contribute to product logic, math modeling, AI-collaborative development, debugging, deployment, and clear demo storytelling.
+Hi, I am a first-year Mathematics student at Renmin University of China, Sino-French Institute in Suzhou. I am interested in AI-assisted development, mathematical modeling, and fast product prototyping. I have been working on a class collaboration website and preparing it as a public hackathon project, focusing on product direction, content organization, AI-assisted implementation support, deployment participation, documentation, GitHub preparation, and demo storytelling.
 
 ## 100 Word Project Description
 
@@ -24,7 +55,7 @@ Math Class Website is a deployed class website and hackathon showcase built from
 
 The project turns that scattered information into a lightweight public web product. Visitors can open the homepage to see the class identity, a daily theorem note, course schedule, activity photo records, and curated reading paths. They can also browse albums and resource pages without logging in. When Supabase is configured, the site supports authentication, comments, submission workflows, and moderation routes for publishing official content.
 
-The frontend uses React, Vite, React Router, custom CSS, KaTeX, and lucide-react icons. Deployment is based on a static Vite build served by Nginx, with a generated `/health.json` endpoint and a suggested Nginx `/health` JSON check. The project also includes a dedicated `/hackathon` page, README, deployment notes, and demo script. My role is freshman math student and AI native builder: I define the problem, shape the product, use AI tools to accelerate coding, and verify the final result.
+The frontend uses React, Vite, React Router, custom CSS, KaTeX, and lucide-react icons. Deployment is based on a static Vite build served by Nginx, with a generated `/health.json` endpoint and a suggested Nginx `/health` JSON check. The project also includes a dedicated `/hackathon` page, README, deployment notes, and demo script. My role is freshman math student and AI-assisted builder: I help shape the product direction, organize content, support implementation with AI tools, participate in deployment preparation, and verify the final public-facing materials.
 
 ## 60 Second Demo Video Script
 
@@ -64,11 +95,11 @@ I want to join because hackathons are one of the fastest ways to test whether I 
 
 ### What have you built before?
 
-I have independently vibe coded and deployed a class website for my mathematics cohort. It includes a public homepage, course context, event albums, curated resources, authentication-related pages, comments, submission workflows, and moderation routes powered by Supabase when configured. I also prepared a dedicated `/hackathon` page, README, health check, deployment notes, and application materials to make the project easier for judges and teammates to evaluate.
+I have worked on a class collaboration website for my mathematics cohort and helped prepare it as a public hackathon project. It includes a public homepage, course context, event albums, curated resources, authentication-related pages, comments, submission workflows, and moderation routes powered by Supabase when configured. I also prepared the public-safe GitHub repository, `/hackathon` showcase page, `/web3-profile` page, README, screenshots, demo video material, health check notes, deployment notes, and application materials to make the project easier for judges and teammates to evaluate.
 
 ### What role can you play in a team?
 
-I can help with problem breakdown, product logic, mathematical modeling, fast frontend prototyping, AI assisted coding, debugging, deployment checks, and demo preparation. I am not positioning myself as a senior engineer. My value is that I can learn quickly, use AI tools actively, keep the product goal clear, and help the team turn ideas into a presentable prototype.
+I can help with problem breakdown, product logic, mathematical modeling, content structure, AI-assisted implementation support, debugging, deployment checks, GitHub preparation, and demo materials. I am not positioning myself as a senior engineer. My value is that I can learn quickly, use AI tools actively, keep the product goal clear, and help the team turn ideas into a presentable prototype.
 
 ### How did you use AI tools responsibly?
 
