@@ -1,15 +1,24 @@
 # Math Class Website
 
-A deployed class knowledge hub and hackathon showcase built by a freshman mathematics student with AI assisted development.
+A deployed class knowledge hub and hackathon showcase built by a freshman mathematics student with AI-assisted development.
+
+## Security & Scope
+
+This is a student-built MVP. Honest scope and safety boundaries:
+
+- **Builder role**: I am a first-year mathematics student, not a fullstack developer. This project is built with AI-assisted development (Claude, Codex, Gemini). I drive product direction, content, deployment, and submission materials, and make the final calls on what to ship.
+- **Web3 boundary**: The `/web3-profile` page reads only a public wallet address from a browser-injected Solana provider (e.g. Phantom). It does **not** handle private keys, seed phrases, signatures, transactions, smart contracts, balances, or any on-chain writes (mainnet or devnet).
+- **Secrets**: Only the Supabase **anon** key is used in the frontend (via `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`). The Supabase `service_role` key is never used in this repo. Deployment uses environment variables; no SSH keys or hostnames are hardcoded.
+- **Data**: This public repository excludes real class media, admin SQL, and `.env` files via `.gitignore`.
 
 ## Live Demo
 
-- Production site: [http://149.28.69.75/](http://149.28.69.75/)
-- Health metadata: [http://149.28.69.75/health.json](http://149.28.69.75/health.json)
+- Production site: [https://rucmathclass.com/](https://rucmathclass.com/)
+- Health metadata: [https://rucmathclass.com/health.json](https://rucmathclass.com/health.json)
 
 ## Hackathon Showcase
 
-- Showcase page: [http://149.28.69.75/hackathon](http://149.28.69.75/hackathon)
+- Showcase page: [https://rucmathclass.com/hackathon](https://rucmathclass.com/hackathon)
 - This page is designed for hackathon judges, teammate matching, and portfolio review.
 - GitHub repository: [https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public](https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public)
 
@@ -211,9 +220,9 @@ sudo systemctl reload nginx
 Check public access:
 
 ```bash
-curl -I http://149.28.69.75/
-curl http://149.28.69.75/health.json
-curl -i http://149.28.69.75/health
+curl -I https://rucmathclass.com/
+curl https://rucmathclass.com/health.json
+curl -i https://rucmathclass.com/health
 ```
 
 For HTTPS later, point a domain to the VPS and run:
