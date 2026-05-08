@@ -1,6 +1,8 @@
 import {
+  Anchor,
   ArrowUpRight,
   Copy,
+  ExternalLink,
   Github,
   PlayCircle,
   ShieldCheck,
@@ -14,10 +16,23 @@ import {
   contributionRecords,
   contributionSummary,
   messageStatement,
+  onchainAnchor,
   stretchGoals,
   walletIdentity,
   web3ProfileLinks,
 } from '../data/web3ProfileContent'
+import {
+  MEMO_PROGRAM_ID,
+  buildMemoPayload,
+  buildSolscanUrl,
+  createDevnetConnection,
+  fetchLamportBalance,
+  formatSol,
+  MIN_LAMPORTS_FOR_MEMO,
+  submitMemoViaWallet,
+} from '../lib/solanaMemo'
+
+const MEMO_PROGRAM_ID_STRING = MEMO_PROGRAM_ID.toBase58()
 
 const PHANTOM_DOWNLOAD_URL = 'https://phantom.app/download'
 
@@ -165,6 +180,13 @@ export default function Web3StudentProfile() {
   const [signatureError, setSignatureError] = useState('')
   const [copyStatus, setCopyStatus] = useState('')
 
+  const [memoState, setMemoState] = useState('idle')
+  const [memoSignature, setMemoSignature] = useState('')
+  const [memoError, setMemoError] = useState('')
+  const [memoPayloadShown, setMemoPayloadShown] = useState('')
+  const [balanceLamports, setBalanceLamports] = useState(null)
+  const [isCheckingBalance, setIsCheckingBalance] = useState(false)
+
   const providerName = useMemo(() => resolveProviderName(provider), [provider])
   const shortAddress = useMemo(() => formatAddress(walletAddress), [walletAddress])
   const isConnected = Boolean(walletAddress)
@@ -189,6 +211,44 @@ export default function Web3StudentProfile() {
           ? 'Try again'
           : 'Sign with wallet'
 
+  const hasMemoSignature = memoState === 'confirmed' && Boolean(memoSignature)
+  const isMemoBusy = memoState === 'checking' || memoState === 'signing' || memoState === 'sending'
+  const memoStatusLabel = !isConnected
+    ? 'Connect wallet first'
+    : memoState === 'checking'
+      ? 'Checking devnet balance'
+      : memoState === 'needs_airdrop'
+        ? 'Devnet SOL needed'
+        : memoState === 'signing'
+          ? 'Awaiting wallet signature'
+          : memoState === 'sending'
+            ? 'Submitting to devnet'
+            : memoState === 'confirmed'
+              ? 'Confirmed on devnet'
+              : memoState === 'error'
+                ? 'Transaction failed'
+                : 'Ready to anchor'
+
+  const memoButtonLabel = isMemoBusy
+    ? 'Anchoring…'
+    : memoState === 'confirmed'
+      ? 'Anchor again'
+      : memoState === 'error' || memoState === 'needs_airdrop'
+        ? 'Retry anchor'
+        : 'Anchor on Devnet'
+
+  const balanceLabel = !walletAddress
+    ? 'Connect a wallet to view balance'
+    : isCheckingBalance && balanceLamports === null
+      ? 'Checking…'
+      : balanceLamports === null
+        ? 'Unavailable (RPC rate limit possible)'
+        : formatSol(balanceLamports)
+
+  const solscanUrl = useMemo(() => buildSolscanUrl(memoSignature, 'devnet'), [memoSignature])
+  const needsAirdrop = memoState === 'needs_airdrop' ||
+    (balanceLamports !== null && balanceLamports < MIN_LAMPORTS_FOR_MEMO)
+
   const resetSignature = useCallback(() => {
     setSigningState('idle')
     setSignedStatement('')
@@ -196,6 +256,15 @@ export default function Web3StudentProfile() {
     setSignatureIssuedAt('')
     setSignatureError('')
     setCopyStatus('')
+  }, [])
+
+  const resetMemo = useCallback(() => {
+    setMemoState('idle')
+    setMemoSignature('')
+    setMemoError('')
+    setMemoPayloadShown('')
+    setBalanceLamports(null)
+    setIsCheckingBalance(false)
   }, [])
 
   const refreshWalletState = useCallback(() => {
@@ -206,13 +275,14 @@ export default function Web3StudentProfile() {
       setWalletStatus('Wallet not detected')
       setWalletAddress('')
       resetSignature()
+      resetMemo()
       return
     }
 
     const nextAddress = getAddressFromProvider(nextProvider)
     setWalletAddress(nextProvider.isConnected && nextAddress ? nextAddress : '')
     setWalletStatus(nextProvider.isConnected && nextAddress ? 'Connected' : 'Ready to connect')
-  }, [resetSignature])
+  }, [resetSignature, resetMemo])
 
   useEffect(() => {
     refreshWalletState()
@@ -232,10 +302,12 @@ export default function Web3StudentProfile() {
       setWalletAddress('')
       setWalletStatus('Ready to connect')
       resetSignature()
+      resetMemo()
     }
 
     const handleAccountChanged = (publicKey) => {
       resetSignature()
+      resetMemo()
       if (publicKey) {
         setWalletError('')
         setWalletAddress(publicKey.toBase58 ? publicKey.toBase58() : `${publicKey}`)
@@ -256,7 +328,7 @@ export default function Web3StudentProfile() {
       currentProvider.off?.('disconnect', handleDisconnect)
       currentProvider.off?.('accountChanged', handleAccountChanged)
     }
-  }, [refreshWalletState, resetSignature])
+  }, [refreshWalletState, resetSignature, resetMemo])
 
   const handleWalletAction = async () => {
     const currentProvider = getInjectedSolanaProvider()
@@ -277,6 +349,7 @@ export default function Web3StudentProfile() {
         setWalletAddress('')
         setWalletStatus('Ready to connect')
         resetSignature()
+        resetMemo()
         return
       }
 
@@ -347,20 +420,94 @@ export default function Web3StudentProfile() {
     setCopyStatus(ok ? 'Signature copied to clipboard.' : 'Copy failed — please select and copy manually.')
   }
 
+  const refreshBalance = useCallback(async () => {
+    if (!walletAddress) {
+      return
+    }
+    setIsCheckingBalance(true)
+    try {
+      const connection = createDevnetConnection()
+      const lamports = await fetchLamportBalance(connection, walletAddress)
+      setBalanceLamports(lamports)
+    } catch {
+      // Public devnet RPC can rate-limit. Surface a soft state, not a hard error.
+      setBalanceLamports(null)
+    } finally {
+      setIsCheckingBalance(false)
+    }
+  }, [walletAddress])
+
+  useEffect(() => {
+    if (!walletAddress) {
+      setBalanceLamports(null)
+      return
+    }
+    refreshBalance()
+  }, [walletAddress, refreshBalance])
+
+  const handleAnchorMemo = async () => {
+    const currentProvider = getInjectedSolanaProvider()
+    if (!currentProvider) {
+      setMemoError('Connect a Solana-compatible wallet first.')
+      return
+    }
+    if (!walletAddress) {
+      setMemoError('Connect a wallet before anchoring.')
+      return
+    }
+
+    setMemoError('')
+    setMemoSignature('')
+    setMemoState('checking')
+
+    try {
+      const connection = createDevnetConnection()
+      const lamports = await fetchLamportBalance(connection, walletAddress)
+      setBalanceLamports(lamports)
+
+      if (lamports < MIN_LAMPORTS_FOR_MEMO) {
+        setMemoState('needs_airdrop')
+        setMemoError(onchainAnchor.faucetHelp)
+        return
+      }
+
+      setMemoState('signing')
+      const memoText = buildMemoPayload({ walletAddress })
+      setMemoPayloadShown(memoText)
+
+      setMemoState('sending')
+      const signature = await submitMemoViaWallet({
+        provider: currentProvider,
+        connection,
+        payerAddress: walletAddress,
+        memoText,
+      })
+
+      setMemoSignature(signature)
+      setMemoState('confirmed')
+
+      // Refresh balance to reflect signature fee burn
+      refreshBalance()
+    } catch (error) {
+      setMemoError(error?.message || 'Memo transaction failed.')
+      setMemoState('error')
+    }
+  }
+
   return (
     <article className="hackathon-page">
       <header className="hackathon-hero">
         <div className="hackathon-hero-copy">
-          <p className="hackathon-eyebrow">Dev3pack solo MVP · wallet identity &amp; ed25519 ownership proof</p>
+          <p className="hackathon-eyebrow">Dev3pack solo MVP · wallet identity, ed25519 proof &amp; devnet anchor</p>
           <h1>Web3 Student Profile</h1>
           <p className="hackathon-hero-summary">
-            A Solana-ready identity layer for student collaboration, contribution records, and AI-assisted
-            project summaries.
+            A Solana-ready identity layer for student collaboration: real wallet connection, off-chain
+            ownership proof, and an on-chain memo anchor on Solana devnet.
           </p>
           <p className="hackathon-hero-context">
             This page extends the existing class collaboration website toward the Dev3pack Solana track with a
-            real browser wallet connection and an optional off-chain ed25519 signature for ownership proof,
-            without smart contracts, mainnet transactions, or new Supabase schema.
+            real browser wallet connection, an optional ed25519 signature, and a real on-chain memo
+            transaction on devnet — without smart contracts, mainnet writes, or new Supabase schema.
           </p>
           <div className="hackathon-actions" aria-label="Web3 profile links">
             <Link className="hackathon-button is-primary" to={web3ProfileLinks.hackathon}>
@@ -378,8 +525,8 @@ export default function Web3StudentProfile() {
           </div>
           <p className="hackathon-ai-badge">
             <Sparkles size={15} aria-hidden="true" />
-            Real wallet connection plus optional off-chain ed25519 signature. No fee, no transaction, no smart
-            contract, no mainnet write.
+            Real wallet connection, optional off-chain ed25519 signature, and an on-chain memo anchor on
+            Solana devnet. No smart contract, no mainnet write, no real money.
           </p>
         </div>
 
@@ -390,11 +537,11 @@ export default function Web3StudentProfile() {
           </div>
           <div className="hackathon-stat">
             <span>Implementation stage</span>
-            <strong>Connect + sign</strong>
+            <strong>Connect + sign + anchor</strong>
           </div>
           <div className="hackathon-stat">
             <span>On-chain status</span>
-            <strong>Off-chain ed25519 only</strong>
+            <strong>Devnet memo enabled</strong>
           </div>
         </aside>
       </header>
@@ -534,7 +681,126 @@ export default function Web3StudentProfile() {
         </article>
       </ProfileSection>
 
-      <ProfileSection id="contributions" kicker="03 · Contribution Records" title="Demo records from the current project">
+      <ProfileSection
+        id="onchain-anchor"
+        kicker="03 · On-Chain Anchor"
+        title="Real Solana devnet transaction"
+      >
+        <article className="hackathon-card">
+          <div className="feature-card-head">
+            <h3>SPL Memo program · Solana Devnet</h3>
+            <span className="feature-status">
+              <Anchor size={15} aria-hidden="true" />
+              {memoStatusLabel}
+            </span>
+          </div>
+          <p>{onchainAnchor.prompt}</p>
+
+          <div className="contact-panel">
+            <dl>
+              <div>
+                <dt>Cluster</dt>
+                <dd>Solana Devnet</dd>
+              </div>
+              <div>
+                <dt>Wallet balance</dt>
+                <dd>{balanceLabel}</dd>
+              </div>
+              <div>
+                <dt>Memo program</dt>
+                <dd className="wallet-address-value">{MEMO_PROGRAM_ID_STRING}</dd>
+              </div>
+              {memoPayloadShown ? (
+                <div>
+                  <dt>Memo payload</dt>
+                  <dd>
+                    <pre className="signed-statement">{memoPayloadShown}</pre>
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          </div>
+
+          <div className="hackathon-actions" aria-label="Devnet anchor controls">
+            <button
+              className="hackathon-button is-primary"
+              type="button"
+              onClick={handleAnchorMemo}
+              disabled={!isConnected || isMemoBusy}
+            >
+              <Anchor size={17} aria-hidden="true" />
+              {memoButtonLabel}
+            </button>
+            {hasMemoSignature && solscanUrl ? (
+              <a
+                className="hackathon-button"
+                href={solscanUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ExternalLink size={17} aria-hidden="true" />
+                View on Solscan
+              </a>
+            ) : null}
+            {walletAddress ? (
+              <button
+                className="hackathon-button"
+                type="button"
+                onClick={refreshBalance}
+                disabled={isCheckingBalance}
+              >
+                <Wallet size={17} aria-hidden="true" />
+                {isCheckingBalance ? 'Refreshing…' : 'Refresh balance'}
+              </button>
+            ) : null}
+          </div>
+
+          {!isConnected ? (
+            <p className="hackathon-section-lead">
+              Connect a wallet in section 01 to enable on-chain anchoring.
+            </p>
+          ) : null}
+
+          {needsAirdrop ? (
+            <p className="hackathon-section-lead">
+              {onchainAnchor.faucetHelp}{' '}
+              <a href={onchainAnchor.faucetUrl} target="_blank" rel="noreferrer">
+                Open faucet.solana.com →
+              </a>
+            </p>
+          ) : null}
+
+          {hasMemoSignature ? (
+            <div className="contact-panel">
+              <dl>
+                <div>
+                  <dt>Transaction signature</dt>
+                  <dd className="wallet-address-value">{memoSignature}</dd>
+                </div>
+                <div>
+                  <dt>Verify on Solscan</dt>
+                  <dd>
+                    <a href={solscanUrl} target="_blank" rel="noreferrer">
+                      {solscanUrl}
+                    </a>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          ) : null}
+
+          {memoError && memoState !== 'needs_airdrop' ? (
+            <p className="status-line is-error">{memoError}</p>
+          ) : null}
+
+          <p className="hackathon-ai-badge">
+            <ShieldCheck size={15} aria-hidden="true" />
+            {onchainAnchor.safety}
+          </p>
+        </article>
+      </ProfileSection>
+
+      <ProfileSection id="contributions" kicker="04 · Contribution Records" title="Demo records from the current project">
         <p className="hackathon-section-lead">
           These records are static demo data for the Web3 Student Profile MVP. They are not presented as on-chain
           records.
@@ -549,7 +815,7 @@ export default function Web3StudentProfile() {
         </div>
       </ProfileSection>
 
-      <ProfileSection id="ai-summary" kicker="04 · AI-assisted Contribution Summary" title="A summary designed for review">
+      <ProfileSection id="ai-summary" kicker="05 · AI-assisted Contribution Summary" title="A summary designed for review">
         <article className="hackathon-card">
           <h3>Summary Draft</h3>
           <p>{contributionSummary}</p>
@@ -559,7 +825,7 @@ export default function Web3StudentProfile() {
         </article>
       </ProfileSection>
 
-      <ProfileSection id="stretch-goals" kicker="05 · Stretch Goal" title="Next steps for a real Solana integration">
+      <ProfileSection id="stretch-goals" kicker="06 · Stretch Goal" title="Next steps for a real Solana integration">
         <div className="hackathon-grid">
           {stretchGoals.map((goal) => (
             <article key={goal} className="hackathon-card">

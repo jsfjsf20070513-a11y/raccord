@@ -13,6 +13,16 @@ export const walletIdentity = {
     'No private keys, seed phrases, service role key, or mainnet transactions are handled. The wallet is used as a non-financial identity layer only. Ownership can be optionally proven through an off-chain ed25519 signature in the next section.',
 }
 
+export const onchainAnchor = {
+  prompt:
+    'Sign and send a real Solana transaction on devnet that anchors a short tag identifying this student profile. The transaction calls the SPL Memo program v2. No SOL is transferred between accounts; only the standard signature fee (~0.000005 SOL) is paid by the wallet.',
+  safety:
+    'Devnet only. Devnet SOL has no monetary value and cannot be exchanged for mainnet SOL. The memo payload is short and ASCII-only, designed to remain readable on Solscan without specialized tooling.',
+  faucetUrl: 'https://faucet.solana.com',
+  faucetHelp:
+    'Wallet has insufficient devnet SOL. Visit faucet.solana.com, paste this wallet address, request 1 SOL (free), then retry.',
+}
+
 export const messageStatement = {
   prompt:
     'Sign a short bilingual student statement with the connected wallet. The signature is produced locally by the wallet using ed25519, never exposes private keys, and does not send any transaction.',
@@ -54,9 +64,9 @@ export const contributionSummary =
   'This student profile summarizes contributions across class collaboration, documentation, deployment, and hackathon preparation. The next version will connect wallet identity to real contribution records and optionally generate AI-assisted summaries from verified project activity.'
 
 export const stretchGoals = [
-  'Devnet memo transaction anchoring contribution hash on Solana',
-  'AI-assisted bilingual project summary (Claude / ElevenLabs)',
-  'Wallet-linked Supabase profile',
-  'On-chain contribution badge for active class members',
+  'Claude AI bilingual (Chinese / French) caption generation for class photos',
+  'Wallet-linked Supabase student profile',
+  'Soulbound contribution badge for active class members',
+  'Real-time devnet contribution feed indexed from Memo program',
   'Cross-class identity portability via wallet signature exchange',
 ]
