@@ -3,64 +3,83 @@ export const showcaseLinks = {
   projectUrl: 'https://rucmathclass.com/hackathon',
   github: 'https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public',
   demoVideo: 'https://youtu.be/kz9K5mWtC20',
+  web3Profile: '/web3-profile',
+  solscanFirstAnchor:
+    'https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet',
 }
 
 export const showcaseStats = [
-  { label: 'Project type', value: 'Class knowledge hub' },
-  { label: 'Current stage', value: 'Deployed MVP' },
-  { label: 'Built by', value: 'Freshman math student' },
+  { label: 'Project type', value: 'Bilingual class dApp' },
+  { label: 'Solana track', value: 'Devnet write + RPC read' },
+  { label: 'AI partners', value: 'ElevenLabs · Claude' },
+  { label: 'Built by', value: 'Solo · freshman math student' },
 ]
 
 export const problemPoints = [
   {
     title: 'Target users',
-    body: 'Students in a small bilingual mathematics cohort who need one place for schedules, class memories, resource links, and collaboration records.',
+    body: 'Students in a small bilingual mathematics cohort (Chinese + French) who need one place for class identity, course schedule, photo plates, learning resources, and a verifiable record of who participated in what.',
   },
   {
     title: 'Pain point',
-    body: 'Class information often lives across chat history, scattered links, personal folders, and temporary posts, so useful material becomes hard to find later.',
+    body: 'Class information lives across chat history, scattered links, personal folders, and temporary posts; contribution records are anecdotal and disappear when accounts close. There is no canonical, durable, cross-platform record of what the class did together.',
   },
   {
     title: 'Why it matters',
-    body: 'A cohort website turns daily academic traces into a stable public archive and gives student builders a real product surface to maintain.',
+    body: 'A class is a long-running collective. A bilingual mathematics cohort especially needs a stable artefact that survives social-media platform churn, is auditable by anyone, and reflects both languages in which the class lives.',
   },
   {
     title: 'Existing gap',
-    body: 'Generic social feeds are fast but not structured; cloud drives are structured but not readable as a product. This site combines a readable front page with curated resources.',
+    body: 'Existing class sites are static and offline-anchored. Existing dApps are financial and ignore real human cohorts. This project is a small bridge: keep the calm book-page class portfolio, and add a Solana-anchored memory layer plus AI-generated bilingual content.',
   },
 ]
 
 export const solutionSteps = [
-  'A visitor lands on the class homepage and immediately sees the cohort identity, daily theorem note, schedule, image plates, and reading paths.',
-  'Students can browse resources and albums without login, while authenticated collaborators can submit materials or draft content for review.',
-  'The site keeps the production version static and lightweight, while Supabase powers optional auth, comments, and content workflows.',
+  'Visitors land on the calm, book-page class homepage and immediately see the cohort identity, daily theorem with a bilingual proof outline, schedule, image plates, reading paths, and a French-narrated intro.',
+  'Anyone can browse without login. Authenticated collaborators submit drafts, comments, and content for review via Supabase.',
+  'Curious or hackathon-class visitors open /web3-profile, connect a Phantom wallet, sign a bilingual student statement off-chain, anchor a memo on Solana devnet, and watch the class collective memo feed update live from devnet RPC.',
 ]
 
 export const keyFeatures = [
   {
-    title: 'Class archive homepage',
-    benefit: 'Judges can see the product purpose quickly, and classmates get a readable entry point.',
-    status: 'Completed',
+    title: '01 — Wallet identity (Phantom)',
+    benefit: 'Real injected Solana provider connection on /web3-profile with full event binding and graceful fallback when no wallet is detected.',
+    status: 'Shipped',
   },
   {
-    title: 'Gallery and album records',
-    benefit: 'Class events become structured visual records instead of disappearing in chat history.',
-    status: 'Completed',
+    title: '02 — Off-chain ed25519 ownership proof',
+    benefit: 'Sign a Chinese + French + wallet + ISO timestamp statement locally; expose base58 signature for independent verification with @solana/web3.js or tweetnacl.',
+    status: 'Shipped',
   },
   {
-    title: 'Curated resource catalog',
-    benefit: 'Learning materials can be grouped, searched mentally, and revisited across the semester.',
-    status: 'Completed',
+    title: '03 — Real on-chain devnet anchor',
+    benefit: 'One-click signAndSendTransaction calling SPL Memo program v2; Solscan-verifiable; first anchor tx 5L76cFugq…56gv846 already on devnet.',
+    status: 'Shipped',
   },
   {
-    title: 'Supabase-based collaboration flow',
-    benefit: 'Logged-in contributors can submit, review, and publish selected class materials.',
-    status: 'In progress',
+    title: '04 — Class collective memo feed (live RPC read)',
+    benefit: 'getSignaturesForAddress + getParsedTransaction directly from api.devnet.solana.com, filtered to memo program, aggregated across class wallets — full read-side proof.',
+    status: 'Shipped',
   },
   {
-    title: 'Hackathon showcase layer',
-    benefit: 'The same deployed product can be evaluated as a builder portfolio and application artifact.',
-    status: 'Completed',
+    title: '05 — ElevenLabs French narration',
+    benefit: '14-second multilingual_v2 mp3 (George storyteller voice) on the home title page; API key never touched the bundle.',
+    status: 'Shipped',
+  },
+  {
+    title: '06 — Anthropic Claude bilingual proof reasoning',
+    benefit: '24 mathematical theorems each with Chinese + French proof outlines generated by claude-opus-4.7, exposed via disclosure under each daily theorem.',
+    status: 'Shipped',
+  },
+  {
+    title: '07 — Cloudflare proxy + Flexible SSL HTTPS',
+    benefit: 'Custom domain rucmathclass.com with HTTPS terminating at the edge so the unrelated VPS proxy on port 443 stays untouched. Zero downtime to other services during build.',
+    status: 'Shipped',
+  },
+  {
+    title: '08 — Supabase collaboration backend',
+    benefit: 'Optional comments, draft submissions, and moderation flow with anon key + RLS. Public-safe schema; no service-role key in the frontend.',
+    status: 'Shipped',
   },
 ]
 
@@ -68,93 +87,98 @@ export const techStack = [
   {
     category: 'Frontend',
     value: 'React 18, React Router 7, Vite 5',
-    note: 'Read from package.json dependencies and project config.',
+    note: 'Strict ESLint flat config with react-hooks rules; production audit reports 0 vulnerabilities.',
   },
   {
-    category: 'Backend',
-    value: 'Not used yet',
-    note: 'The current production app is a static SPA; future local APIs can be proxied under /api.',
+    category: 'Solana',
+    value: '@solana/web3.js v1.95, bs58 v6, SPL Memo program v2, Phantom-compatible injected wallet',
+    note: 'Both write-side (signAndSendTransaction) and read-side (getSignaturesForAddress + getParsedTransaction) implemented in src/lib/solanaMemo.js.',
   },
   {
-    category: 'Database',
-    value: 'Supabase Postgres',
-    note: 'Used when Supabase environment variables are configured.',
+    category: 'AI partners',
+    value: 'ElevenLabs multilingual_v2 + Anthropic Claude (claude-opus-4.7)',
+    note: 'Both used at build time only; API keys never reach the deployed bundle.',
   },
   {
-    category: 'Authentication',
-    value: 'Supabase Auth',
-    note: 'Login, reset password, and protected moderation routes are already wired.',
+    category: 'Database & auth',
+    value: 'Supabase Postgres + Auth (anon key only, RLS enforced)',
+    note: 'Comments, draft submissions, moderation flow already wired.',
+  },
+  {
+    category: 'Hosting & HTTPS',
+    value: 'Vultr LA VPS + Nginx 1.18 + Cloudflare proxy with Flexible SSL',
+    note: 'Custom domain rucmathclass.com; HTTPS terminates at edge so port 443 on the origin stays free for unrelated services.',
   },
   {
     category: 'Deployment',
-    value: 'Nginx static hosting, rsync deploy script, Vite dist output',
-    note: 'Cloudflare Pages and Vercel tooling also exist in package scripts/dependencies.',
+    value: 'rsync deploy script driven by environment variables',
+    note: 'Zero hardcoded credentials; SSH key path is read from env.',
   },
   {
-    category: 'AI tools',
+    category: 'AI-assisted dev tools',
     value: 'Codex GPT 5.5, Claude Opus, Claude Sonnet, Gemini Google AI Pro',
-    note: 'Used for assisted coding, debugging, architecture review, writing, and research.',
+    note: 'Implementation accelerated by AI; product direction, scope, and validation are human-decided.',
   },
   {
-    category: 'UI framework',
-    value: 'Custom CSS, lucide-react icons, KaTeX, local fonts',
-    note: 'No heavy component framework is used.',
+    category: 'UI',
+    value: 'Custom CSS, lucide-react icons, KaTeX, local fonts (EB Garamond, Noto Serif SC, JetBrains Mono)',
+    note: 'No heavy component framework. Calm book-page editorial aesthetic deliberately preserved across the Web3 features.',
   },
 ]
 
 export const roleItems = [
-  'Requirement breakdown and product logic design',
-  'AI assisted coding for React pages, routing, styling, and deployment scripts',
-  'Frontend and Supabase-backed prototype implementation',
-  'Debugging, production build checks, and Nginx deployment notes',
-  'Hackathon README, demo script, and application materials preparation',
+  'Product direction, scope, and the bilingual class narrative',
+  'AI-assisted implementation across React pages, Solana flows, and bilingual content',
+  'Solana integration: real devnet memo write, RPC read across multiple wallets, base58 encoder',
+  'ElevenLabs and Anthropic Claude integration as static build-time assets (no runtime API keys)',
+  'Deployment and HTTPS via Cloudflare proxy without disturbing the unrelated VPS proxy on port 443',
+  'README, architecture diagram, hackathon submission materials, and demo storytelling',
 ]
 
 export const aiWorkflow = [
   {
     tool: 'Codex GPT 5.5',
-    use: 'Code generation, debugging, refactoring, build checks, deployment scripts, and README structure.',
+    use: 'Code generation, debugging, refactoring, build pipeline, and deployment scripts.',
   },
   {
-    tool: 'Claude Opus',
-    use: 'Complex architecture review and difficult issue analysis when a second reasoning pass is useful.',
+    tool: 'Claude Opus 4.7',
+    use: 'Architecture review, Solana integration scoping, bilingual proof outlines for 24 theorems, security review.',
   },
   {
     tool: 'Claude Sonnet',
-    use: 'Frontend page drafting, copy refinement, and long-context organization for presentation materials.',
+    use: 'Frontend page drafting, copy refinement, long-context organization for submission materials.',
   },
   {
     tool: 'Gemini Google AI Pro',
-    use: 'Research, competitor scan, hackathon preparation, slides, and demo material support.',
+    use: 'Research, competitor scan, hackathon track analysis, presentation material support.',
   },
 ]
 
 export const roadmap = [
   {
-    phase: 'Before Hackathon',
+    phase: 'Before Dev3pack submission',
     tasks: [
-      'Record a 60-second demo video and add the final link.',
-      'Replace GitHub placeholder with the public repository.',
-      'Review Supabase Row Level Security policies table by table.',
-      'Add real screenshots to the README after the final UI pass.',
+      'Record an updated 60-second demo video covering the six shipped features and the live Solscan anchor.',
+      'Run a final Supabase RLS pass on every public-facing table.',
+      'Update demoVideo URL and final screenshot set in the README.',
+      'Submit via the Dev3pack Project page with verifiable artefacts table.',
     ],
   },
   {
-    phase: 'During Hackathon',
+    phase: 'During Dev3pack',
     tasks: [
-      'Use the site as a live portfolio when finding teammates.',
-      'Extend the prototype around a clear math modeling or student workflow problem.',
-      'Document AI prompts, human decisions, and validation steps during development.',
-      'Keep a small changelog for judging and final presentation.',
+      'Use the site as a live portfolio when meeting other builders and mentors.',
+      'Document any judge or mentor feedback as a public CHANGELOG entry.',
+      'Capture any interesting bugs or edge cases as future contribution memos on devnet.',
     ],
   },
   {
-    phase: 'After Hackathon',
+    phase: 'After Dev3pack',
     tasks: [
-      'Connect a custom domain and HTTPS certificate.',
-      'Turn repeated content workflows into reusable admin tools.',
-      'Add analytics for anonymous page health and resource usage.',
-      'Write a short technical case study for future applications.',
+      'Stand up a Cloudflare Worker that fronts an Anthropic API key for runtime streaming AI Q&A.',
+      'Implement Sign-in with Solana to bridge the wallet identity into the Supabase student profile.',
+      'Mint a soulbound class membership cNFT via Metaplex Bubblegum for verified active class members.',
+      'Replace direct devnet RPC reads with a Helius-indexed memo subscription for class-wide real-time.',
     ],
   },
 ]
