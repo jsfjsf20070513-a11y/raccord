@@ -94,6 +94,9 @@ export default function Layout() {
         <p>
           EB Garamond · 思源宋体 · JetBrains Mono · KaTeX.
         </p>
+        <p className="site-footer-attribution">
+          Voice by ElevenLabs · Bilingual reasoning by Anthropic Claude · Anchored on Solana devnet.
+        </p>
         <p className="site-footer-secondary">
           Pour la classe.
         </p>
