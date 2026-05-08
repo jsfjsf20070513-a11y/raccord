@@ -2140,6 +2140,50 @@
   letter-spacing: 0.04em;
 }
 
+.feed-view-tabs {
+  display: inline-flex;
+  align-items: stretch;
+  margin: 0 0 14px;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.feed-view-tab {
+  padding: 7px 16px;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--rule);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.feed-view-tab:last-child {
+  border-right: 0;
+}
+
+.feed-view-tab:hover,
+.feed-view-tab:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.feed-view-tab.is-active {
+  background: rgba(139, 0, 0, 0.06);
+  color: var(--accent);
+}
+
+.feed-view-tab-count {
+  margin-left: 4px;
+  color: inherit;
+  opacity: 0.7;
+  font-size: 12px;
+}
+
 .contact-sentence {
   margin: 28px 0 18px;
   padding-top: 18px;

@@ -179,6 +179,46 @@ export async function fetchWalletMemos({
   return memos
 }
 
+/**
+ * Aggregate memo entries across multiple wallets into a single time-sorted
+ * feed. Useful for showing a "class collective memory" view: each wallet
+ * is queried independently (sequentially, with the same per-wallet limit),
+ * then results are merged by blockTime descending.
+ */
+export async function fetchCollectiveMemos({
+  connection,
+  walletAddresses,
+  perWalletLimit = 5,
+  rpcDelayMs = 100,
+}) {
+  if (!walletAddresses || walletAddresses.length === 0) {
+    return []
+  }
+
+  const all = []
+  for (const address of walletAddresses) {
+    try {
+      const entries = await fetchWalletMemos({
+        connection,
+        walletAddress: address,
+        limit: perWalletLimit,
+        rpcDelayMs,
+      })
+      for (const entry of entries) {
+        all.push({ ...entry, walletAddress: address })
+      }
+    } catch {
+      // One wallet failing should not nuke the whole feed.
+    }
+  }
+
+  return all.sort((a, b) => {
+    const at = a.blockTime || 0
+    const bt = b.blockTime || 0
+    return bt - at
+  })
+}
+
 export function formatBlockTime(blockTimeSeconds) {
   if (!blockTimeSeconds) {
     return ''

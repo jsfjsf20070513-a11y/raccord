@@ -27,6 +27,7 @@ import {
   buildMemoPayload,
   buildSolscanUrl,
   createDevnetConnection,
+  fetchCollectiveMemos,
   fetchLamportBalance,
   fetchWalletMemos,
   formatBlockTime,
@@ -34,6 +35,10 @@ import {
   MIN_LAMPORTS_FOR_MEMO,
   submitMemoViaWallet,
 } from '../lib/solanaMemo'
+import {
+  addLocalWallet,
+  getMergedRegistry,
+} from '../data/classRegistry'
 
 const MEMO_PROGRAM_ID_STRING = MEMO_PROGRAM_ID.toBase58()
 
@@ -193,6 +198,8 @@ export default function Web3StudentProfile() {
   const [memoFeed, setMemoFeed] = useState([])
   const [memoFeedState, setMemoFeedState] = useState('idle')
   const [memoFeedError, setMemoFeedError] = useState('')
+  const [feedView, setFeedView] = useState('mine') // 'mine' | 'collective'
+  const [classRegistry, setClassRegistry] = useState(() => getMergedRegistry())
 
   const providerName = useMemo(() => resolveProviderName(provider), [provider])
   const shortAddress = useMemo(() => formatAddress(walletAddress), [walletAddress])
@@ -244,17 +251,19 @@ export default function Web3StudentProfile() {
         ? 'Retry anchor'
         : 'Anchor on Devnet'
 
-  const memoFeedStatusLabel = !isConnected
-    ? 'Connect wallet first'
-    : memoFeedState === 'loading'
-      ? 'Reading from devnet RPC'
-      : memoFeedState === 'loaded'
-        ? memoFeed.length === 0
-          ? 'No memos yet'
-          : `${memoFeed.length} memo${memoFeed.length === 1 ? '' : 's'} indexed`
-        : memoFeedState === 'error'
-          ? 'RPC read failed'
+  const memoFeedStatusLabel = memoFeedState === 'loading'
+    ? 'Reading from devnet RPC'
+    : memoFeedState === 'loaded'
+      ? memoFeed.length === 0
+        ? 'No memos yet'
+        : `${memoFeed.length} memo${memoFeed.length === 1 ? '' : 's'} indexed`
+      : memoFeedState === 'error'
+        ? 'RPC read failed'
+        : feedView === 'mine' && !isConnected
+          ? 'Connect wallet first'
           : 'Idle'
+
+  const collectiveWalletCount = classRegistry.length
 
   const balanceLabel = !walletAddress
     ? 'Connect a wallet to view balance'
@@ -460,32 +469,60 @@ export default function Web3StudentProfile() {
   }, [walletAddress])
 
   const refreshMemoFeed = useCallback(async () => {
-    if (!walletAddress) {
-      return
-    }
     setMemoFeedState('loading')
     setMemoFeedError('')
     try {
       const connection = createDevnetConnection()
+
+      if (feedView === 'collective') {
+        const memos = await fetchCollectiveMemos({
+          connection,
+          walletAddresses: classRegistry,
+          perWalletLimit: 5,
+        })
+        setMemoFeed(memos)
+        setMemoFeedState('loaded')
+        return
+      }
+
+      // 'mine' view requires a connected wallet
+      if (!walletAddress) {
+        setMemoFeed([])
+        setMemoFeedState('idle')
+        return
+      }
       const memos = await fetchWalletMemos({
         connection,
         walletAddress,
         limit: 8,
       })
-      setMemoFeed(memos)
+      setMemoFeed(memos.map((entry) => ({ ...entry, walletAddress })))
       setMemoFeedState('loaded')
     } catch (error) {
       setMemoFeedError(error?.message || 'Failed to read memos from devnet RPC.')
       setMemoFeedState('error')
     }
+  }, [walletAddress, feedView, classRegistry])
+
+  // When the user connects a wallet, register it locally so the
+  // 'Class collective' feed can pick it up.
+  useEffect(() => {
+    if (!walletAddress) {
+      return
+    }
+    const merged = addLocalWallet(walletAddress)
+    setClassRegistry((prev) => {
+      const next = Array.from(new Set([...prev, ...merged]))
+      return next.length === prev.length ? prev : next
+    })
   }, [walletAddress])
 
   useEffect(() => {
     if (!walletAddress) {
       setBalanceLamports(null)
-      return
+    } else {
+      refreshBalance()
     }
-    refreshBalance()
     refreshMemoFeed()
   }, [walletAddress, refreshBalance, refreshMemoFeed])
 
@@ -860,21 +897,49 @@ export default function Web3StudentProfile() {
       <ProfileSection
         id="onchain-feed"
         kicker="04 · On-Chain Activity Feed"
-        title="Live memo history read from Solana devnet"
+        title="Class collective memory · live read from Solana devnet"
       >
         <article className="hackathon-card">
           <div className="feature-card-head">
-            <h3>Wallet memos · live RPC read</h3>
+            <h3>Memo feed · live RPC read</h3>
             <span className="feature-status">
               <History size={15} aria-hidden="true" />
               {memoFeedStatusLabel}
             </span>
           </div>
           <p>
-            Real-time read-side proof. This list is fetched from the Solana devnet RPC at{' '}
+            Real-time read-side proof. The list below is fetched directly from the Solana devnet RPC at{' '}
             <code>api.devnet.solana.com</code> using <code>getSignaturesForAddress</code> followed by{' '}
-            <code>getParsedTransaction</code>, then filtered to instructions targeting the SPL Memo program.
-            No backend, no API key, no cache — every refresh is a fresh round-trip to Solana.
+            <code>getParsedTransaction</code>, then filtered to SPL Memo instructions and decoded.
+            No backend, no cache, no third-party indexer — every refresh is a fresh devnet round-trip.
+          </p>
+
+          <div className="feed-view-tabs" role="tablist" aria-label="Feed scope">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={feedView === 'mine'}
+              className={`feed-view-tab${feedView === 'mine' ? ' is-active' : ''}`}
+              onClick={() => setFeedView('mine')}
+            >
+              My wallet
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={feedView === 'collective'}
+              className={`feed-view-tab${feedView === 'collective' ? ' is-active' : ''}`}
+              onClick={() => setFeedView('collective')}
+            >
+              Class collective
+              <span className="feed-view-tab-count">· {collectiveWalletCount}</span>
+            </button>
+          </div>
+
+          <p className="hackathon-section-lead">
+            {feedView === 'collective'
+              ? `Aggregated memo feed across ${collectiveWalletCount} known class wallet${collectiveWalletCount === 1 ? '' : 's'}, sorted by on-chain time. New wallets join the registry automatically when they connect to this site and anchor a memo.`
+              : 'Memos signed by your connected wallet only. Anchor a fresh memo in section 03 — it will appear here within seconds of devnet indexing.'}
           </p>
 
           <div className="hackathon-actions" aria-label="Feed controls">
@@ -882,34 +947,35 @@ export default function Web3StudentProfile() {
               className="hackathon-button is-primary"
               type="button"
               onClick={refreshMemoFeed}
-              disabled={!isConnected || memoFeedState === 'loading'}
+              disabled={memoFeedState === 'loading' || (feedView === 'mine' && !isConnected)}
             >
               <RefreshCw size={17} aria-hidden="true" />
               {memoFeedState === 'loading' ? 'Reading…' : 'Refresh feed'}
             </button>
           </div>
 
-          {!isConnected ? (
+          {feedView === 'mine' && !isConnected ? (
             <p className="hackathon-section-lead">
-              Connect a wallet in section 01 to read its on-chain memos.
+              Connect a wallet in section 01 to read its on-chain memos. The Class collective tab works without a wallet.
             </p>
           ) : null}
 
-          {isConnected && memoFeedState === 'loading' && memoFeed.length === 0 ? (
+          {memoFeedState === 'loading' && memoFeed.length === 0 ? (
             <p className="hackathon-section-lead">Reading recent transactions from devnet RPC…</p>
           ) : null}
 
-          {isConnected && memoFeedState === 'loaded' && memoFeed.length === 0 ? (
+          {memoFeedState === 'loaded' && memoFeed.length === 0 && (feedView === 'collective' || isConnected) ? (
             <p className="hackathon-section-lead">
-              No memo transactions found yet for this wallet on devnet. Anchor one in section 03; it will
-              appear here automatically once devnet indexes it.
+              {feedView === 'collective'
+                ? 'No memos yet across the class registry. Connect a wallet and anchor one in section 03 to seed the collective.'
+                : 'No memo transactions found yet for this wallet on devnet. Anchor one in section 03; it will appear here automatically once devnet indexes it.'}
             </p>
           ) : null}
 
           {memoFeed.length > 0 ? (
             <ol className="memo-feed-list">
-              {memoFeed.map((entry) => (
-                <li key={entry.signature} className="memo-feed-entry">
+              {memoFeed.map((entry, idx) => (
+                <li key={`${entry.signature}-${idx}`} className="memo-feed-entry">
                   <div className="memo-feed-head">
                     <span className="memo-feed-time">
                       {formatBlockTime(entry.blockTime) || `slot ${entry.slot}`}
@@ -926,7 +992,12 @@ export default function Web3StudentProfile() {
                   </div>
                   <pre className="signed-statement">{entry.memo}</pre>
                   <p className="memo-feed-sig">
-                    sig: {entry.signature.slice(0, 16)}…{entry.signature.slice(-12)}
+                    {feedView === 'collective' && entry.walletAddress ? (
+                      <>
+                        from {entry.walletAddress.slice(0, 6)}…{entry.walletAddress.slice(-6)} ·{' '}
+                      </>
+                    ) : null}
+                    sig: {entry.signature.slice(0, 12)}…{entry.signature.slice(-10)}
                   </p>
                 </li>
               ))}
@@ -937,8 +1008,9 @@ export default function Web3StudentProfile() {
 
           <p className="hackathon-ai-badge">
             <ShieldCheck size={15} aria-hidden="true" />
-            Read-only RPC. Public devnet endpoint, no API key required. Up to 8 most recent memos
-            shown; older history remains fully verifiable on Solscan.
+            Read-only RPC, public devnet endpoint, no API key required. Up to 5 memos per wallet;
+            older history is fully verifiable on Solscan. The class registry persists locally and
+            seeds with the original anchor wallet.
           </p>
         </article>
       </ProfileSection>
