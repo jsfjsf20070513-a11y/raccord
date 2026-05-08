@@ -95,10 +95,28 @@ export function buildMemoPayload({ walletAddress, project = 'math-class-website'
   return `${project}:1|tag=${tag}|wallet=${walletAddress}|issued=${issuedAt}`
 }
 
+function withTimeout(promise, ms, label) {
+  let timeoutId
+  const timeout = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`${label} timed out after ${Math.round(ms / 1000)}s. The wallet popup may have been closed; please retry.`))
+    }, ms)
+  })
+
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+    }
+  })
+}
+
 /**
  * Submit a memo transaction through the connected wallet. Returns the
  * transaction signature on success. Caller is responsible for catching
  * thrown errors and surfacing them to the user.
+ *
+ * The signing step is wrapped in a 90s timeout so a stuck wallet popup
+ * (e.g. user closed the approve window) cannot leave the UI hanging.
  */
 export async function submitMemoViaWallet({
   provider,
@@ -117,22 +135,31 @@ export async function submitMemoViaWallet({
     recentBlockhash: blockhash,
   })
 
-  const result = await provider.signAndSendTransaction(transaction)
+  const result = await withTimeout(
+    provider.signAndSendTransaction(transaction),
+    90_000,
+    'Wallet sign-and-send',
+  )
   const signature = typeof result === 'string' ? result : result?.signature
   if (!signature) {
     throw new Error('Wallet did not return a transaction signature.')
   }
 
-  // Best-effort confirmation. We do not await full finalization — a confirmed
-  // commitment is enough for the demo and avoids a long-running spinner.
+  // Best-effort confirmation, capped at 30 seconds. A signed transaction
+  // sent to devnet is already on-chain; the confirm wait is just for UI
+  // status feedback and is not strictly required for the demo evidence.
   try {
-    await connection.confirmTransaction(
-      {
-        signature,
-        blockhash,
-        lastValidBlockHeight,
-      },
-      'confirmed',
+    await withTimeout(
+      connection.confirmTransaction(
+        {
+          signature,
+          blockhash,
+          lastValidBlockHeight,
+        },
+        'confirmed',
+      ),
+      30_000,
+      'Devnet confirmation',
     )
   } catch {
     // Treat confirmation timeout as soft-fail; the signature is still valid
