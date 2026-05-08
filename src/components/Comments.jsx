@@ -200,7 +200,9 @@ export default function Comments({ albumId, title = '留言板' }) {
 
       setNewComment('')
     } catch (error) {
-      setErrorMsg(`发送失败：${error.message || '请检查 Supabase 配置或网络'}`)
+      setErrorMsg(
+        `Submit failed: ${error.message || 'check Supabase config or network'} · 发送失败：${error.message || '请检查 Supabase 配置或网络'}`,
+      )
     } finally {
       setSubmitting(false)
     }
@@ -213,11 +215,11 @@ export default function Comments({ albumId, title = '留言板' }) {
     }
 
     if (!user) {
-      setErrorMsg('请先登录后再删除留言。')
+      setErrorMsg('Sign in before deleting a comment. · 请先登录后再删除留言。')
       return
     }
 
-    if (!window.confirm('确定要删除这条留言吗？')) {
+    if (!window.confirm('Delete this comment? · 确定要删除这条留言吗？')) {
       return
     }
 
@@ -237,12 +239,18 @@ export default function Comments({ albumId, title = '留言板' }) {
 
     const { data, error } = await query.select('id')
     if (error) {
-      setErrorMsg(`删除失败：${error.message || '网络错误'}`)
+      setErrorMsg(
+        `Delete failed: ${error.message || 'network error'} · 删除失败：${error.message || '网络错误'}`,
+      )
       return
     }
 
     if (!data?.length) {
-      setErrorMsg(isAdmin ? '删除失败：留言不存在或已变更。' : '删除失败：你只能删除自己的留言。')
+      setErrorMsg(
+        isAdmin
+          ? 'Delete failed: comment no longer exists or has changed. · 删除失败：留言不存在或已变更。'
+          : 'Delete failed: you can only delete your own comments. · 删除失败：你只能删除自己的留言。',
+      )
       return
     }
 
@@ -284,8 +292,8 @@ export default function Comments({ albumId, title = '留言板' }) {
         </form>
       ) : (
         <p className="muted-copy">
-          <Link to="/login">登录</Link>
-          后可在此留言。
+          <Link to="/login">Sign in · 登录</Link>
+          {' '}to leave a marginal note. · 后可在此留言。
         </p>
       )}
 

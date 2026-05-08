@@ -63,7 +63,7 @@ export default function ManageHub() {
     publishedContentMode: backendMode,
   })
 
-  const displayName = user?.user_metadata?.nickname || user?.user_metadata?.real_name || user?.email || '未登录'
+  const displayName = user?.user_metadata?.nickname || user?.user_metadata?.real_name || user?.email || 'Not signed in · 未登录'
   const moduleByKind = Object.fromEntries(focusModules.map((item) => [item.kind, item]))
 
   const myEntries = useMemo(() => {
@@ -126,11 +126,11 @@ export default function ManageHub() {
                   ))}
                 </ol>
               ) : (
-                <p className="manage-desk-note">案头暂空。</p>
+                <p className="manage-desk-note">Desk is empty for now. · 案头暂空。</p>
               )}
             </>
           ) : (
-            <p className="manage-desk-note">登录后可见自己的案头。</p>
+            <p className="manage-desk-note">Sign in to view your own desk. · 登录后可见自己的案头。</p>
           )}
         </div>
       </section>

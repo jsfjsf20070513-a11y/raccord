@@ -5,6 +5,39 @@ import PageHeader from '../components/PageHeader'
 import PasswordField from '../components/PasswordField'
 import { supabase, isSupabaseConfigured, SUPABASE_MISSING_MESSAGE } from '../lib/supabase'
 
+const PHONE_PATTERN = /^1\d{10}$/
+
+const COPY = {
+  login: {
+    title: 'Sign in · 登录',
+    summary: 'Access your collaborative records and class workspace.',
+    submit: 'Sign in',
+    submitting: 'Signing in…',
+  },
+  signup: {
+    title: 'Create account · 注册',
+    summary: 'Set up an account scoped to this class website.',
+    submit: 'Create account',
+    submitting: 'Creating…',
+  },
+  forgot: {
+    title: 'Reset password · 找回密码',
+    summary: 'Receive a password reset link by email.',
+    submit: 'Send reset link',
+    submitting: 'Sending…',
+  },
+}
+
+const ERRORS = {
+  invalidPhone: 'Enter a valid 11-digit Chinese mobile number. · 请输入有效的 11 位手机号码。',
+  realNameRequired: 'Real name is required. · 请填写真实姓名。',
+  nicknameRequired: 'Nickname is required. · 请填写昵称。',
+  passwordTooShort: 'Password must be at least 6 characters. · 密码至少需要 6 位字符。',
+  passwordMismatch: 'The two passwords do not match. · 两次输入的密码不一致。',
+  emailRequired: 'Enter an email address. · 请输入邮箱地址。',
+  generic: 'Operation failed. Please try again later. · 操作失败，请稍后重试。',
+}
+
 export default function Login() {
   const navigate = useNavigate()
   const [mode, setMode] = useState('login')
@@ -19,6 +52,7 @@ export default function Login() {
   const [message, setMessage] = useState(null)
 
   const finalEmail = loginMethod === 'phone' ? `${phone}@phone.local` : email
+  const copy = COPY[mode]
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -32,8 +66,8 @@ export default function Login() {
 
     try {
       if (mode === 'login') {
-        if (loginMethod === 'phone' && !/^1\d{10}$/.test(phone)) {
-          throw new Error('请输入有效的 11 位手机号码。')
+        if (loginMethod === 'phone' && !PHONE_PATTERN.test(phone)) {
+          throw new Error(ERRORS.invalidPhone)
         }
         const { error } = await supabase.auth.signInWithPassword({ email: finalEmail, password })
         if (error) throw error
@@ -42,12 +76,12 @@ export default function Login() {
       }
 
       if (mode === 'signup') {
-        if (!realName.trim()) throw new Error('请填写真实姓名。')
-        if (!nickname.trim()) throw new Error('请填写昵称。')
-        if (password.length < 6) throw new Error('密码至少需要 6 位字符。')
-        if (password !== confirmPassword) throw new Error('两次输入的密码不一致。')
-        if (loginMethod === 'phone' && !/^1\d{10}$/.test(phone)) {
-          throw new Error('请输入有效的 11 位手机号码。')
+        if (!realName.trim()) throw new Error(ERRORS.realNameRequired)
+        if (!nickname.trim()) throw new Error(ERRORS.nicknameRequired)
+        if (password.length < 6) throw new Error(ERRORS.passwordTooShort)
+        if (password !== confirmPassword) throw new Error(ERRORS.passwordMismatch)
+        if (loginMethod === 'phone' && !PHONE_PATTERN.test(phone)) {
+          throw new Error(ERRORS.invalidPhone)
         }
 
         const { data, error } = await supabase.auth.signUp({
@@ -67,21 +101,27 @@ export default function Login() {
           navigate('/')
           return
         }
-        setMessage({ type: 'success', text: '注册完成。若启用了邮箱确认，请先前往邮箱验证。' })
+        setMessage({
+          type: 'success',
+          text: 'Account created. If email confirmation is enabled, check your inbox to verify. · 注册完成。若启用了邮箱确认，请先前往邮箱验证。',
+        })
         return
       }
 
       if (!email.trim()) {
-        throw new Error('请输入邮箱地址。')
+        throw new Error(ERRORS.emailRequired)
       }
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       })
       if (error) throw error
-      setMessage({ type: 'success', text: '重置链接已发送，请检查邮箱。' })
+      setMessage({
+        type: 'success',
+        text: 'Reset link sent. Please check your email. · 重置链接已发送，请检查邮箱。',
+      })
     } catch (error) {
-      setMessage({ type: 'error', text: error.message || '操作失败，请稍后重试。' })
+      setMessage({ type: 'error', text: error.message || ERRORS.generic })
     } finally {
       setLoading(false)
     }
@@ -91,44 +131,76 @@ export default function Login() {
     <article className="page-column">
       <PageHeader
         kicker="Authentication"
-        title={mode === 'login' ? '登录' : mode === 'signup' ? '注册' : '找回密码'}
-        summary={mode === 'login' ? '进入协作与个人记录。' : mode === 'signup' ? '建立一个站内账户。' : '通过邮箱重设密码。'}
+        title={copy.title}
+        summary={copy.summary}
         backTo="/"
-        backLabel="返回扉页"
+        backLabel="Back to title page · 返回扉页"
         showRule={false}
       />
 
       <section className="page-section">
         <div className="editorial-actions tabs">
-          <button type="button" className={`text-button ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>登录</button>
-          <button type="button" className={`text-button ${mode === 'signup' ? 'active' : ''}`} onClick={() => setMode('signup')}>注册</button>
-          <button type="button" className={`text-button ${mode === 'forgot' ? 'active' : ''}`} onClick={() => setMode('forgot')}>找回密码</button>
+          <button type="button" className={`text-button ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>
+            Sign in · 登录
+          </button>
+          <button type="button" className={`text-button ${mode === 'signup' ? 'active' : ''}`} onClick={() => setMode('signup')}>
+            Sign up · 注册
+          </button>
+          <button type="button" className={`text-button ${mode === 'forgot' ? 'active' : ''}`} onClick={() => setMode('forgot')}>
+            Reset password · 找回密码
+          </button>
         </div>
 
         {mode !== 'forgot' ? (
           <div className="editorial-actions tabs">
-            <button type="button" className={`text-button ${loginMethod === 'email' ? 'active' : ''}`} onClick={() => setLoginMethod('email')}>邮箱</button>
-            <button type="button" className={`text-button ${loginMethod === 'phone' ? 'active' : ''}`} onClick={() => setLoginMethod('phone')}>手机</button>
+            <button type="button" className={`text-button ${loginMethod === 'email' ? 'active' : ''}`} onClick={() => setLoginMethod('email')}>
+              Email · 邮箱
+            </button>
+            <button type="button" className={`text-button ${loginMethod === 'phone' ? 'active' : ''}`} onClick={() => setLoginMethod('phone')}>
+              Phone · 手机
+            </button>
           </div>
         ) : null}
 
         <form className="editorial-form" onSubmit={handleSubmit}>
           {mode === 'signup' ? (
             <>
-              <label><span>真实姓名</span><input value={realName} onChange={(event) => setRealName(event.target.value)} required /></label>
-              <label><span>昵称</span><input value={nickname} onChange={(event) => setNickname(event.target.value)} required /></label>
+              <label>
+                <span>Real name · 真实姓名</span>
+                <input value={realName} onChange={(event) => setRealName(event.target.value)} required />
+              </label>
+              <label>
+                <span>Nickname · 昵称</span>
+                <input value={nickname} onChange={(event) => setNickname(event.target.value)} required />
+              </label>
             </>
           ) : null}
 
           {mode === 'forgot' || loginMethod === 'email' ? (
-            <label><span>邮箱</span><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required={mode === 'forgot' || loginMethod === 'email'} /></label>
+            <label>
+              <span>Email · 邮箱</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required={mode === 'forgot' || loginMethod === 'email'}
+              />
+            </label>
           ) : (
-            <label><span>手机号</span><input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="11 位手机号" required /></label>
+            <label>
+              <span>Phone · 手机号</span>
+              <input
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+                placeholder="11-digit mobile number · 11 位手机号"
+                required
+              />
+            </label>
           )}
 
           {mode !== 'forgot' ? (
             <PasswordField
-              label="密码"
+              label="Password · 密码"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
@@ -138,7 +210,7 @@ export default function Login() {
 
           {mode === 'signup' ? (
             <PasswordField
-              label="确认密码"
+              label="Confirm password · 确认密码"
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
               required
@@ -148,9 +220,9 @@ export default function Login() {
 
           <div className="editorial-actions">
             <button type="submit" className="text-button" disabled={loading}>
-              {loading ? '处理中' : mode === 'login' ? '登录' : mode === 'signup' ? '注册' : '发送重置链接'}
+              {loading ? copy.submitting : copy.submit}
             </button>
-            {mode === 'login' ? <Link to="/manage">进入协作</Link> : null}
+            {mode === 'login' ? <Link to="/manage">Open collaboration desk · 进入协作</Link> : null}
           </div>
           {message ? <p className={`status-line ${message.type === 'error' ? 'is-error' : 'is-success'}`}>{message.text}</p> : null}
         </form>

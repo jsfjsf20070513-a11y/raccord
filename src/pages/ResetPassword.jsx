@@ -4,6 +4,9 @@ import PageHeader from '../components/PageHeader'
 import PasswordField from '../components/PasswordField'
 import { supabase, isSupabaseConfigured, SUPABASE_MISSING_MESSAGE } from '../lib/supabase'
 
+const BACK_LABEL = 'Back to sign in · 返回登录'
+const HOME_LABEL = 'Back to title page · 返回扉页'
+
 export default function ResetPassword() {
   const navigate = useNavigate()
   const [pageState, setPageState] = useState('loading')
@@ -44,11 +47,11 @@ export default function ResetPassword() {
       return
     }
     if (password.length < 6) {
-      setMessage('密码至少需要 6 位字符。')
+      setMessage('Password must be at least 6 characters. · 密码至少需要 6 位字符。')
       return
     }
     if (password !== confirmPassword) {
-      setMessage('两次输入的密码不一致。')
+      setMessage('The two passwords do not match. · 两次输入的密码不一致。')
       return
     }
 
@@ -60,7 +63,10 @@ export default function ResetPassword() {
       setPageState('success')
       setTimeout(() => navigate('/'), 2000)
     } catch (error) {
-      setMessage(error.message || '重置失败，请重新申请重置链接。')
+      setMessage(
+        error.message ||
+          'Reset failed — please request a new reset link. · 重置失败，请重新申请重置链接。',
+      )
     } finally {
       setSubmitting(false)
     }
@@ -69,7 +75,13 @@ export default function ResetPassword() {
   if (pageState === 'loading') {
     return (
       <article className="page-column">
-        <PageHeader kicker="Password Recovery" title="验证重置链接" summary="正在检查当前链接是否仍然有效。" backTo="/login" backLabel="返回登录" />
+        <PageHeader
+          kicker="Password Recovery"
+          title="Verifying reset link · 验证重置链接"
+          summary="Checking whether the current link is still valid. · 正在检查当前链接是否仍然有效。"
+          backTo="/login"
+          backLabel={BACK_LABEL}
+        />
       </article>
     )
   }
@@ -79,10 +91,14 @@ export default function ResetPassword() {
       <article className="page-column">
         <PageHeader
           kicker="Password Recovery"
-          title={pageState === 'invalid' ? '链接已失效' : '功能暂不可用'}
-          summary={pageState === 'invalid' ? '重置链接已过期或已使用，请重新申请一次。' : SUPABASE_MISSING_MESSAGE}
+          title={pageState === 'invalid' ? 'Link expired · 链接已失效' : 'Feature unavailable · 功能暂不可用'}
+          summary={
+            pageState === 'invalid'
+              ? 'The reset link has expired or has already been used. Please request a new one. · 重置链接已过期或已使用，请重新申请一次。'
+              : SUPABASE_MISSING_MESSAGE
+          }
           backTo="/login"
-          backLabel="返回登录"
+          backLabel={BACK_LABEL}
         />
       </article>
     )
@@ -91,7 +107,13 @@ export default function ResetPassword() {
   if (pageState === 'success') {
     return (
       <article className="page-column">
-        <PageHeader kicker="Password Recovery" title="密码已重置" summary="新密码已经写入账户，稍后将返回首页。" backTo="/" backLabel="返回扉页" />
+        <PageHeader
+          kicker="Password Recovery"
+          title="Password reset · 密码已重置"
+          summary="The new password has been written to the account. Returning to the title page shortly. · 新密码已经写入账户，稍后将返回首页。"
+          backTo="/"
+          backLabel={HOME_LABEL}
+        />
       </article>
     )
   }
@@ -100,31 +122,33 @@ export default function ResetPassword() {
     <article className="page-column">
       <PageHeader
         kicker="Password Recovery"
-        title="设置新密码"
-        summary="通过邮件中的重置链接进入后，在此写入新的登录密码。"
+        title="Set a new password · 设置新密码"
+        summary="Enter a new sign-in password after arriving here from the reset link in your email. · 通过邮件中的重置链接进入后，在此写入新的登录密码。"
         backTo="/login"
-        backLabel="返回登录"
+        backLabel={BACK_LABEL}
       />
 
       <section className="page-section">
         <form className="editorial-form" onSubmit={handleSubmit}>
           <PasswordField
-            label="新密码"
+            label="New password · 新密码"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
             autoComplete="new-password"
           />
           <PasswordField
-            label="确认新密码"
+            label="Confirm new password · 确认新密码"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
             required
             autoComplete="new-password"
           />
           <div className="editorial-actions">
-            <button type="submit" className="text-button" disabled={submitting}>{submitting ? '提交中' : '更新密码'}</button>
-            <Link to="/login">返回登录</Link>
+            <button type="submit" className="text-button" disabled={submitting}>
+              {submitting ? 'Submitting…' : 'Update password · 更新密码'}
+            </button>
+            <Link to="/login">{BACK_LABEL}</Link>
           </div>
           {message ? <p className="status-line is-error">{message}</p> : null}
         </form>

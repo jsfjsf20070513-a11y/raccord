@@ -27,10 +27,10 @@ export default function PasswordField({
           className="password-toggle"
           onClick={() => setVisible((current) => !current)}
           aria-pressed={visible}
-          aria-label={visible ? `隐藏${label}` : `显示${label}`}
-          title={visible ? `隐藏${label}` : `显示${label}`}
+          aria-label={visible ? `Hide ${label}` : `Show ${label}`}
+          title={visible ? `Hide ${label}` : `Show ${label}`}
         >
-          {visible ? '隐藏' : '显示'}
+          {visible ? 'Hide' : 'Show'}
         </button>
       </span>
     </label>

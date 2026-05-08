@@ -57,7 +57,7 @@ export default function Layout() {
           </nav>
 
           <div className="site-header-tools">
-            <nav className="site-nav-secondary" aria-label="其余导航">
+            <nav className="site-nav-secondary" aria-label="Secondary navigation · 其余导航">
               {secondaryNav.map((item) => (
                 <Link key={item.to} to={item.to}>
                   {item.label}
@@ -68,15 +68,15 @@ export default function Layout() {
             <div className="site-auth">
               {user ? (
                 <>
-                  <span className="site-auth-note">在席：{displayName}</span>
+                  <span className="site-auth-note">Signed in · 在席：{displayName}</span>
                   <button type="button" className="text-button" onClick={() => signOut()}>
-                    退出
+                    Sign out · 退出
                   </button>
                 </>
               ) : isAuthEnabled ? (
-                <Link to="/login">登录</Link>
+                <Link to="/login">Sign in · 登录</Link>
               ) : (
-                <span className="site-auth-note">登录未启用</span>
+                <span className="site-auth-note">Sign-in disabled · 登录未启用</span>
               )}
             </div>
           </div>
