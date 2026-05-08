@@ -1242,7 +1242,85 @@
 }
 
 .plate-list li {
-  margin-bottom: 18px;
+  margin-bottom: 28px;
+}
+
+.plate-link {
+  display: grid;
+  grid-template-columns: 156px 1fr;
+  gap: 18px;
+  align-items: start;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: none;
+}
+
+.plate-link:hover .plate-headline,
+.plate-link:focus-visible .plate-headline {
+  color: var(--accent);
+}
+
+.plate-thumb {
+  margin: 0;
+  width: 156px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: rgba(26, 26, 26, 0.04);
+  border: 1px solid var(--rule);
+}
+
+.plate-thumb picture,
+.plate-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plate-caption {
+  display: block;
+  line-height: 1.55;
+}
+
+.plate-roman {
+  color: var(--muted);
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  margin-right: 2px;
+}
+
+.plate-headline {
+  color: var(--ink);
+  transition: color 0.18s ease;
+}
+
+.plate-description {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.plate-headline-zh {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.title-page-track {
+  margin: 12px 0 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 640px) {
+  .plate-link {
+    grid-template-columns: 1fr;
+  }
+  .plate-thumb {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+  }
 }
 
 .plate-overview-reference {
@@ -1464,7 +1542,13 @@
 
 .password-toggle {
   flex: 0 0 auto;
-  padding: 0;
+  /* Inline-friendly visual width but a 44×44 hit target (WCAG 2.5.5).
+     The text remains underlined inline; the padding extends the
+     clickable region without disturbing surrounding layout. */
+  padding: 12px 8px;
+  margin: -12px -8px;
+  min-width: 44px;
+  min-height: 44px;
   border: none;
   border-bottom: 1px solid currentColor;
   background: transparent;
@@ -2225,6 +2309,34 @@
 
 .memo-feed-empty-registry li {
   margin: 0;
+}
+
+.memo-feed-historical {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--rule);
+}
+
+.memo-feed-historical-kicker {
+  margin: 0 0 4px;
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.memo-feed-historical-meta {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.memo-feed-historical-payload {
+  margin: 0 0 8px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .class-registry-panel {

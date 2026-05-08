@@ -37,15 +37,6 @@ function ShowcaseSection({ id, kicker, title, children }) {
   )
 }
 
-function PlaceholderButton({ icon: Icon, children }) {
-  return (
-    <span className="hackathon-button is-disabled" aria-disabled="true">
-      <Icon size={17} aria-hidden="true" />
-      {children}
-    </span>
-  )
-}
-
 export default function HackathonShowcase() {
   return (
     <article className="hackathon-page">
@@ -62,11 +53,18 @@ export default function HackathonShowcase() {
             proof of AI native product-building ability.
           </p>
           <div className="hackathon-actions" aria-label="Project links">
-            <Link className="hackathon-button is-primary" to={showcaseLinks.liveDemo}>
-              <ArrowUpRight size={17} aria-hidden="true" />
-              Live Demo
+            <Link className="hackathon-button is-primary" to={showcaseLinks.web3Profile}>
+              <Sparkles size={17} aria-hidden="true" />
+              Open Web3 Student Profile
             </Link>
-            <PlaceholderButton icon={Github}>GitHub pending</PlaceholderButton>
+            <Link className="hackathon-button" to={showcaseLinks.liveDemo}>
+              <ArrowUpRight size={17} aria-hidden="true" />
+              Live class site
+            </Link>
+            <a className="hackathon-button" href={showcaseLinks.github} target="_blank" rel="noreferrer">
+              <Github size={17} aria-hidden="true" />
+              GitHub repository
+            </a>
             <a className="hackathon-button" href={showcaseLinks.demoVideo} target="_blank" rel="noreferrer">
               <PlayCircle size={17} aria-hidden="true" />
               Demo Video
@@ -149,13 +147,14 @@ export default function HackathonShowcase() {
         </div>
       </ShowcaseSection>
 
-      <ShowcaseSection id="my-role" kicker="05 · My Role" title="Freshman math student, AI native builder">
+      <ShowcaseSection id="my-role" kicker="05 · My Role" title="Freshman math student, AI-native builder">
         <div className="hackathon-two-column">
           <p>
             I am a first-year Mathematics student at Renmin University of China, Sino-French Institute in
-            Suzhou. In this project, my role is not to claim senior engineering experience, but to show that I
-            can define a real student problem, use AI tools responsibly, test the output, and ship a working
-            prototype.
+            Suzhou. I led product direction, scope, deployment, and final verification across this entire
+            project — and I used AI tools (Claude, Codex, Gemini) as collaborators to accelerate the
+            implementation. Every shipped feature was tested end-to-end against a real Phantom wallet,
+            real Solana devnet RPC, and the live production VPS before being committed.
           </p>
           <ul className="hackathon-check-list">
             {roleItems.map((item) => (
@@ -186,10 +185,10 @@ export default function HackathonShowcase() {
             <span>Live class website</span>
             <strong>Open deployed product</strong>
           </Link>
-          <span className="demo-link-row is-placeholder">
+          <a className="demo-link-row" href={showcaseLinks.github} target="_blank" rel="noreferrer">
             <span>GitHub repository</span>
             <strong>{showcaseLinks.github}</strong>
-          </span>
+          </a>
           <a className="demo-link-row" href={showcaseLinks.demoVideo} target="_blank" rel="noreferrer">
             <span>Demo video</span>
             <strong>{showcaseLinks.demoVideo}</strong>
@@ -221,7 +220,7 @@ export default function HackathonShowcase() {
           <dl>
             <div>
               <dt>Name</dt>
-              <dd>Your name / English name</dd>
+              <dd>Jin Shuopeng · 金铄莑</dd>
             </div>
             <div>
               <dt>School</dt>
@@ -232,8 +231,16 @@ export default function HackathonShowcase() {
               <dd>Mathematics and Applied Mathematics, freshman year</dd>
             </div>
             <div>
-              <dt>Email</dt>
-              <dd>TODO: Add contact email</dd>
+              <dt>Reach out</dt>
+              <dd>
+                <a
+                  href="https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public/issues/new"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open a GitHub issue
+                </a>
+              </dd>
             </div>
             <div>
               <dt>GitHub</dt>

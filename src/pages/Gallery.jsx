@@ -31,7 +31,9 @@ export default function Gallery() {
           {orderedAlbums.map((album) => (
             <li key={album.id} className="record-entry">
               <h3>
-                <Link to={`/album/${album.id}`}>{album.title}</Link>
+                <Link to={`/album/${album.id}`}>
+                  {album.titleEn ? `${album.titleEn} · ${album.title}` : album.title}
+                </Link>
               </h3>
               <p className="record-meta">{album.date} · {album.location}</p>
               <figure className="entry-figure">

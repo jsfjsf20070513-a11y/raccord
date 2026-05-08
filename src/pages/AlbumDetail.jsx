@@ -35,7 +35,7 @@ export default function AlbumDetail() {
     <article className="page-column album-page">
       <PageHeader
         kicker="Planches"
-        title={album.title}
+        title={album.titleEn ? `${album.titleEn} · ${album.title}` : album.title}
         backTo="/"
         backLabel="Back to title page · 返回扉页"
         meta={[album.date, album.location, `${album.photos.length} plate${album.photos.length === 1 ? '' : 's'} · ${album.photos.length} 张图版`]}

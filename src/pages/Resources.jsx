@@ -44,7 +44,7 @@ export default function Resources() {
   return (
     <article className="page-column">
       <PageHeader
-        kicker="Bibliotheque"
+        kicker="Bibliothèque"
         title="Resources &amp; bibliography · 资源与书目"
         note="Classer n'est pas clore; c'est laisser les chemins demeurer lisibles. 编目不是封存，而是让路径仍可辨认。"
         backTo="/"

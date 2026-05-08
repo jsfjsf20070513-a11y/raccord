@@ -228,7 +228,8 @@ For HTTPS, the canonical setup is **Cloudflare proxy + Flexible SSL** so HTTPS t
 - **No mainnet writes**: All transactions go to Solana devnet exclusively. Devnet SOL has no monetary value.
 - **No API keys at runtime**: ElevenLabs and Anthropic keys were used in-memory only during static generation; neither is read by the deployed app.
 - **Supabase**: Only the `anon` key reaches the browser. RLS is enforced on `comments`; no service-role key is ever used in this repo.
-- **No real class media in this public repo**: Anonymized samples and SVG placeholders only. Real class photos, admin SQL, and the production `.env` live outside this repository.
+- **No real class photos in this public repo**: SVG placeholders only. Real class photos, admin SQL, and the production `.env` live outside this repository and are injected into the production build at deploy time via `scripts/prepare-private-assets.mjs` (gated by the `MATHCLASS_PRIVATE_REPO` env var). The repository itself never carries class photo binaries or any commit history of them.
+- **The Spring 2026 schedule is intentionally public**: `src/data/siteContent.js` keeps the actual registered timetable verbatim — including teacher names, classroom codes, and time-slot annotations — because that fidelity is the credibility signal for an "honest student builder" hackathon submission. The corresponding faculty members are publicly listed on the institute's official course catalogue, so this is information disclosure, not privacy disclosure.
 
 ---
 
@@ -244,4 +245,4 @@ For HTTPS, the canonical setup is **Cloudflare proxy + Flexible SSL** so HTTPS t
 
 ## License
 
-License pending. Class media (photos, real names, real schedule) are **not** part of this public repository. The code in this repository is intended to be reusable; specific class content is reserved.
+License pending. Class photos are **not** part of this public repository (they're injected at deploy time from a private sibling clone). The code is intended to be reusable; specific class content (photo binaries, admin SQL, production `.env`) is reserved. The bilingual class schedule and the bilingual proof outlines, by contrast, are intentionally part of this public source — see "Security & honest scope" above.

@@ -1103,6 +1103,29 @@ export default function Web3StudentProfile() {
                   ? 'No memos in the current devnet RPC window across the class registry. The public devnet RPC at api.devnet.solana.com retains roughly 1–2 hours of recent transaction history; older anchors are still permanently visible on Solscan.'
                   : 'No memos in the current devnet RPC window for this wallet. The public devnet RPC retains roughly 1–2 hours of recent transaction history; older anchors are still permanently visible on Solscan.'}
               </p>
+              <div className="memo-feed-historical">
+                <p className="memo-feed-historical-kicker">
+                  Verified historical anchor (outside the current RPC window)
+                </p>
+                <p className="memo-feed-historical-meta">
+                  First on-chain memo from this project · Solana devnet · 2026-05-08
+                </p>
+                <pre className="signed-statement memo-feed-historical-payload">
+                  math-class-website:1|tag=student-profile|wallet=Fo7H3z7r47RSJs7jLLQGdgcShUrdC9o3yWx1fmrigHJQ|issued=2026-05-08T…
+                </pre>
+                <p className="hackathon-section-lead">
+                  <a
+                    href="https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="memo-feed-link"
+                  >
+                    <ExternalLink size={13} aria-hidden="true" />
+                    View tx 5L76cFugq…56gv846 on Solscan →
+                  </a>
+                </p>
+              </div>
+
               {feedView === 'mine' && walletSolscanUrl ? (
                 <p className="hackathon-section-lead">
                   <a href={walletSolscanUrl} target="_blank" rel="noreferrer" className="memo-feed-link">

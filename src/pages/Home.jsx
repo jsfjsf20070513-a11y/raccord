@@ -62,13 +62,17 @@ export default function Home() {
         <div className="title-page-head">
           <p className="page-header-kicker">{classProfile.campus}</p>
           <h1>2025 级数学班</h1>
-          <p className="title-page-subtitle">Trente mathematiciens, une classe.</p>
+          <p className="title-page-subtitle">Trente mathématiciens, une classe.</p>
           <div className="title-page-copy">
             <p>Fenêtre sur le présent, miroir pour la mémoire.</p>
           </div>
           <TitlePageNarration />
           <p className="title-page-ledger">{`Édition du ${editionDateLabel}`}</p>
+          <p className="title-page-track">
+            Dev3pack 2026 · Solana + AI hackathon entry
+          </p>
           <nav className="title-page-nav" aria-label="Showcase entry · 作品展示入口">
+            <Link to="/web3-profile">→ Open Web3 Student Profile (Solana devnet)</Link>
             <Link to="/hackathon">View Hackathon Showcase</Link>
           </nav>
         </div>
@@ -76,7 +80,7 @@ export default function Home() {
 
       <section className="home-fragment theorem-fragment" aria-label="Theorem review · 定理回顾">
         <article className="daily-entry theorem-entry">
-          <p className="daily-entry-kicker">Rappel mathematique</p>
+          <p className="daily-entry-kicker">Rappel mathématique</p>
           <h2>{dailyTheorem.title}</h2>
           <p className="daily-entry-prelude">{dailyTheorem.prelude}</p>
           <div
@@ -138,9 +142,28 @@ export default function Home() {
         <ol className="plate-list">
           {plates.map((album, index) => (
             <li key={album.id}>
-              <span>Plate {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][index] || `${index + 1}`}. </span>
-              <Link to={`/album/${album.id}`}>{album.date}，{album.title}。</Link>
-              <span className="muted-copy"> {album.description}</span>
+              <Link to={`/album/${album.id}`} className="plate-link">
+                <figure className="plate-thumb">
+                  <picture>
+                    {album.coverWebp ? <source srcSet={album.coverWebp} type="image/webp" /> : null}
+                    <img
+                      src={album.cover}
+                      alt={album.title}
+                      loading="lazy"
+                      decoding="async"
+                      width={album.coverWidth}
+                      height={album.coverHeight}
+                    />
+                  </picture>
+                </figure>
+                <span className="plate-caption">
+                  <span className="plate-roman">Plate {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][index] || `${index + 1}`}. </span>
+                  <span className="plate-headline">
+                    {album.titleEn ? <>{album.titleEn}<span className="plate-headline-zh"> · {album.title}</span></> : `${album.date}，${album.title}。`}
+                  </span>
+                  <span className="plate-description muted-copy"> {album.description}</span>
+                </span>
+              </Link>
             </li>
           ))}
         </ol>

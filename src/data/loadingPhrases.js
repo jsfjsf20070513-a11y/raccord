@@ -6,7 +6,7 @@ const fallbackLoadingThemes = {
     kicker: 'Avant-propos',
     eyebrow: '扉页',
     title: '扉页正在徐徐展开',
-    ledger: 'Prelude · Memoire · Presence',
+    ledger: 'Prélude · Mémoire · Présence',
     palette: {
       accent: '#8b0000',
       muted: '#6f5a56',
@@ -66,11 +66,11 @@ const fallbackLoadingThemes = {
   gallery: {
     id: 'gallery',
     badge: '影',
-    motto: '光影与留念 · Memoire',
+    motto: '光影与留念 · Mémoire',
     kicker: 'Chambre claire',
     eyebrow: '相册',
     title: '图像正在显影',
-    ledger: 'Image · Memoire · Lumiere',
+    ledger: 'Image · Mémoire · Lumière',
     palette: {
       accent: '#2f6a63',
       muted: '#51655f',
@@ -130,8 +130,8 @@ const fallbackLoadingThemes = {
   resources: {
     id: 'resources',
     badge: '卷',
-    motto: '书页与路径 · Bibliotheque',
-    kicker: 'Bibliotheque',
+    motto: '书页与路径 · Bibliothèque',
+    kicker: 'Bibliothèque',
     eyebrow: '资源',
     title: '书页正在归架',
     ledger: 'Rayon · Etude · Methode',
