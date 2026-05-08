@@ -4,7 +4,9 @@ import {
   Copy,
   ExternalLink,
   Github,
+  History,
   PlayCircle,
+  RefreshCw,
   ShieldCheck,
   Signature,
   Sparkles,
@@ -13,7 +15,6 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  contributionRecords,
   contributionSummary,
   messageStatement,
   onchainAnchor,
@@ -27,6 +28,8 @@ import {
   buildSolscanUrl,
   createDevnetConnection,
   fetchLamportBalance,
+  fetchWalletMemos,
+  formatBlockTime,
   formatSol,
   MIN_LAMPORTS_FOR_MEMO,
   submitMemoViaWallet,
@@ -187,6 +190,10 @@ export default function Web3StudentProfile() {
   const [balanceLamports, setBalanceLamports] = useState(null)
   const [isCheckingBalance, setIsCheckingBalance] = useState(false)
 
+  const [memoFeed, setMemoFeed] = useState([])
+  const [memoFeedState, setMemoFeedState] = useState('idle')
+  const [memoFeedError, setMemoFeedError] = useState('')
+
   const providerName = useMemo(() => resolveProviderName(provider), [provider])
   const shortAddress = useMemo(() => formatAddress(walletAddress), [walletAddress])
   const isConnected = Boolean(walletAddress)
@@ -237,6 +244,18 @@ export default function Web3StudentProfile() {
         ? 'Retry anchor'
         : 'Anchor on Devnet'
 
+  const memoFeedStatusLabel = !isConnected
+    ? 'Connect wallet first'
+    : memoFeedState === 'loading'
+      ? 'Reading from devnet RPC'
+      : memoFeedState === 'loaded'
+        ? memoFeed.length === 0
+          ? 'No memos yet'
+          : `${memoFeed.length} memo${memoFeed.length === 1 ? '' : 's'} indexed`
+        : memoFeedState === 'error'
+          ? 'RPC read failed'
+          : 'Idle'
+
   const balanceLabel = !walletAddress
     ? 'Connect a wallet to view balance'
     : isCheckingBalance && balanceLamports === null
@@ -265,6 +284,9 @@ export default function Web3StudentProfile() {
     setMemoPayloadShown('')
     setBalanceLamports(null)
     setIsCheckingBalance(false)
+    setMemoFeed([])
+    setMemoFeedState('idle')
+    setMemoFeedError('')
   }, [])
 
   const refreshWalletState = useCallback(() => {
@@ -437,13 +459,35 @@ export default function Web3StudentProfile() {
     }
   }, [walletAddress])
 
+  const refreshMemoFeed = useCallback(async () => {
+    if (!walletAddress) {
+      return
+    }
+    setMemoFeedState('loading')
+    setMemoFeedError('')
+    try {
+      const connection = createDevnetConnection()
+      const memos = await fetchWalletMemos({
+        connection,
+        walletAddress,
+        limit: 8,
+      })
+      setMemoFeed(memos)
+      setMemoFeedState('loaded')
+    } catch (error) {
+      setMemoFeedError(error?.message || 'Failed to read memos from devnet RPC.')
+      setMemoFeedState('error')
+    }
+  }, [walletAddress])
+
   useEffect(() => {
     if (!walletAddress) {
       setBalanceLamports(null)
       return
     }
     refreshBalance()
-  }, [walletAddress, refreshBalance])
+    refreshMemoFeed()
+  }, [walletAddress, refreshBalance, refreshMemoFeed])
 
   const handleAnchorMemo = async () => {
     const currentProvider = getInjectedSolanaProvider()
@@ -486,8 +530,13 @@ export default function Web3StudentProfile() {
       setMemoSignature(signature)
       setMemoState('confirmed')
 
-      // Refresh balance to reflect signature fee burn
+      // Refresh balance and memo feed to reflect new on-chain state
       refreshBalance()
+      // Devnet RPC needs a moment to index a fresh transaction; wait briefly
+      // before pulling the updated feed.
+      setTimeout(() => {
+        refreshMemoFeed()
+      }, 1500)
     } catch (error) {
       setMemoError(error?.message || 'Memo transaction failed.')
       setMemoState('error')
@@ -537,11 +586,11 @@ export default function Web3StudentProfile() {
           </div>
           <div className="hackathon-stat">
             <span>Implementation stage</span>
-            <strong>Connect + sign + anchor</strong>
+            <strong>Connect · sign · anchor · index</strong>
           </div>
           <div className="hackathon-stat">
             <span>On-chain status</span>
-            <strong>Devnet memo enabled</strong>
+            <strong>Devnet write + RPC read</strong>
           </div>
         </aside>
       </header>
@@ -808,19 +857,90 @@ export default function Web3StudentProfile() {
         </article>
       </ProfileSection>
 
-      <ProfileSection id="contributions" kicker="04 · Contribution Records" title="Demo records from the current project">
-        <p className="hackathon-section-lead">
-          These records are static demo data for the Web3 Student Profile MVP. They are not presented as on-chain
-          records.
-        </p>
-        <div className="hackathon-grid">
-          {contributionRecords.map((record) => (
-            <article key={record.title} className="hackathon-card">
-              <h3>{record.title}</h3>
-              <p>{record.detail}</p>
-            </article>
-          ))}
-        </div>
+      <ProfileSection
+        id="onchain-feed"
+        kicker="04 · On-Chain Activity Feed"
+        title="Live memo history read from Solana devnet"
+      >
+        <article className="hackathon-card">
+          <div className="feature-card-head">
+            <h3>Wallet memos · live RPC read</h3>
+            <span className="feature-status">
+              <History size={15} aria-hidden="true" />
+              {memoFeedStatusLabel}
+            </span>
+          </div>
+          <p>
+            Real-time read-side proof. This list is fetched from the Solana devnet RPC at{' '}
+            <code>api.devnet.solana.com</code> using <code>getSignaturesForAddress</code> followed by{' '}
+            <code>getParsedTransaction</code>, then filtered to instructions targeting the SPL Memo program.
+            No backend, no API key, no cache — every refresh is a fresh round-trip to Solana.
+          </p>
+
+          <div className="hackathon-actions" aria-label="Feed controls">
+            <button
+              className="hackathon-button is-primary"
+              type="button"
+              onClick={refreshMemoFeed}
+              disabled={!isConnected || memoFeedState === 'loading'}
+            >
+              <RefreshCw size={17} aria-hidden="true" />
+              {memoFeedState === 'loading' ? 'Reading…' : 'Refresh feed'}
+            </button>
+          </div>
+
+          {!isConnected ? (
+            <p className="hackathon-section-lead">
+              Connect a wallet in section 01 to read its on-chain memos.
+            </p>
+          ) : null}
+
+          {isConnected && memoFeedState === 'loading' && memoFeed.length === 0 ? (
+            <p className="hackathon-section-lead">Reading recent transactions from devnet RPC…</p>
+          ) : null}
+
+          {isConnected && memoFeedState === 'loaded' && memoFeed.length === 0 ? (
+            <p className="hackathon-section-lead">
+              No memo transactions found yet for this wallet on devnet. Anchor one in section 03; it will
+              appear here automatically once devnet indexes it.
+            </p>
+          ) : null}
+
+          {memoFeed.length > 0 ? (
+            <ol className="memo-feed-list">
+              {memoFeed.map((entry) => (
+                <li key={entry.signature} className="memo-feed-entry">
+                  <div className="memo-feed-head">
+                    <span className="memo-feed-time">
+                      {formatBlockTime(entry.blockTime) || `slot ${entry.slot}`}
+                    </span>
+                    <a
+                      className="memo-feed-link"
+                      href={buildSolscanUrl(entry.signature, 'devnet')}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <ExternalLink size={13} aria-hidden="true" />
+                      Solscan
+                    </a>
+                  </div>
+                  <pre className="signed-statement">{entry.memo}</pre>
+                  <p className="memo-feed-sig">
+                    sig: {entry.signature.slice(0, 16)}…{entry.signature.slice(-12)}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          ) : null}
+
+          {memoFeedError ? <p className="status-line is-error">{memoFeedError}</p> : null}
+
+          <p className="hackathon-ai-badge">
+            <ShieldCheck size={15} aria-hidden="true" />
+            Read-only RPC. Public devnet endpoint, no API key required. Up to 8 most recent memos
+            shown; older history remains fully verifiable on Solscan.
+          </p>
+        </article>
       </ProfileSection>
 
       <ProfileSection id="ai-summary" kicker="05 · AI-assisted Contribution Summary" title="A summary designed for review">

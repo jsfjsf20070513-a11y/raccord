@@ -69,9 +69,9 @@ export const contributionSummary =
   'This student profile summarizes contributions across class collaboration, documentation, deployment, and hackathon preparation. The next version will connect wallet identity to real contribution records and optionally generate AI-assisted summaries from verified project activity.'
 
 export const stretchGoals = [
-  'Claude AI bilingual (Chinese / French) caption generation for class photos',
-  'Wallet-linked Supabase student profile',
+  'Streaming Claude Q&A via Cloudflare Worker (server-side API key)',
+  'Wallet-linked Supabase student profile (Web2 ↔ Web3 bridge)',
+  'Class-wide collective memo feed (multi-wallet indexing)',
   'Soulbound contribution badge for active class members',
-  'Real-time devnet contribution feed indexed from Memo program',
   'Cross-class identity portability via wallet signature exchange',
 ]

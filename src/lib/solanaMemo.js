@@ -95,6 +95,97 @@ export function buildMemoPayload({ walletAddress, project = 'math-class-website'
   return `${project}:1|tag=${tag}|wallet=${walletAddress}|issued=${issuedAt}`
 }
 
+/**
+ * Fetch recent on-chain memo records produced by a wallet on Solana devnet.
+ *
+ * Strategy:
+ *   1. List the wallet's most recent transaction signatures via getSignaturesForAddress
+ *   2. For each signature, parse the transaction and extract instructions that
+ *      target the SPL Memo program v2
+ *   3. Decode the memo data as UTF-8 and return one entry per memo
+ *
+ * The number of RPC calls is bounded by `limit` to stay friendly to the
+ * public devnet RPC rate limits. Calls are awaited sequentially with a small
+ * delay so a quick page load does not trigger 429s.
+ */
+export async function fetchWalletMemos({
+  connection,
+  walletAddress,
+  limit = 8,
+  rpcDelayMs = 80,
+}) {
+  if (!walletAddress) {
+    return []
+  }
+
+  const pubkey = new PublicKey(walletAddress)
+  const sigs = await connection.getSignaturesForAddress(pubkey, { limit })
+  if (!sigs || sigs.length === 0) {
+    return []
+  }
+
+  const memos = []
+  for (const sigInfo of sigs) {
+    if (sigInfo.err) {
+      continue
+    }
+    try {
+      const tx = await connection.getParsedTransaction(sigInfo.signature, {
+        maxSupportedTransactionVersion: 0,
+        commitment: 'confirmed',
+      })
+      if (!tx) {
+        continue
+      }
+
+      const instructions = tx.transaction?.message?.instructions || []
+      for (const instr of instructions) {
+        const programId = instr.programId?.toBase58?.() || instr.programId
+        if (programId !== MEMO_PROGRAM_ID.toBase58()) {
+          continue
+        }
+
+        // Parsed memo instructions in @solana/web3.js v1 expose `parsed`
+        // (string), older serializations may put it in `data`.
+        const memoData = typeof instr.parsed === 'string'
+          ? instr.parsed
+          : instr.parsed?.info?.memo
+            ? instr.parsed.info.memo
+            : typeof instr.data === 'string'
+              ? instr.data
+              : ''
+
+        if (!memoData) {
+          continue
+        }
+
+        memos.push({
+          signature: sigInfo.signature,
+          memo: memoData,
+          slot: sigInfo.slot,
+          blockTime: sigInfo.blockTime || tx.blockTime || null,
+          err: sigInfo.err || null,
+        })
+      }
+    } catch {
+      // Per-tx failure should not break the whole feed; just skip.
+    }
+
+    if (rpcDelayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, rpcDelayMs))
+    }
+  }
+
+  return memos
+}
+
+export function formatBlockTime(blockTimeSeconds) {
+  if (!blockTimeSeconds) {
+    return ''
+  }
+  return new Date(blockTimeSeconds * 1000).toISOString().replace(/\.\d+Z$/, 'Z')
+}
+
 function withTimeout(promise, ms, label) {
   let timeoutId
   const timeout = new Promise((_, reject) => {
