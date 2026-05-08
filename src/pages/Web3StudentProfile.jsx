@@ -33,12 +33,15 @@ import {
   fetchWalletMemos,
   formatBlockTime,
   formatSol,
+  isValidSolanaAddress,
   MIN_LAMPORTS_FOR_MEMO,
   submitMemoViaWallet,
 } from '../lib/solanaMemo'
 import {
   addLocalWallet,
   getMergedRegistry,
+  isSeedWallet,
+  removeLocalWallet,
 } from '../data/classRegistry'
 
 const MEMO_PROGRAM_ID_STRING = MEMO_PROGRAM_ID.toBase58()
@@ -201,6 +204,8 @@ export default function Web3StudentProfile() {
   const [memoFeedError, setMemoFeedError] = useState('')
   const [feedView, setFeedView] = useState('mine') // 'mine' | 'collective'
   const [classRegistry, setClassRegistry] = useState(() => getMergedRegistry())
+  const [addWalletInput, setAddWalletInput] = useState('')
+  const [addWalletStatus, setAddWalletStatus] = useState('')
 
   const providerName = useMemo(() => resolveProviderName(provider), [provider])
   const shortAddress = useMemo(() => formatAddress(walletAddress), [walletAddress])
@@ -521,6 +526,48 @@ export default function Web3StudentProfile() {
       return next.length === prev.length ? prev : next
     })
   }, [walletAddress])
+
+  const handleAddWalletToRegistry = (event) => {
+    event?.preventDefault?.()
+    const candidate = addWalletInput.trim()
+    setAddWalletStatus('')
+
+    if (!candidate) {
+      setAddWalletStatus('Paste a Solana base58 wallet address first.')
+      return
+    }
+    if (!isValidSolanaAddress(candidate)) {
+      setAddWalletStatus('Not a valid Solana base58 address (32–44 chars).')
+      return
+    }
+    if (classRegistry.includes(candidate)) {
+      setAddWalletStatus('This wallet is already in the class registry.')
+      return
+    }
+
+    addLocalWallet(candidate)
+    setClassRegistry(getMergedRegistry())
+    setAddWalletInput('')
+    setAddWalletStatus(`Added ${candidate.slice(0, 6)}…${candidate.slice(-6)} to registry.`)
+
+    // Trigger an immediate refresh so the new wallet's memos (if any)
+    // show up in the collective feed without an extra click.
+    if (feedView === 'collective') {
+      setTimeout(() => refreshMemoFeed(), 50)
+    }
+  }
+
+  const handleRemoveWalletFromRegistry = (address) => {
+    if (!address) {
+      return
+    }
+    removeLocalWallet(address)
+    setClassRegistry(getMergedRegistry())
+    setAddWalletStatus(`Removed ${address.slice(0, 6)}…${address.slice(-6)} from local registry.`)
+    if (feedView === 'collective') {
+      setTimeout(() => refreshMemoFeed(), 50)
+    }
+  }
 
   useEffect(() => {
     if (!walletAddress) {
@@ -951,6 +998,81 @@ export default function Web3StudentProfile() {
               ? `Aggregated memo feed across ${collectiveWalletCount} known class wallet${collectiveWalletCount === 1 ? '' : 's'}, sorted by on-chain time. New wallets join the registry automatically when they connect to this site and anchor a memo.`
               : 'Memos signed by your connected wallet only. Anchor a fresh memo in section 03 — it will appear here within seconds of devnet indexing.'}
           </p>
+
+          {feedView === 'collective' ? (
+            <div className="class-registry-panel" aria-label="Class wallet registry">
+              <form className="class-registry-add-form" onSubmit={handleAddWalletToRegistry}>
+                <label htmlFor="add-wallet-input" className="class-registry-add-label">
+                  Add a class wallet to the collective feed
+                </label>
+                <div className="class-registry-add-row">
+                  <input
+                    id="add-wallet-input"
+                    type="text"
+                    className="class-registry-add-input"
+                    placeholder="Paste a Solana base58 wallet address…"
+                    value={addWalletInput}
+                    onChange={(event) => setAddWalletInput(event.target.value)}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  <button
+                    type="submit"
+                    className="hackathon-button is-primary"
+                    disabled={!addWalletInput.trim()}
+                  >
+                    + Add wallet
+                  </button>
+                </div>
+                <p className="class-registry-help">
+                  Stored locally in this browser only. The wallet&rsquo;s recent devnet memos
+                  are merged into the feed below on the next refresh. Reviewers can paste the
+                  Dev3pack judging wallet here to verify the aggregation is real.
+                </p>
+                {addWalletStatus ? (
+                  <p className="status-line">{addWalletStatus}</p>
+                ) : null}
+              </form>
+
+              {classRegistry.length > 0 ? (
+                <ul className="class-registry-list" aria-label="Known class wallets">
+                  {classRegistry.map((address) => {
+                    const seed = isSeedWallet(address)
+                    return (
+                      <li key={address} className="class-registry-item">
+                        <a
+                          href={buildSolscanAccountUrl(address, 'devnet')}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="class-registry-link"
+                        >
+                          <ExternalLink size={12} aria-hidden="true" />
+                          <span className="class-registry-address">
+                            {address.slice(0, 6)}…{address.slice(-6)}
+                          </span>
+                        </a>
+                        {seed ? (
+                          <span className="class-registry-tag" title="Seed wallet — cannot be removed">
+                            seed
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            className="class-registry-remove"
+                            onClick={() => handleRemoveWalletFromRegistry(address)}
+                            aria-label={`Remove ${address.slice(0, 6)}…${address.slice(-6)} from local registry`}
+                            title="Remove from local registry"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="hackathon-actions" aria-label="Feed controls">
             <button

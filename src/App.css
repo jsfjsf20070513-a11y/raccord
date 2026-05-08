@@ -2219,6 +2219,131 @@
   margin: 0;
 }
 
+.class-registry-panel {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  background: rgba(26, 26, 26, 0.025);
+  border-left: 2px solid rgba(139, 0, 0, 0.35);
+}
+
+.class-registry-add-form {
+  margin: 0 0 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.class-registry-add-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.class-registry-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.class-registry-add-input {
+  flex: 1 1 280px;
+  min-width: 0;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  transition: border-color 0.18s ease;
+}
+
+.class-registry-add-input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.class-registry-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.class-registry-list {
+  margin: 12px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid rgba(26, 26, 26, 0.08);
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.class-registry-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid var(--rule);
+}
+
+.class-registry-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  transition: color 0.18s ease;
+}
+
+.class-registry-link:hover,
+.class-registry-link:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.class-registry-address {
+  font-variant-numeric: tabular-nums;
+}
+
+.class-registry-tag {
+  padding: 1px 6px;
+  background: rgba(139, 0, 0, 0.08);
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.class-registry-remove {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.class-registry-remove:hover,
+.class-registry-remove:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(139, 0, 0, 0.06);
+  outline: none;
+}
+
 .contact-sentence {
   margin: 28px 0 18px;
   padding-top: 18px;

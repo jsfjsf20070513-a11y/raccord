@@ -61,6 +61,20 @@ export function addLocalWallet(address) {
   return next
 }
 
+export function removeLocalWallet(address) {
+  if (!address) {
+    return readLocalRegistry()
+  }
+  const current = readLocalRegistry()
+  const next = current.filter((entry) => entry !== address)
+  writeLocalRegistry(next)
+  return next
+}
+
+export function isSeedWallet(address) {
+  return SEED_CLASS_WALLETS.includes(address)
+}
+
 export function getMergedRegistry() {
   const local = readLocalRegistry()
   return Array.from(new Set([...SEED_CLASS_WALLETS, ...local]))

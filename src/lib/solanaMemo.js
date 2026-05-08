@@ -22,6 +22,28 @@ export const MIN_LAMPORTS_FOR_MEMO = 5_000_000 // 0.005 SOL
 export const SOLSCAN_TX_URL_BASE = 'https://solscan.io/tx'
 export const SOLSCAN_ACCOUNT_URL_BASE = 'https://solscan.io/account'
 
+/**
+ * Validate a string as a Solana base58 public key. Catches both length
+ * issues and invalid base58 characters via the PublicKey constructor.
+ */
+export function isValidSolanaAddress(address) {
+  if (!address || typeof address !== 'string') {
+    return false
+  }
+  const trimmed = address.trim()
+  if (trimmed.length < 32 || trimmed.length > 44) {
+    return false
+  }
+  try {
+    // PublicKey constructor throws on invalid base58 or wrong byte length.
+    // The constructor's side effect (validation) is exactly what we want here.
+    const probe = new PublicKey(trimmed)
+    return probe.toBase58().length > 0
+  } catch {
+    return false
+  }
+}
+
 export function lamportsToSol(lamports) {
   if (typeof lamports !== 'number' || !Number.isFinite(lamports)) {
     return 0
