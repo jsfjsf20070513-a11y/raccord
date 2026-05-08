@@ -10,7 +10,21 @@ export const walletIdentity = {
   address: 'Connect a wallet to display the public address.',
   nextStep: 'Link wallet identity to the existing student collaboration profile.',
   safety:
-    'No private keys, seed phrases, service role key, signatures, or mainnet transactions are handled. This stage only requests a public wallet connection and displays the public address as a non-financial identity layer.',
+    'No private keys, seed phrases, service role key, or mainnet transactions are handled. The wallet is used as a non-financial identity layer only. Ownership can be optionally proven through an off-chain ed25519 signature in the next section.',
+}
+
+export const messageStatement = {
+  prompt:
+    'Sign a short bilingual student statement with the connected wallet. The signature is produced locally by the wallet using ed25519, never exposes private keys, and does not send any transaction.',
+  safety:
+    'Off-chain ownership proof. No fee, no transaction, no smart contract. The signature can be independently verified by anyone holding the public wallet address using standard ed25519 verification (for example @solana/web3.js verify or tweetnacl).',
+  buildStatement: ({ address, issuedAt }) =>
+    `I am a student of the bilingual mathematics class at Renmin University of China — Suzhou campus.
+Je suis étudiant·e de la classe de mathématiques bilingue à RUC — campus de Suzhou.
+
+Wallet:  ${address}
+Issued:  ${issuedAt}
+Project: Math Class Website (Dev3pack solo submission)`,
 }
 
 export const contributionRecords = [
@@ -40,9 +54,9 @@ export const contributionSummary =
   'This student profile summarizes contributions across class collaboration, documentation, deployment, and hackathon preparation. The next version will connect wallet identity to real contribution records and optionally generate AI-assisted summaries from verified project activity.'
 
 export const stretchGoals = [
+  'Devnet memo transaction anchoring contribution hash on Solana',
+  'AI-assisted bilingual project summary (Claude / ElevenLabs)',
   'Wallet-linked Supabase profile',
-  'Wallet ownership proof with message signing',
-  'Devnet contribution proof',
-  'On-chain contribution badge',
-  'Stronger AI-generated contribution summaries',
+  'On-chain contribution badge for active class members',
+  'Cross-class identity portability via wallet signature exchange',
 ]

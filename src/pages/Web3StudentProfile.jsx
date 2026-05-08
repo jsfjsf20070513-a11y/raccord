@@ -1,8 +1,10 @@
 import {
   ArrowUpRight,
+  Copy,
   Github,
   PlayCircle,
   ShieldCheck,
+  Signature,
   Sparkles,
   Wallet,
 } from 'lucide-react'
@@ -11,12 +13,95 @@ import { Link } from 'react-router-dom'
 import {
   contributionRecords,
   contributionSummary,
+  messageStatement,
   stretchGoals,
   walletIdentity,
   web3ProfileLinks,
 } from '../data/web3ProfileContent'
 
 const PHANTOM_DOWNLOAD_URL = 'https://phantom.app/download'
+
+// Base58 encoder for Solana signatures. Kept inline (no dependency) to avoid
+// pulling @solana/web3.js / bs58 which previously triggered high-severity npm
+// audit warnings for this public-safe repository.
+const BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+
+function base58Encode(input) {
+  if (!input) {
+    return ''
+  }
+
+  const bytes = input instanceof Uint8Array ? input : new Uint8Array(input)
+  if (bytes.length === 0) {
+    return ''
+  }
+
+  let leadingZeros = 0
+  for (const byte of bytes) {
+    if (byte === 0) {
+      leadingZeros += 1
+    } else {
+      break
+    }
+  }
+
+  const digits = [0]
+  for (let byteIndex = 0; byteIndex < bytes.length; byteIndex += 1) {
+    let carry = bytes[byteIndex]
+    for (let digitIndex = 0; digitIndex < digits.length; digitIndex += 1) {
+      carry += digits[digitIndex] << 8
+      digits[digitIndex] = carry % 58
+      carry = (carry / 58) | 0
+    }
+    while (carry > 0) {
+      digits.push(carry % 58)
+      carry = (carry / 58) | 0
+    }
+  }
+
+  let encoded = ''
+  for (let i = 0; i < leadingZeros; i += 1) {
+    encoded += BASE58_ALPHABET[0]
+  }
+  for (let i = digits.length - 1; i >= 0; i -= 1) {
+    encoded += BASE58_ALPHABET[digits[i]]
+  }
+  return encoded
+}
+
+function buildIssuedTimestamp() {
+  return new Date().toISOString().replace(/\.\d+Z$/, 'Z')
+}
+
+async function copyToClipboardSafe(text) {
+  if (!text) {
+    return false
+  }
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch {
+    // fall through to legacy path
+  }
+
+  try {
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.setAttribute('readonly', '')
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
+    return true
+  } catch {
+    return false
+  }
+}
 
 function getInjectedSolanaProvider() {
   if (typeof window === 'undefined') {
@@ -73,9 +158,45 @@ export default function Web3StudentProfile() {
   const [walletError, setWalletError] = useState('')
   const [isConnecting, setIsConnecting] = useState(false)
 
+  const [signingState, setSigningState] = useState('idle')
+  const [signedStatement, setSignedStatement] = useState('')
+  const [signatureBase58, setSignatureBase58] = useState('')
+  const [signatureIssuedAt, setSignatureIssuedAt] = useState('')
+  const [signatureError, setSignatureError] = useState('')
+  const [copyStatus, setCopyStatus] = useState('')
+
   const providerName = useMemo(() => resolveProviderName(provider), [provider])
   const shortAddress = useMemo(() => formatAddress(walletAddress), [walletAddress])
   const isConnected = Boolean(walletAddress)
+  const hasSignature = signingState === 'signed' && Boolean(signatureBase58)
+
+  const signingStatusLabel = !isConnected
+    ? 'Connect wallet first'
+    : signingState === 'signing'
+      ? 'Signing in progress'
+      : signingState === 'signed'
+        ? 'Signature verified locally'
+        : signingState === 'error'
+          ? 'Signing failed'
+          : 'Ready to sign'
+
+  const signingButtonLabel =
+    signingState === 'signing'
+      ? 'Signing…'
+      : signingState === 'signed'
+        ? 'Sign again'
+        : signingState === 'error'
+          ? 'Try again'
+          : 'Sign with wallet'
+
+  const resetSignature = useCallback(() => {
+    setSigningState('idle')
+    setSignedStatement('')
+    setSignatureBase58('')
+    setSignatureIssuedAt('')
+    setSignatureError('')
+    setCopyStatus('')
+  }, [])
 
   const refreshWalletState = useCallback(() => {
     const nextProvider = getInjectedSolanaProvider()
@@ -84,13 +205,14 @@ export default function Web3StudentProfile() {
     if (!nextProvider) {
       setWalletStatus('Wallet not detected')
       setWalletAddress('')
+      resetSignature()
       return
     }
 
     const nextAddress = getAddressFromProvider(nextProvider)
     setWalletAddress(nextProvider.isConnected && nextAddress ? nextAddress : '')
     setWalletStatus(nextProvider.isConnected && nextAddress ? 'Connected' : 'Ready to connect')
-  }, [])
+  }, [resetSignature])
 
   useEffect(() => {
     refreshWalletState()
@@ -109,9 +231,11 @@ export default function Web3StudentProfile() {
     const handleDisconnect = () => {
       setWalletAddress('')
       setWalletStatus('Ready to connect')
+      resetSignature()
     }
 
     const handleAccountChanged = (publicKey) => {
+      resetSignature()
       if (publicKey) {
         setWalletError('')
         setWalletAddress(publicKey.toBase58 ? publicKey.toBase58() : `${publicKey}`)
@@ -132,7 +256,7 @@ export default function Web3StudentProfile() {
       currentProvider.off?.('disconnect', handleDisconnect)
       currentProvider.off?.('accountChanged', handleAccountChanged)
     }
-  }, [refreshWalletState])
+  }, [refreshWalletState, resetSignature])
 
   const handleWalletAction = async () => {
     const currentProvider = getInjectedSolanaProvider()
@@ -152,6 +276,7 @@ export default function Web3StudentProfile() {
         await currentProvider.disconnect?.()
         setWalletAddress('')
         setWalletStatus('Ready to connect')
+        resetSignature()
         return
       }
 
@@ -167,11 +292,66 @@ export default function Web3StudentProfile() {
     }
   }
 
+  const handleSignStatement = async () => {
+    const currentProvider = getInjectedSolanaProvider()
+    if (!currentProvider) {
+      setSignatureError('Connect a Solana-compatible wallet first to sign the statement.')
+      return
+    }
+    if (!walletAddress) {
+      setSignatureError('Connect a wallet before signing.')
+      return
+    }
+    if (typeof currentProvider.signMessage !== 'function') {
+      setSignatureError('Connected wallet does not expose signMessage. Try Phantom or a compatible wallet.')
+      return
+    }
+
+    setSignatureError('')
+    setCopyStatus('')
+    setSigningState('signing')
+
+    try {
+      const issuedAt = buildIssuedTimestamp()
+      const statement = messageStatement.buildStatement({
+        address: walletAddress,
+        issuedAt,
+      })
+      const encoded = new TextEncoder().encode(statement)
+      const result = await currentProvider.signMessage(encoded, 'utf8')
+      const signatureBytes = result?.signature
+        ? result.signature
+        : result instanceof Uint8Array
+          ? result
+          : null
+
+      if (!signatureBytes || !(signatureBytes instanceof Uint8Array) || signatureBytes.length === 0) {
+        throw new Error('Wallet returned an empty signature.')
+      }
+
+      setSignedStatement(statement)
+      setSignatureBase58(base58Encode(signatureBytes))
+      setSignatureIssuedAt(issuedAt)
+      setSigningState('signed')
+    } catch (error) {
+      setSignatureError(error?.message || 'Signing was cancelled or failed.')
+      setSigningState('error')
+    }
+  }
+
+  const handleCopySignature = async () => {
+    if (!signatureBase58) {
+      return
+    }
+    const ok = await copyToClipboardSafe(signatureBase58)
+    setCopyStatus(ok ? 'Signature copied to clipboard.' : 'Copy failed — please select and copy manually.')
+  }
+
   return (
     <article className="hackathon-page">
       <header className="hackathon-hero">
         <div className="hackathon-hero-copy">
-          <p className="hackathon-eyebrow">Dev3pack solo MVP · real wallet connection stage</p>
+          <p className="hackathon-eyebrow">Dev3pack solo MVP · wallet identity &amp; ed25519 ownership proof</p>
           <h1>Web3 Student Profile</h1>
           <p className="hackathon-hero-summary">
             A Solana-ready identity layer for student collaboration, contribution records, and AI-assisted
@@ -179,7 +359,8 @@ export default function Web3StudentProfile() {
           </p>
           <p className="hackathon-hero-context">
             This page extends the existing class collaboration website toward the Dev3pack Solana track with a
-            real browser wallet connection, without smart contracts, mainnet transactions, or new Supabase schema.
+            real browser wallet connection and an optional off-chain ed25519 signature for ownership proof,
+            without smart contracts, mainnet transactions, or new Supabase schema.
           </p>
           <div className="hackathon-actions" aria-label="Web3 profile links">
             <Link className="hackathon-button is-primary" to={web3ProfileLinks.hackathon}>
@@ -197,7 +378,8 @@ export default function Web3StudentProfile() {
           </div>
           <p className="hackathon-ai-badge">
             <Sparkles size={15} aria-hidden="true" />
-            Real wallet connection MVP. No signature request, RPC write, or transaction is performed in this stage.
+            Real wallet connection plus optional off-chain ed25519 signature. No fee, no transaction, no smart
+            contract, no mainnet write.
           </p>
         </div>
 
@@ -208,11 +390,11 @@ export default function Web3StudentProfile() {
           </div>
           <div className="hackathon-stat">
             <span>Implementation stage</span>
-            <strong>Wallet connect</strong>
+            <strong>Connect + sign</strong>
           </div>
           <div className="hackathon-stat">
             <span>On-chain status</span>
-            <strong>No transactions</strong>
+            <strong>Off-chain ed25519 only</strong>
           </div>
         </aside>
       </header>
@@ -279,7 +461,80 @@ export default function Web3StudentProfile() {
         </article>
       </ProfileSection>
 
-      <ProfileSection id="contributions" kicker="02 · Contribution Records" title="Demo records from the current project">
+      <ProfileSection
+        id="identity-proof"
+        kicker="02 · Identity Proof"
+        title="Cryptographically signed student statement"
+      >
+        <article className="hackathon-card">
+          <div className="feature-card-head">
+            <h3>Wallet-Signed Statement</h3>
+            <span className="feature-status">
+              <Signature size={15} aria-hidden="true" />
+              {signingStatusLabel}
+            </span>
+          </div>
+          <p>{messageStatement.prompt}</p>
+          <div className="hackathon-actions" aria-label="Signing controls">
+            <button
+              className="hackathon-button is-primary"
+              type="button"
+              onClick={handleSignStatement}
+              disabled={!isConnected || signingState === 'signing'}
+            >
+              <Signature size={17} aria-hidden="true" />
+              {signingButtonLabel}
+            </button>
+            {hasSignature ? (
+              <button
+                className="hackathon-button"
+                type="button"
+                onClick={handleCopySignature}
+              >
+                <Copy size={17} aria-hidden="true" />
+                Copy signature
+              </button>
+            ) : null}
+          </div>
+          {!isConnected ? (
+            <p className="hackathon-section-lead">
+              Connect a wallet in the section above to enable signing.
+            </p>
+          ) : null}
+          {hasSignature ? (
+            <div className="contact-panel">
+              <dl>
+                <div>
+                  <dt>Statement</dt>
+                  <dd>
+                    <pre className="signed-statement">{signedStatement}</pre>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Issued at</dt>
+                  <dd>{signatureIssuedAt}</dd>
+                </div>
+                <div>
+                  <dt>Signer public key</dt>
+                  <dd className="wallet-address-value">{walletAddress}</dd>
+                </div>
+                <div>
+                  <dt>Signature (base58)</dt>
+                  <dd className="wallet-address-value">{signatureBase58}</dd>
+                </div>
+              </dl>
+            </div>
+          ) : null}
+          {signatureError ? <p className="status-line is-error">{signatureError}</p> : null}
+          {copyStatus ? <p className="status-line">{copyStatus}</p> : null}
+          <p className="hackathon-ai-badge">
+            <ShieldCheck size={15} aria-hidden="true" />
+            {messageStatement.safety}
+          </p>
+        </article>
+      </ProfileSection>
+
+      <ProfileSection id="contributions" kicker="03 · Contribution Records" title="Demo records from the current project">
         <p className="hackathon-section-lead">
           These records are static demo data for the Web3 Student Profile MVP. They are not presented as on-chain
           records.
@@ -294,7 +549,7 @@ export default function Web3StudentProfile() {
         </div>
       </ProfileSection>
 
-      <ProfileSection id="ai-summary" kicker="03 · AI-assisted Contribution Summary" title="A summary designed for review">
+      <ProfileSection id="ai-summary" kicker="04 · AI-assisted Contribution Summary" title="A summary designed for review">
         <article className="hackathon-card">
           <h3>Summary Draft</h3>
           <p>{contributionSummary}</p>
@@ -304,14 +559,14 @@ export default function Web3StudentProfile() {
         </article>
       </ProfileSection>
 
-      <ProfileSection id="stretch-goals" kicker="04 · Stretch Goal" title="Next steps for a real Solana integration">
+      <ProfileSection id="stretch-goals" kicker="05 · Stretch Goal" title="Next steps for a real Solana integration">
         <div className="hackathon-grid">
           {stretchGoals.map((goal) => (
             <article key={goal} className="hackathon-card">
               <h3>{goal}</h3>
               <p>
-                Planned for a later phase after wallet connection remains stable and the original class website
-                remains safe.
+                Planned for a later phase after wallet connection and signing remain stable and the original class
+                website remains safe.
               </p>
             </article>
           ))}
