@@ -20,6 +20,7 @@ export const DEVNET_RPC_ENDPOINT = 'https://api.devnet.solana.com'
 export const MIN_LAMPORTS_FOR_MEMO = 5_000_000 // 0.005 SOL
 
 export const SOLSCAN_TX_URL_BASE = 'https://solscan.io/tx'
+export const SOLSCAN_ACCOUNT_URL_BASE = 'https://solscan.io/account'
 
 export function lamportsToSol(lamports) {
   if (typeof lamports !== 'number' || !Number.isFinite(lamports)) {
@@ -39,6 +40,14 @@ export function buildSolscanUrl(signature, cluster = 'devnet') {
   }
   const params = cluster && cluster !== 'mainnet-beta' ? `?cluster=${cluster}` : ''
   return `${SOLSCAN_TX_URL_BASE}/${signature}${params}`
+}
+
+export function buildSolscanAccountUrl(walletAddress, cluster = 'devnet') {
+  if (!walletAddress) {
+    return ''
+  }
+  const params = cluster && cluster !== 'mainnet-beta' ? `?cluster=${cluster}` : ''
+  return `${SOLSCAN_ACCOUNT_URL_BASE}/${walletAddress}${params}`
 }
 
 export function createDevnetConnection() {

@@ -2184,6 +2184,33 @@
   font-size: 12px;
 }
 
+.memo-feed-empty {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  background: rgba(26, 26, 26, 0.025);
+  border-left: 2px solid rgba(139, 0, 0, 0.35);
+}
+
+.memo-feed-empty p {
+  margin: 0;
+}
+
+.memo-feed-empty p + p {
+  margin-top: 10px;
+}
+
+.memo-feed-empty-registry {
+  margin: 10px 0 0;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.memo-feed-empty-registry li {
+  margin: 0;
+}
+
 .contact-sentence {
   margin: 28px 0 18px;
   padding-top: 18px;

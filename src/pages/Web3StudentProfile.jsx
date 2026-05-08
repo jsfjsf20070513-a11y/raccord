@@ -25,6 +25,7 @@ import {
 import {
   MEMO_PROGRAM_ID,
   buildMemoPayload,
+  buildSolscanAccountUrl,
   buildSolscanUrl,
   createDevnetConnection,
   fetchCollectiveMemos,
@@ -274,6 +275,10 @@ export default function Web3StudentProfile() {
         : formatSol(balanceLamports)
 
   const solscanUrl = useMemo(() => buildSolscanUrl(memoSignature, 'devnet'), [memoSignature])
+  const walletSolscanUrl = useMemo(
+    () => buildSolscanAccountUrl(walletAddress, 'devnet'),
+    [walletAddress],
+  )
   const needsAirdrop = memoState === 'needs_airdrop' ||
     (balanceLamports !== null && balanceLamports < MIN_LAMPORTS_FOR_MEMO)
 
@@ -567,13 +572,18 @@ export default function Web3StudentProfile() {
       setMemoSignature(signature)
       setMemoState('confirmed')
 
-      // Refresh balance and memo feed to reflect new on-chain state
+      // Refresh balance and memo feed to reflect new on-chain state.
       refreshBalance()
-      // Devnet RPC needs a moment to index a fresh transaction; wait briefly
-      // before pulling the updated feed.
-      setTimeout(() => {
-        refreshMemoFeed()
-      }, 1500)
+
+      // Devnet public RPC indexes a fresh transaction with variable latency
+      // (1-15 seconds in practice) and aggressively prunes old history. Try
+      // a few times so the just-anchored memo reliably appears in the feed.
+      const retries = [3000, 7000, 14000]
+      retries.forEach((delay) => {
+        setTimeout(() => {
+          refreshMemoFeed()
+        }, delay)
+      })
     } catch (error) {
       setMemoError(error?.message || 'Memo transaction failed.')
       setMemoState('error')
@@ -965,11 +975,38 @@ export default function Web3StudentProfile() {
           ) : null}
 
           {memoFeedState === 'loaded' && memoFeed.length === 0 && (feedView === 'collective' || isConnected) ? (
-            <p className="hackathon-section-lead">
-              {feedView === 'collective'
-                ? 'No memos yet across the class registry. Connect a wallet and anchor one in section 03 to seed the collective.'
-                : 'No memo transactions found yet for this wallet on devnet. Anchor one in section 03; it will appear here automatically once devnet indexes it.'}
-            </p>
+            <div className="memo-feed-empty">
+              <p className="hackathon-section-lead">
+                {feedView === 'collective'
+                  ? 'No memos in the current devnet RPC window across the class registry. The public devnet RPC at api.devnet.solana.com retains roughly 1–2 hours of recent transaction history; older anchors are still permanently visible on Solscan.'
+                  : 'No memos in the current devnet RPC window for this wallet. The public devnet RPC retains roughly 1–2 hours of recent transaction history; older anchors are still permanently visible on Solscan.'}
+              </p>
+              {feedView === 'mine' && walletSolscanUrl ? (
+                <p className="hackathon-section-lead">
+                  <a href={walletSolscanUrl} target="_blank" rel="noreferrer" className="memo-feed-link">
+                    <ExternalLink size={13} aria-hidden="true" />
+                    View this wallet&rsquo;s complete devnet history on Solscan →
+                  </a>
+                </p>
+              ) : null}
+              {feedView === 'collective' && classRegistry.length > 0 ? (
+                <ul className="memo-feed-empty-registry">
+                  {classRegistry.map((address) => (
+                    <li key={address}>
+                      <a
+                        href={buildSolscanAccountUrl(address, 'devnet')}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="memo-feed-link"
+                      >
+                        <ExternalLink size={13} aria-hidden="true" />
+                        {address.slice(0, 6)}…{address.slice(-6)} on Solscan →
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
           ) : null}
 
           {memoFeed.length > 0 ? (
