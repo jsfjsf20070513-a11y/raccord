@@ -15,7 +15,18 @@ SSH_KEY="${MATHCLASS_DEPLOY_SSH_KEY:-}"
 # photos and album metadata. When set, scripts/prepare-private-assets.mjs
 # pulls the real albums into this build; otherwise the public-safe
 # placeholder data ships untouched.
+#
+# If unset, fall back to ../MathClassWebsite (the conventional sibling
+# layout) so a deploy from inside MathClassWebsite-public picks up real
+# plates automatically. Setting MATHCLASS_PRIVATE_REPO=skip explicitly
+# disables the injection and forces a placeholder-only build.
 PRIVATE_REPO="${MATHCLASS_PRIVATE_REPO:-}"
+if [ -z "${PRIVATE_REPO}" ] && [ -d "../MathClassWebsite/.git" ]; then
+  PRIVATE_REPO="$(cd ../MathClassWebsite && pwd)"
+fi
+if [ "${PRIVATE_REPO}" = "skip" ]; then
+  PRIVATE_REPO=""
+fi
 
 SSH_OPTS=(
   -i "${SSH_KEY}"
