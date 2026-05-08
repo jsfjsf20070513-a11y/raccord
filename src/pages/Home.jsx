@@ -122,6 +122,13 @@ export default function Home() {
 
       <section className="page-section" id="courses">
         <h2 className="section-title">§1 Schedule · 课程表</h2>
+        <p className="schedule-context">
+          The real Spring 2026 timetable for the class — six teaching days, bilingual
+          mathematics + French foundation tracks, taught at the Renmin University of
+          China Sino-French Institute (Suzhou campus). Course names and classroom
+          codes are kept in their registered Chinese form for fidelity. ·
+          中法学院 2026 春学期真实课表，完整保留课程名与教室编号。
+        </p>
         <pre className="editorial-pre">{courseTable}</pre>
         <DailyMeditation offset={0} />
       </section>

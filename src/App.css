@@ -1208,6 +1208,14 @@
   overflow-x: auto;
 }
 
+.schedule-context {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+  max-width: 60ch;
+}
+
 .archive-list {
   list-style: none;
   padding-left: 0;
