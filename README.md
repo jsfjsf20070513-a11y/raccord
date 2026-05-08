@@ -1,316 +1,247 @@
 # Math Class Website
 
-A deployed class knowledge hub and hackathon showcase built by a freshman mathematics student with AI-assisted development.
+> A bilingual class collaboration website with **real Solana on-chain memory**, **off-chain ed25519 identity proof**, **ElevenLabs French narration**, and **Claude bilingual mathematical reasoning** — built solo by a first-year mathematics student at Renmin University of China · Suzhou campus, with AI-assisted development.
 
-## Security & Scope
+[![Live Site](https://img.shields.io/badge/live-rucmathclass.com-8b0000?style=flat-square)](https://rucmathclass.com/)
+[![Web3 Profile](https://img.shields.io/badge/web3-profile-2f6a63?style=flat-square)](https://rucmathclass.com/web3-profile)
+[![Solana Devnet](https://img.shields.io/badge/solana-devnet--anchored-9945ff?style=flat-square)](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet)
 
-This is a student-built MVP. Honest scope and safety boundaries:
+---
 
-- **Builder role**: I am a first-year mathematics student, not a fullstack developer. This project is built with AI-assisted development (Claude, Codex, Gemini). I drive product direction, content, deployment, and submission materials, and make the final calls on what to ship.
-- **Web3 boundary**: The `/web3-profile` page reads only a public wallet address from a browser-injected Solana provider (e.g. Phantom). It does **not** handle private keys, seed phrases, signatures, transactions, smart contracts, balances, or any on-chain writes (mainnet or devnet).
-- **Secrets**: Only the Supabase **anon** key is used in the frontend (via `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`). The Supabase `service_role` key is never used in this repo. Deployment uses environment variables; no SSH keys or hostnames are hardcoded.
-- **Data**: This public repository excludes real class media, admin SQL, and `.env` files via `.gitignore`.
+## TL;DR — Six things judges can verify in under 5 minutes
 
-## Live Demo
+| # | Capability | What to check | Where |
+|---|---|---|---|
+| 1 | **Real Solana wallet connection** | Connect Phantom on `/web3-profile`, see public key | https://rucmathclass.com/web3-profile |
+| 2 | **Off-chain ed25519 ownership proof** | Section 02 — sign a bilingual student statement, copy base58 signature | https://rucmathclass.com/web3-profile#identity-proof |
+| 3 | **Real on-chain devnet transaction (write)** | Section 03 — anchor a memo on Solana devnet, view on Solscan | [Solscan tx](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet) |
+| 4 | **Live class collective memo feed (read)** | Section 04 — `getSignaturesForAddress` + memo decode across class wallets | https://rucmathclass.com/web3-profile#onchain-feed |
+| 5 | **ElevenLabs French narration** | Home title page — `▶ Écouter` button plays a `multilingual_v2` mp3 | https://rucmathclass.com/ |
+| 6 | **Claude bilingual proof reasoning** | Home daily theorem — expand `Voir la preuve · 查看证明思路`, see Chinese + French side-by-side | https://rucmathclass.com/ |
 
-- Production site: [https://rucmathclass.com/](https://rucmathclass.com/)
-- Health metadata: [https://rucmathclass.com/health.json](https://rucmathclass.com/health.json)
+Verifiable artefacts:
 
-## Hackathon Showcase
+- Public GitHub: https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public
+- First on-chain anchor: [tx 5L76cFugq…56gv846](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet) (devnet)
+- Architectural narration: see [§ Architecture](#architecture) below
 
-- Showcase page: [https://rucmathclass.com/hackathon](https://rucmathclass.com/hackathon)
-- This page is designed for hackathon judges, teammate matching, and portfolio review.
-- GitHub repository: [https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public](https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public)
+---
 
-## Web3 Student Profile MVP
+## Why this project exists
 
-- MVP page: `/web3-profile`
-- This is the first Dev3pack preparation feature: an AI-assisted student collaboration website with Solana wallet-based identity and contribution records.
-- Current status: real browser wallet connection MVP using an injected Solana wallet provider such as Phantom.
-- It displays the public wallet address only. It does not request signatures, perform smart contract calls, send devnet transactions, or send mainnet transactions.
-- Future phase: evaluate Solana Wallet Adapter or compatible wallet integration and connect wallet identity to verified contribution records.
-- Safety notes: no private keys, no seed phrases, no service role key, and no mainnet transaction are handled in this stage.
+Math Class Website started as a small portfolio for a bilingual mathematics class — Chinese and French students learning the same subject in two languages. The original site keeps a calm, book-page tone: course schedule, daily theorem, photo plates, reading paths, collaboration drafts. It looks more like a shared class notebook than a typical dApp.
 
-## Demo Video
+For Dev3pack, I extended that book — without tearing pages out of it — with a parallel `/web3-profile` route that anchors student identity and contribution memory onto Solana. The bilingual nature of the class also matched two of the Dev3pack co-host tracks: **ElevenLabs** (real French voice narration) and **AI in general** (Anthropic Claude generating bilingual proof reasoning).
 
-[https://youtu.be/kz9K5mWtC20](https://youtu.be/kz9K5mWtC20)
+The class is the protagonist. Web3 and AI are layers on top of the class, not a replacement for it.
 
-## Screenshots
-
-### Homepage Desktop
-
-![Homepage desktop](docs/screenshots/homepage-desktop.png)
-
-### Homepage Mobile
-
-![Homepage mobile](docs/screenshots/homepage-mobile.png)
-
-### Hackathon Showcase Desktop
-
-![Hackathon showcase desktop](docs/screenshots/hackathon-showcase-desktop.png)
-
-### Hackathon Showcase Mobile
-
-![Hackathon showcase mobile](docs/screenshots/hackathon-showcase-mobile.png)
-
-### GitHub Repository
-
-![GitHub repository](docs/screenshots/github-repository.png)
-
-### Health Check
-
-![Health check](docs/screenshots/health-check.png)
-
-## Problem
-
-Small student cohorts often keep important class information in scattered chat messages, temporary links, cloud folders, and personal notes. That makes schedules, event memories, and learning resources hard to revisit later.
-
-For a bilingual mathematics class, the information is even more mixed: mathematics courses, French-language courses, class activities, reading paths, and shared resource lists all need a stable place.
-
-## Solution
-
-Math Class Website is a lightweight React/Vite single-page application that turns the class record into a readable public website. It keeps the original class-homepage purpose while adding a dedicated `/hackathon` showcase page so judges can understand the product, stack, builder role, and AI workflow quickly.
-
-The current product flow:
-
-1. Visitors open the homepage and see the class identity, schedule, theorem note, image plates, and reading paths.
-2. Visitors browse albums and curated learning resources without login.
-3. Authenticated collaborators can use Supabase-backed workflows for login, comments, submissions, review, and published content.
-4. Hackathon judges open `/hackathon` for a concise product and builder overview.
-
-## Key Features
-
-- Class archive homepage: a stable entry point for class identity, course context, and daily mathematical notes.
-- Gallery and album pages: structured records for class activities and photos.
-- Resource catalog: curated learning resources with detail pages.
-- Supabase collaboration flow: optional login, comments, submission workspace, and moderation routes.
-- Hackathon showcase: a review-ready page explaining the project, tech stack, my role, AI workflow, and roadmap.
-- Static deployment health check: generated `/health.json` plus an Nginx `/health` sample that returns JSON instead of SPA fallback HTML.
-
-## Tech Stack
-
-- Frontend: React 18, React Router 7, Vite 5
-- UI: custom CSS, lucide-react icons, KaTeX, local fonts
-- Backend: not used yet as a local server; the current production app is a static SPA
-- Database: Supabase Postgres when configured
-- Authentication: Supabase Auth
-- Deployment: Vite build output, Nginx static hosting, rsync deployment script
-- Package manager: npm with `package-lock.json`
-- AI tools: Codex GPT 5.5, Claude Opus, Claude Sonnet, Gemini Google AI Pro
+---
 
 ## Architecture
 
-```text
-Browser
-  |
-  | requests static pages/assets
-  v
-Nginx on VPS
-  |
-  | serves dist/ generated by Vite
-  v
-React SPA
-  |
-  | optional client-side SDK calls when env vars are configured
-  v
-Supabase Auth + Postgres + RLS policies
+```mermaid
+flowchart LR
+    subgraph Browser["Browser (judge / class member)"]
+        UI["React 18 + Vite SPA<br/>book-page editorial UI"]
+        Phantom["Phantom wallet<br/>(injected provider)"]
+    end
+
+    subgraph CFEdge["Cloudflare edge"]
+        CF["Cloudflare proxy<br/>Flexible SSL"]
+    end
+
+    subgraph VPS["Vultr LA (149.28.69.75)"]
+        Nginx["Nginx :80<br/>SPA + static assets<br/>+ /audio/*.mp3"]
+        Xray["Xray :443<br/>(unrelated proxy<br/>service, untouched)"]
+    end
+
+    subgraph Solana["Solana devnet"]
+        RPC["api.devnet.solana.com<br/>JSON-RPC"]
+        Memo["SPL Memo program v2<br/>MemoSq4gqAB...mfcHr"]
+    end
+
+    subgraph EL["ElevenLabs"]
+        TTS["multilingual_v2 TTS<br/>(George voice)"]
+    end
+
+    subgraph Anthropic["Anthropic"]
+        Claude["claude-opus-4.7<br/>(offline at build time)"]
+    end
+
+    UI -->|"https"| CF
+    CF -->|"http (Flexible SSL)"| Nginx
+    UI -->|"connect / sign / signAndSendTransaction"| Phantom
+    Phantom -->|"signed tx (devnet)"| Memo
+    UI -->|"getSignaturesForAddress<br/>getParsedTransaction"| RPC
+    RPC --> Memo
+
+    TTS -.->|"pre-generated mp3<br/>at build time"| Nginx
+    Claude -.->|"pre-generated bilingual<br/>proof outlines"| Nginx
 ```
 
-There is no custom Node/Express backend in the current production version. If a future backend is added, the included Nginx sample has a commented `/api/` reverse-proxy block.
+**Key separation that protected the user during development:** Xray on port 443 is a personal proxy out-of-scope to this project. The dApp's HTTPS terminates at the Cloudflare edge in **Flexible SSL** mode and reaches the origin Nginx on port 80 — so port 443 was never disturbed and the user's proxy service stayed live for the entire build.
 
-## Getting Started
+A subtle but important detail: when Xray itself routes outbound `rucmathclass.com` traffic via its own out-gateway IP, the local DNS resolver returned `149.28.69.75` (the VPS itself) and the Reality protocol fell back to `www.microsoft.com`, breaking the loop. Fixed by hardcoding Cloudflare anycast IPs into the VPS `/etc/hosts` and pointing `systemd-resolved` at `1.1.1.1` / `8.8.8.8`. Documented in commit history.
 
-Install dependencies:
+---
+
+## Six features in detail
+
+### 1 — Wallet identity (Section 01 of `/web3-profile`)
+
+- Detects an injected Solana provider (`window.phantom.solana` or `window.solana`)
+- Falls back gracefully when no wallet is installed (link to `phantom.app/download`)
+- Auto-binds to `connect`, `disconnect`, `accountChanged` events to keep UI in sync
+
+### 2 — Off-chain ed25519 ownership proof (Section 02)
+
+- Builds a bilingual student statement (Chinese + French + wallet + ISO timestamp)
+- Calls `provider.signMessage(encoded, 'utf8')` — never sees private keys
+- Encodes the signature in base58 via an inline encoder (no `bs58` runtime dep, no audit warnings)
+- Independently verifiable by anyone holding the public key (`@solana/web3.js verify`, `tweetnacl`)
+
+### 3 — Real on-chain devnet anchor (Section 03)
+
+- Builds a `TransactionInstruction` against `MemoSq4gqAB...mfcHr` (SPL Memo program v2)
+- ASCII-only payload: `math-class-website:1|tag=student-profile|wallet=<addr>|issued=<iso>` — readable on Solscan without specialized tooling
+- Sends via `provider.signAndSendTransaction` with a 90s timeout safeguard
+- Confirms at `confirmed` commitment, gracefully soft-fails confirmation timeout (signature is already on-chain)
+- Auto-detects insufficient devnet SOL (< 0.005) and surfaces a deep-link to `faucet.solana.com`
+- Pre-empts Phantom's "Request blocked" warning with an explicit notice + GitHub source-code link so judges can audit the exact instruction bytes before approving
+
+### 4 — Live class collective memo feed (Section 04)
+
+- Reads `getSignaturesForAddress` + `getParsedTransaction` directly from `api.devnet.solana.com`
+- Filters instructions to the Memo program and decodes UTF-8 payloads
+- Two views:
+  - **My wallet** — connected wallet's last 8 memos
+  - **Class collective · N** — aggregated across N registered class wallets, sorted by `blockTime`
+- New wallets register automatically when they connect (persisted in `localStorage`)
+- Each entry deep-links to Solscan, attributable to the originating wallet
+
+### 5 — ElevenLabs French narration (Home page)
+
+- 14-second French intro (`Trente mathématiciens, une classe / Fenêtre sur le présent / class introduction / Pour la classe`)
+- Voice: George (warm, captivating storyteller), model: `eleven_multilingual_v2`
+- API key was used in-memory only during generation; never written to any file or commit
+- Static `public/audio/carnet-fr-intro.mp3` (229 KB, 128 kbps mono) served by Nginx with `Content-Type: audio/mpeg`
+- Custom play/pause control preserves the editorial book-page aesthetic (red italic underlined text, small-caps `Voice by ElevenLabs · multilingual_v2` credit)
+
+### 6 — Claude bilingual proof reasoning (Home page)
+
+- 24 mathematical theorems each have a Chinese + French proof outline (Bolzano-Weierstrass, Cauchy criterion, Lagrange MVT, rank-nullity, spectral theorem, Bayes, LLN, Heine-Borel, FTC, Taylor, Cauchy-Schwarz, Gram-Schmidt, Cayley-Hamilton, SVD, orthogonal projection, Markov, Chebyshev, total expectation, Jensen, CLT, Banach fixed point, Fubini, inverse function, Lax-Milgram)
+- Generated by Anthropic Claude (`claude-opus-4.7`) directly during a development session
+- Stored statically in [`src/data/theoremExplanations.js`](src/data/theoremExplanations.js) because the public deployment runs on free static infrastructure without a server-side API key
+- A production deployment would route runtime requests through a Cloudflare Worker that holds the key — documented in [`explanationsCredit.scope`](src/data/theoremExplanations.js)
+- Disclosed as a `<details>` element under each daily theorem with a small-caps credit line `BILINGUAL REASONING BY ANTHROPIC CLAUDE · CLAUDE-OPUS-4.7`
+
+---
+
+## Tech stack
+
+| Layer | Tooling |
+|---|---|
+| Frontend | React 18, React Router 7, Vite 5 |
+| Solana | `@solana/web3.js` v1.95, `bs58` v6, SPL Memo program v2, Phantom-compatible injected wallet |
+| AI | Anthropic Claude (`claude-opus-4.7`) for bilingual reasoning, ElevenLabs `multilingual_v2` for French TTS |
+| Backend | Supabase (anon key only, RLS enforced) for optional comments / collaboration drafts |
+| Hosting | Vultr LA VPS, Nginx 1.18, Cloudflare proxy (Flexible SSL), `rucmathclass.com` registered through Cloudflare-compatible registrar |
+| Build | npm, ESLint flat config, Mermaid for architecture diagram |
+| AI-assisted dev | Codex (GPT-5.5), Claude (Opus, Sonnet), Gemini |
+
+Production audit: `npm audit --omit=dev --audit-level=high` reports **0 vulnerabilities**.
+
+---
+
+## Live URLs
+
+| | URL |
+|---|---|
+| Class homepage | https://rucmathclass.com/ |
+| Hackathon showcase | https://rucmathclass.com/hackathon |
+| Web3 student profile | https://rucmathclass.com/web3-profile |
+| Health endpoint | https://rucmathclass.com/health |
+| Health JSON | https://rucmathclass.com/health.json |
+| French narration mp3 | https://rucmathclass.com/audio/carnet-fr-intro.mp3 |
+| First on-chain memo (Solscan) | [tx 5L76cFugq…56gv846 (devnet)](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet) |
+
+---
+
+## Local development
 
 ```bash
+git clone https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public.git
+cd MathClassWebsite-public
+cp .env.example .env.local        # optional: only needed if you wire up Supabase
 npm install
+npm run dev                       # http://localhost:5173
 ```
-
-Start local development:
-
-```bash
-npm run dev
-```
-
-Build for production:
-
-```bash
-npm run build
-```
-
-Preview the production build locally:
-
-```bash
-npm run preview
-```
-
-Run lint checks:
 
 ```bash
 npm run lint
+npm run build
+npm run preview
 ```
 
-Generate health metadata only:
+> Phantom only injects its provider on `https://`, `localhost`, and `127.0.0.1`. Use `npm run dev` (localhost) to test wallet flows locally without a real domain.
 
-```bash
-npm run health:generate
+---
+
+## Environment variables
+
+Only `VITE_`-prefixed variables are read at build time, and they ship to the browser bundle. Never put a Supabase service-role key, an Anthropic API key, or any other server-side secret in `.env.local`.
+
 ```
-
-## Environment Variables
-
-Create `.env.local` from `.env.example` when Supabase features are needed:
-
-```bash
-cp .env.example .env.local
-```
-
-Available variables:
-
-```bash
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 ```
 
-Important security notes:
+The dApp does **not** read any AI provider keys at runtime — Claude and ElevenLabs content is generated offline and stored as static assets.
 
-- Variables prefixed with `VITE_` are exposed to browser-side JavaScript. Do not put service role keys, private API keys, passwords, or other secrets in them.
-- The frontend can only use a Supabase publishable key / anon key.
-- The Supabase service role key must never be placed in frontend code, `.env.local`, `.env.example`, or any `VITE_` variable.
-- The Supabase anon key can be used as a browser-side publishable key, but tables must be protected with Row Level Security.
-- All Supabase `public` schema tables should be reviewed table by table for Row Level Security policies before public use.
-- Recheck `anon` and `authenticated` role permissions before making the repository public or accepting real users.
-- Do not commit `.env.local` to Git. This repository keeps `.env.local` ignored.
+---
 
 ## Deployment
 
-Current deployment model: build locally, then sync `dist/` to the server directory used by Nginx.
+Build locally, then sync `dist/` to the Nginx root:
 
 ```bash
 npm run build
-export MATHCLASS_DEPLOY_HOST=<SERVER_HOST>
-export MATHCLASS_DEPLOY_USER=<SERVER_USER>
-export MATHCLASS_DEPLOY_SSH_KEY=~/.ssh/<DEPLOY_KEY>
+export MATHCLASS_DEPLOY_HOST=<server-ip-or-host>
+export MATHCLASS_DEPLOY_USER=<server-user>
+export MATHCLASS_DEPLOY_SSH_KEY="$HOME/.ssh/<deploy-key>"
+export MATHCLASS_DEPLOY_DIR=/var/www/<project>/dist
 ./deploy.sh
 ```
 
-Do not commit real server login details or SSH key paths. Keep deployment host, user, and key path in local shell environment variables.
+`deploy.sh` reads only environment variables — no SSH key paths, hostnames, or usernames are committed.
 
-Expected production directory on the server:
+The included [`deployment/nginx/mathclasswebsite.conf`](deployment/nginx/mathclasswebsite.conf) supports SPA fallback, gzip, immutable asset caching, and an exact-match `/health` endpoint that returns JSON instead of the SPA HTML.
 
-```bash
-/var/www/<PROJECT_NAME>/dist
-```
+For HTTPS, the canonical setup is **Cloudflare proxy + Flexible SSL** so HTTPS termination happens at the edge and the origin only needs port 80. Useful when the VPS already runs another service on 443.
 
-Suggested Nginx config is included at:
+---
 
-```text
-deployment/nginx/mathclasswebsite.conf
-```
+## Security & honest scope
 
-Install or update Nginx config on the server:
+- **Builder role**: I am a first-year mathematics student, not a fullstack developer. Implementation is AI-assisted (Claude, Codex, Gemini); product direction, content, deployment decisions, and final validation are mine.
+- **Wallet usage**: The dApp never sees private keys or seed phrases. It uses the wallet only as an identity layer and for one short, ASCII-only memo transaction on devnet.
+- **No mainnet writes**: All transactions go to Solana devnet exclusively. Devnet SOL has no monetary value.
+- **No API keys at runtime**: ElevenLabs and Anthropic keys were used in-memory only during static generation; neither is read by the deployed app.
+- **Supabase**: Only the `anon` key reaches the browser. RLS is enforced on `comments`; no service-role key is ever used in this repo.
+- **No real class media in this public repo**: Anonymized samples and SVG placeholders only. Real class photos, admin SQL, and the production `.env` live outside this repository.
 
-```bash
-sudo sed -i 's/<SERVER_NAME>/your-domain.example/g; s/<PROJECT_NAME>/MathClassWebsite/g' deployment/nginx/mathclasswebsite.conf
-sudo cp deployment/nginx/mathclasswebsite.conf /etc/nginx/sites-available/mathclasswebsite
-sudo ln -sfn /etc/nginx/sites-available/mathclasswebsite /etc/nginx/sites-enabled/mathclasswebsite
-sudo nginx -t
-sudo systemctl reload nginx
-```
+---
 
-Check public access:
+## Roadmap (post-Dev3pack)
 
-```bash
-curl -I https://rucmathclass.com/
-curl https://rucmathclass.com/health.json
-curl -i https://rucmathclass.com/health
-```
+- Streaming Claude Q&A via Cloudflare Worker (server-side API key, runtime answers)
+- Wallet-linked Supabase student profile (Web2 ↔ Web3 bridge using Sign-in with Solana)
+- Soulbound contribution badge for active class members (Solana cNFT via Metaplex Bubblegum)
+- Cross-class identity portability via wallet signature exchange
+- Real-time collective dashboard pulling from a Helius-indexed memo subscription
 
-For HTTPS later, point a domain to the VPS and run:
-
-```bash
-sudo apt update
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d your-domain.example
-```
-
-## Supabase Security Notes
-
-The project uses Supabase only when the public Vite variables are configured. Because this is a browser-side integration:
-
-- Never use a Supabase service role key in the frontend.
-- Keep RLS enabled on all public-facing tables.
-- Recheck `anon` and `authenticated` policies on every table in the `public` schema.
-- Confirm read/write policies for comments, submissions, albums, resources, and moderation tables.
-- Treat client-side role checks as UX helpers, not as the final security boundary.
-- Prefer server-side functions or Supabase policies for any sensitive future workflow.
-- Admin setup SQL is intentionally kept out of the public repository unless provided as an example. Replace placeholders such as `YOUR_ADMIN_EMAIL@example.com` before private deployment.
-
-## Public-safe Content Notes
-
-This public repository uses anonymized sample content. Real class photos, private uploads, precise room schedules, and admin setup files should stay in private storage or a private deployment repository unless every relevant permission is confirmed.
-
-## AI assisted Development Process
-
-AI was used as a development accelerator, not as a replacement for product judgment.
-
-- Codex GPT 5.5: code generation, debugging, refactoring, deployment scripts, build checks, and documentation structure.
-- Claude Opus: complex architecture review and difficult issue analysis.
-- Claude Sonnet: frontend page drafting, copy refinement, and long-context organization.
-- Gemini Google AI Pro: research, competitor scan, presentation material, and demo preparation.
-
-My responsibility was to define the problem, choose the product direction, verify outputs, test the deployed result, and decide what should be accepted.
-
-## My Role
-
-I am a first-year Mathematics student at Renmin University of China, Sino-French Institute in Suzhou.
-
-In this project, I was responsible for:
-
-- Requirement breakdown
-- Product logic design
-- AI assisted coding
-- Frontend prototype implementation
-- Supabase-backed feature integration
-- Debugging and deployment verification
-- Hackathon showcase, README, and application material preparation
-
-The goal is to present a credible student-builder profile: mathematics background, AI native workflow, fast prototype delivery, and willingness to collaborate on-site during hackathons.
-
-## Roadmap
-
-Before hackathon:
-
-- Record demo video and add screenshots.
-- Submit the project to hackathon platforms.
-- Review Supabase RLS policies carefully.
-- Apply the `/health` Nginx exact-match config on the server.
-
-During hackathon:
-
-- Use this site as a live portfolio for teammate matching.
-- Extend the prototype around a clear user workflow.
-- Document AI prompts, human decisions, and validation steps.
-- Keep final presentation focused on problem, product, stack, and learning.
-
-After hackathon:
-
-- Connect a custom domain and HTTPS.
-- Add lightweight analytics for page health and resource usage.
-- Improve admin workflows for repeated content publishing.
-- Write a short case study for future technical or quantitative applications.
-
-## Hackathon Submission Notes
-
-Suggested one-line project description:
-
-> A deployed class knowledge hub showing how a freshman mathematics student uses AI assisted development to turn a real campus workflow into a working web product.
-
-Suggested role positioning:
-
-> Mathematics modeling + AI assisted development + fast product prototyping + on-site collaboration.
-
-Target events include AdventureX 2026 Hangzhou, Dev3pack Shanghai Hub, HackHarvard China, and similar student-builder hackathons in Jiangsu, Zhejiang, and Shanghai.
+---
 
 ## License
 
-License is not finalized yet. Before making the repository public, add a `LICENSE` file and clarify whether class photos and written content are included or kept as reserved media/content.
+License pending. Class media (photos, real names, real schedule) are **not** part of this public repository. The code in this repository is intended to be reusable; specific class content is reserved.

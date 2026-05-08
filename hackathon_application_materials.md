@@ -1,114 +1,139 @@
-# Hackathon Application Materials
+# Hackathon Application Materials — Dev3pack Final Submission
 
 ## Public Contact Placeholders
 
 - Email: TODO: Add contact email
 - GitHub: https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public
-- Demo video: https://youtu.be/kz9K5mWtC20
+- Demo video: TODO: Add updated demo video URL after recording
 
-## Dev3pack Solo Direction
+## Verifiable artefacts
 
-AI-assisted student collaboration website with Solana wallet-based identity and contribution records. The `/web3-profile` page now supports a real injected Solana wallet connection, such as Phantom, and displays the public wallet address only. It uses no private keys, no seed phrases, no service role key, no smart contract, no signature request, and no mainnet transaction. The next phase can evaluate Solana Wallet Adapter or compatible wallet integration for a broader wallet-selection flow.
+| Asset | URL |
+|---|---|
+| Live site | https://rucmathclass.com/ |
+| Hackathon showcase page | https://rucmathclass.com/hackathon |
+| Web3 student profile | https://rucmathclass.com/web3-profile |
+| First on-chain memo | [Solscan tx 5L76cFugq…56gv846 (devnet)](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet) |
+| ElevenLabs French narration | https://rucmathclass.com/audio/carnet-fr-intro.mp3 |
+| GitHub source — Solana memo lib | https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public/blob/main/src/lib/solanaMemo.js |
+| GitHub source — Bilingual proofs | https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public/blob/main/src/data/theoremExplanations.js |
 
-## Dev3pack Final Submission Draft
+---
+
+## Dev3pack Project Submission
 
 ### Project Name
 
-Math Class Website: Web3 Student Profile
+Math Class Website — Solana-Anchored Bilingual Class Memory
 
 ### One-liner
 
-A calm, text-first class collaboration website extended with a Solana-compatible wallet identity layer for non-financial student contribution profiles.
+A bilingual class collaboration website with real Solana on-chain memory, ed25519 ownership proofs, ElevenLabs French narration, and Claude bilingual mathematical reasoning — built solo by a first-year mathematics student.
 
-### Description
+### Tagline (alt)
 
-Math Class Website is a class collaboration and knowledge-sharing website for a bilingual mathematics cohort. It keeps class information, learning resources, activity records, collaboration drafts, and public project materials in one minimal, readable interface. For Dev3pack, I prepared a Web3 Student Profile page that connects the existing class collaboration story with a Solana-compatible wallet identity layer.
+Anchor a class on-chain. In two languages. With AI.
 
-The Web3 feature is intentionally small and safe. It uses an injected Solana wallet provider such as Phantom to request a wallet connection and display the public wallet address only. The wallet is treated as a non-financial identity signal for future contribution records, not as a payment or trading feature. The MVP does not handle private keys, seed phrases, balances, signatures, smart contracts, service role keys, devnet proof transactions, or mainnet transactions.
+### Description (300 words)
 
-This project is not a claim that I independently built the entire system from scratch. My role was to help shape the product direction, maintain and organize content, support AI-assisted implementation and debugging, participate in deployment preparation, clean the public GitHub repository, write documentation, prepare screenshots, and create the demo material. The result is a practical student-builder project that shows how a beginner Web3 builder can responsibly add a small Solana-compatible identity layer to an existing AI-assisted web product.
+Math Class Website is a deployed class collaboration website for a bilingual mathematics cohort at Renmin University of China · Suzhou campus. The original site keeps a calm, book-page tone for course schedules, photo plates, learning resources, and collaboration drafts.
+
+For Dev3pack, the site grew six concrete capabilities — verifiable in under five minutes by any judge:
+
+1. **Wallet identity** — a real injected Solana provider (Phantom) connection on `/web3-profile`, with full event-binding and graceful fallback when no wallet is detected.
+2. **Off-chain ed25519 ownership proof** — sign a bilingual student statement (Chinese + French + wallet + ISO timestamp) locally with the wallet; expose the base58 signature for independent ed25519 verification.
+3. **Real on-chain devnet anchor** — a one-click `signAndSendTransaction` that calls SPL Memo program v2 with an ASCII payload identifying the student profile. Confirmed signatures deep-link to Solscan.
+4. **Live class collective memory feed** — a read-side view that fetches `getSignaturesForAddress` + `getParsedTransaction` directly from `api.devnet.solana.com`, filters memo instructions, and aggregates across all class wallets so the dApp narrates a real Web3 use case beyond single-user identity.
+5. **ElevenLabs French narration** — a 14-second `multilingual_v2` clip (George storyteller voice) plays from the home title page; API key never touched the bundle or the repo.
+6. **Claude bilingual proof reasoning** — 24 mathematical theorems each have a Chinese + French proof outline generated by Anthropic Claude (`claude-opus-4.7`), exposed via a disclosure beneath each daily theorem.
+
+Production runs on a single VPS that already hosted an unrelated proxy on port 443. Cloudflare proxy with Flexible SSL terminates HTTPS at the edge so the existing service was never disturbed during the build. The full architecture, including the DNS-loop bug we hit when the proxy started routing the dApp's own domain back to itself, is documented in the GitHub README.
+
+### Why this fits Dev3pack
+
+- **Solana track** — both write-side (real devnet transaction via SPL Memo program v2) and read-side (RPC indexing across multiple wallets, decoding instructions) are implemented and live. Total Solana code path is auditable in `src/lib/solanaMemo.js`.
+- **AI track / ElevenLabs co-host** — real ElevenLabs `multilingual_v2` voice deployed as static assets; real Anthropic Claude bilingual content embedded into the daily theorem flow.
+- **Student / Web2-to-Web3 narrative** — built solo by a first-year mathematics student who started from a class portfolio site and grew it into a Solana-anchored dApp without abandoning the original purpose. The class is still the protagonist.
+- **Originality** — "Class collective memory on-chain" — multi-wallet aggregated memo feed for a real bilingual class — is not a use case I have seen in past Solana hackathon submissions. It is small enough to ship in one weekend and large enough to extend.
 
 ### Tech Stack
 
-- Frontend: React, Vite, React Router, JavaScript
-- UI: custom CSS, lucide-react icons, KaTeX, local fonts
-- Backend services: optional Supabase Auth, Postgres, and storage-related workflows
-- Web3 layer: injected Solana wallet provider such as Phantom
-- Deployment: static Vite build, Nginx/VPS deployment, public-safe GitHub repository
-- AI-assisted workflow: used for product planning, implementation support, debugging, documentation, and demo preparation
+React 18, Vite 5, React Router 7, `@solana/web3.js` v1.95, `bs58` v6, SPL Memo program v2, Phantom-compatible injected wallet, Anthropic Claude (`claude-opus-4.7`), ElevenLabs `multilingual_v2`, Supabase (anon key + RLS), Nginx, Cloudflare proxy with Flexible SSL, Vultr LA VPS, AI-assisted development with Codex / Claude / Gemini.
 
-### Honest Contribution Wording
+### Honest contribution wording
 
-I am a first-year mathematics student and AI-assisted builder. I did not independently build the entire project from scratch. My contribution was to clarify the product direction, maintain and organize class-facing content, use AI tools to support implementation and debugging, participate in deployment and public repository preparation, write README and application materials, prepare screenshots, and create the demo narrative. For the Dev3pack version, I helped frame the Web3 extension as a small Solana-compatible identity layer that displays only a public wallet address and keeps financial or on-chain functionality out of scope.
+I am a first-year mathematics student and AI-assisted builder. Implementation is AI-assisted (Claude, Codex, Gemini); product direction, content, deployment decisions, the Solana integration scope, the bilingual narrative, and final validation are mine. I do not claim to be a fullstack developer. The Solana code path, the build pipeline, the README, and the submission materials were all written and reviewed under my judgement before shipping.
 
-## 30 Second Self Introduction
+---
 
-Hi, I am a first-year Mathematics student at Renmin University of China, Sino-French Institute in Suzhou. I am interested in AI-assisted development, mathematical modeling, and fast product prototyping. I have been working on a class collaboration website and preparing it as a public hackathon project, focusing on product direction, content organization, AI-assisted implementation support, deployment participation, documentation, GitHub preparation, and demo storytelling.
+## 30-second self introduction
 
-## 100 Word Project Description
+I am a first-year Mathematics student at Renmin University of China, Sino-French Institute in Suzhou. I built Math Class Website solo as an AI-assisted builder: a bilingual class collaboration site that I extended into a Solana-anchored dApp for Dev3pack, with real on-chain memo transactions, ElevenLabs French voice, and Claude bilingual proof reasoning. My focus is mathematical modeling, AI-assisted product prototyping, and shipping verifiable artefacts.
 
-Math Class Website is a deployed class knowledge hub for a bilingual mathematics cohort at Renmin University of China, Sino-French Institute in Suzhou. It solves the problem of scattered class information by organizing schedules, event albums, learning resources, and collaboration drafts into one readable web product. The site is built with React, Vite, React Router, custom CSS, KaTeX, and optional Supabase integration for authentication, comments, submissions, and moderation. A dedicated `/hackathon` page explains the problem, solution, tech stack, my role, AI assisted workflow, and roadmap so judges can understand the project within 30 seconds.
+## 100-word project description
 
-## 200 Word Project Description
+Math Class Website is a deployed bilingual class collaboration site that I extended for Dev3pack into a Solana-anchored dApp. On `/web3-profile` a connected Phantom wallet can sign a bilingual student statement (off-chain ed25519), anchor a memo on Solana devnet (one-click `signAndSendTransaction` to SPL Memo program v2), and browse a class-wide collective memory feed that reads transaction history live from the devnet RPC. The home page adds an ElevenLabs French narration and Claude-generated Chinese + French proof outlines for 24 mathematical theorems. Production runs behind Cloudflare proxy with Flexible SSL on an existing VPS, leaving its other services untouched.
 
-Math Class Website is a deployed class website and hackathon showcase built from a real campus need. In a small bilingual mathematics cohort, useful information often gets scattered across chat history, cloud folders, temporary links, and personal notes. This makes schedules, event memories, and learning resources hard to retrieve after the moment has passed.
+## 200-word project description
 
-The project turns that scattered information into a lightweight public web product. Visitors can open the homepage to see the class identity, a daily theorem note, course schedule, activity photo records, and curated reading paths. They can also browse albums and resource pages without logging in. When Supabase is configured, the site supports authentication, comments, submission workflows, and moderation routes for publishing official content.
+Math Class Website is a calm, book-page bilingual class collaboration website for a mathematics cohort at Renmin University of China · Suzhou campus, built solo by a first-year mathematics student with AI-assisted development.
 
-The frontend uses React, Vite, React Router, custom CSS, KaTeX, and lucide-react icons. Deployment is based on a static Vite build served by Nginx, with a generated `/health.json` endpoint and a suggested Nginx `/health` JSON check. The project also includes a dedicated `/hackathon` page, README, deployment notes, and demo script. My role is freshman math student and AI-assisted builder: I help shape the product direction, organize content, support implementation with AI tools, participate in deployment preparation, and verify the final public-facing materials.
+For Dev3pack the site grew six verifiable capabilities. The new `/web3-profile` route hosts: a real Phantom wallet connection (section 01), an off-chain ed25519 ownership proof that signs a bilingual statement (section 02), a real on-chain devnet anchor that submits a memo via SPL Memo program v2 (section 03), and a live class collective memory feed that reads `getSignaturesForAddress` and `getParsedTransaction` directly from `api.devnet.solana.com` and aggregates memos across class wallets (section 04). The home page adds an ElevenLabs `multilingual_v2` French narration on the title page, and a disclosure under every daily theorem reveals a Chinese + French proof outline generated by Anthropic Claude (`claude-opus-4.7`) covering 24 theorems.
 
-## 60 Second Demo Video Script
+The architecture preserves an unrelated VPS proxy on port 443 by terminating HTTPS at Cloudflare's edge in Flexible SSL mode and reaching the origin Nginx on port 80. The Solana code path is open-sourced for auditing. No mainnet writes, no API keys at runtime, no class media in the public repo.
 
-### 0-10s: Problem
+## Demo video script (60 seconds)
 
-"In a small bilingual mathematics class, important information is easy to lose. Schedules, photos, resource links, and collaboration drafts often live in chat messages or temporary folders."
+> **0–8s** — On `https://rucmathclass.com/` (lock icon visible), play the ▶ Écouter button: 3 seconds of George reading the French intro.
+>
+> **8–18s** — Scroll to "Rappel mathématique". Expand `Voir la preuve · 查看证明思路`. Pan over the Chinese block, then the French block, then the small-caps `BILINGUAL REASONING BY ANTHROPIC CLAUDE` credit.
+>
+> **18–28s** — Click "View Hackathon Showcase" → click "Web3 Student Profile". Show wallet connect (Phantom address `Fo7H3z…rigHJQ`).
+>
+> **28–35s** — Section 02: Sign with wallet → Phantom popup → base58 signature appears.
+>
+> **35–48s** — Section 03: balance shows 1 SOL → click "Anchor on Devnet" → Phantom approval → Confirmed on devnet → click "View on Solscan".
+>
+> **48–55s** — Open Solscan tab: scroll to Instructions → highlight the memo program + ASCII payload `math-class-website:1|tag=student-profile|wallet=…`.
+>
+> **55–60s** — Back to section 04: switch to "Class collective" tab — show that the same memo is now indexed live from RPC. Cut.
+>
+> **Optional outro card**: "Math Class Website. Solana wallet identity, ed25519 proof, on-chain anchor, ElevenLabs French voice, Anthropic Claude bilingual reasoning. https://rucmathclass.com — github.com/jsfjsf20070513-a11y/MathClassWebsite-public"
 
-### 10-20s: Target Users
+## Slogan options
 
-"The target users are classmates, student contributors, and reviewers who need a stable place to understand what the class is learning, saving, and building together."
+1. *Anchor a class on-chain. In two languages. With AI.*
+2. *A book-page dApp: bilingual class memory, signed and anchored on Solana.*
+3. *Le carnet de classe, signé sur Solana.*
+4. *Class collective memory — write to devnet, read back from RPC.*
+5. *Where a freshman's class notebook meets Solana, ElevenLabs, and Claude.*
 
-### 20-45s: Core Feature Demo
+## Common Dev3pack application answers
 
-"Here is the homepage. It gives the class identity, a daily theorem note, the course schedule, image plates, and reading paths. From the gallery, users can browse structured activity albums. From resources, they can open curated study materials. The collaboration area supports Supabase-backed login, submissions, review, and publishing when the backend variables are configured. For hackathon judges, I added this `/hackathon` page so the project can be reviewed quickly."
+### Why do you want to participate?
 
-### 45-55s: Tech Stack
-
-"The stack is React, Vite, React Router, custom CSS, KaTeX, lucide-react, and optional Supabase for auth, database, comments, and moderation. Production is a static build served by Nginx."
-
-### 55-60s: Future Plan
-
-"Next I will add the public GitHub link, attach the demo video URL, review Supabase RLS, and connect HTTPS with a custom domain."
-
-## 5 Slogan Options
-
-1. A class website that turns scattered student memory into a working product.
-2. From math cohort notes to a deployed AI assisted web prototype.
-3. A lightweight knowledge hub built by a freshman math student.
-4. Real campus workflow, fast AI assisted prototype, deployed result.
-5. Mathematics background meets AI native product building.
-
-## Common Hackathon Application Answers
-
-### Why do you want to join this hackathon?
-
-I want to join because hackathons are one of the fastest ways to test whether I can turn a real problem into a working product under time pressure. As a freshman mathematics student, I want to learn how stronger builders think about product scope, engineering tradeoffs, teamwork, and demo storytelling. I am especially interested in events where AI assisted development, rapid prototyping, and mathematical reasoning can be combined.
+I built and deployed a real bilingual class collaboration site as a first-year mathematics student. Dev3pack gave me a focused window to extend it into a real Solana dApp without abandoning the original class story. I wanted to learn, by shipping, how to combine Web3 identity, on-chain memory, and AI-generated bilingual content in a single coherent product. I also wanted to show that a solo Web3 beginner can integrate Solana write + read responsibly without smart contracts or mainnet writes.
 
 ### What have you built before?
 
-I have worked on a class collaboration website for my mathematics cohort and helped prepare it as a public hackathon project. It includes a public homepage, course context, event albums, curated resources, authentication-related pages, comments, submission workflows, and moderation routes powered by Supabase when configured. I also prepared the public-safe GitHub repository, `/hackathon` showcase page, `/web3-profile` page, README, screenshots, demo video material, health check notes, deployment notes, and application materials to make the project easier for judges and teammates to evaluate.
+I have already shipped Math Class Website end-to-end: a deployed React + Vite + Supabase class collaboration site at `https://rucmathclass.com/` with a custom domain, Cloudflare proxy + Flexible SSL HTTPS, a public-safe GitHub repository, screenshots, security & RLS notes, and a hackathon showcase page. For Dev3pack I extended it with the six features described above (wallet identity, ed25519 proof, on-chain memo write, RPC read feed, class collective view, French TTS, bilingual Claude reasoning) and a tested first on-chain anchor on Solana devnet that judges can verify on Solscan.
 
 ### What role can you play in a team?
 
-I can help with problem breakdown, product logic, mathematical modeling, content structure, AI-assisted implementation support, debugging, deployment checks, GitHub preparation, and demo materials. I am not positioning myself as a senior engineer. My value is that I can learn quickly, use AI tools actively, keep the product goal clear, and help the team turn ideas into a presentable prototype.
+Solo for this submission. I drive product direction, content, AI-assisted implementation, deployment, documentation, and demo materials end-to-end, and I own all final calls. In a team I would naturally take the product/AI-assisted-builder role: turning a real human use case into a shippable prototype, integrating AI tools responsibly, and bridging mathematical thinking with hands-on building.
 
 ### How did you use AI tools responsibly?
 
-I used AI tools as accelerators for coding, debugging, refactoring, documentation, and research. I did not treat AI output as automatically correct. I reviewed the code, ran build and lint checks, checked deployment behavior, and made final decisions based on whether the result served the product. I also keep secrets out of prompts and source files, and I understand that browser-exposed variables such as Supabase anon keys still require Row Level Security.
+Three rules:
+
+- AI is an accelerator, not a substitute for judgement. Every shipping decision (scope, security boundaries, fallback behaviour, what goes into the public repo) is human-decided and reviewed before commit.
+- API keys never reach the bundle. ElevenLabs and Anthropic keys were used in-memory only during static generation; they are not in `.env.local`, not in the deployed app, and not in any commit.
+- AI-generated content is labelled. The bilingual proof outlines carry an explicit `BILINGUAL REASONING BY ANTHROPIC CLAUDE · CLAUDE-OPUS-4.7` credit; the ElevenLabs narration carries a `Voice by ElevenLabs · multilingual_v2` credit.
 
 ### What technologies are you comfortable with?
 
-I am comfortable working with React, Vite, JavaScript, CSS, React Router, npm, static deployment, Nginx basics, Supabase Auth and database concepts, Git/GitHub workflows, and AI assisted coding tools such as Codex GPT 5.5, Claude Opus, Claude Sonnet, and Gemini Google AI Pro. I am also building my foundation in mathematics, Python, and modeling.
+JavaScript, React, Vite, npm, Supabase (anon-key client-side patterns, RLS review), `@solana/web3.js` v1, the SPL Memo program, Phantom-compatible injected wallets, Solana devnet RPC, Anthropic Claude API (offline / static generation patterns), ElevenLabs TTS API, Nginx static hosting, Cloudflare proxy + Flexible SSL, rsync-based deployment, AI-assisted development with Codex / Claude / Gemini.
 
 ### What do you hope to learn?
 
-I hope to learn how to build with a team under real time constraints, how to scope a hackathon idea sharply, how to combine math modeling with usable software, and how to present technical decisions clearly. I also want to learn better engineering habits, including testing, API design, data security, and collaborative Git workflows.
+How experienced Solana builders structure compressed-NFT mints, Sign-in with Solana flows, and indexed real-time feeds. How to design a Cloudflare Worker that safely fronts an Anthropic API key for a real-time AI feature without leaking it. How to grow a single-user identity dApp into a true multi-user collective product without losing the original product's tone.
