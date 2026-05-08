@@ -21,6 +21,11 @@ export const onchainAnchor = {
   faucetUrl: 'https://faucet.solana.com',
   faucetHelp:
     'Wallet has insufficient devnet SOL. Visit faucet.solana.com, paste this wallet address, request 1 SOL (free), then retry.',
+  phantomWarningNotice:
+    'Phantom may flag this domain as "could be malicious" because rucmathclass.com is a new dApp not yet listed in the Blowfish dApp registry. This is the default behavior for any new hackathon project. The transaction only invokes the SPL Memo program (no SOL transfer, no smart contract). You can audit the exact instruction code below before approving.',
+  sourceCodeLabel: 'Audit the memo transaction source code',
+  sourceCodeUrl:
+    'https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public/blob/main/src/lib/solanaMemo.js',
 }
 
 export const messageStatement = {

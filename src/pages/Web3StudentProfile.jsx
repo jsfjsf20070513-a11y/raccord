@@ -696,6 +696,14 @@ export default function Web3StudentProfile() {
           </div>
           <p>{onchainAnchor.prompt}</p>
 
+          <div className="phantom-warning-notice" role="note">
+            <strong>About the Phantom &ldquo;Request blocked&rdquo; warning:</strong>{' '}
+            {onchainAnchor.phantomWarningNotice}{' '}
+            <a href={onchainAnchor.sourceCodeUrl} target="_blank" rel="noreferrer">
+              {onchainAnchor.sourceCodeLabel} →
+            </a>
+          </div>
+
           <div className="contact-panel">
             <dl>
               <div>
