@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import DailyMeditation from '../components/DailyMeditation'
+import TitlePageNarration from '../components/TitlePageNarration'
 import {
   classProfile,
   courseSchedule,
@@ -63,6 +64,7 @@ export default function Home() {
           <div className="title-page-copy">
             <p>Fenêtre sur le présent, miroir pour la mémoire.</p>
           </div>
+          <TitlePageNarration />
           <p className="title-page-ledger">{`Édition du ${editionDateLabel}`}</p>
           <nav className="title-page-nav" aria-label="作品展示入口">
             <Link to="/hackathon">View Hackathon Showcase</Link>

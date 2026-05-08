@@ -1,0 +1,112 @@
+import { useEffect, useRef, useState } from 'react'
+
+const AUDIO_SRC = '/audio/carnet-fr-intro.mp3'
+
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds) || seconds <= 0) {
+    return '0:00'
+  }
+
+  const total = Math.round(seconds)
+  const minutes = Math.floor(total / 60)
+  const remainder = total % 60
+  return `${minutes}:${remainder.toString().padStart(2, '0')}`
+}
+
+export default function TitlePageNarration() {
+  const audioRef = useRef(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [duration, setDuration] = useState(0)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) {
+      return undefined
+    }
+
+    const handleLoaded = () => {
+      setDuration(audio.duration || 0)
+      setError('')
+    }
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime || 0)
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
+    const handleEnded = () => {
+      setIsPlaying(false)
+      setCurrentTime(0)
+    }
+    const handleError = () => {
+      setError('Audio unavailable.')
+      setIsPlaying(false)
+    }
+
+    audio.addEventListener('loadedmetadata', handleLoaded)
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
+    audio.addEventListener('ended', handleEnded)
+    audio.addEventListener('error', handleError)
+
+    return () => {
+      audio.removeEventListener('loadedmetadata', handleLoaded)
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
+      audio.removeEventListener('ended', handleEnded)
+      audio.removeEventListener('error', handleError)
+    }
+  }, [])
+
+  const togglePlay = async () => {
+    const audio = audioRef.current
+    if (!audio) {
+      return
+    }
+
+    setError('')
+
+    try {
+      if (audio.paused) {
+        await audio.play()
+      } else {
+        audio.pause()
+      }
+    } catch (err) {
+      setError(err?.message || 'Playback was blocked by the browser.')
+      setIsPlaying(false)
+    }
+  }
+
+  const timeLabel = duration > 0
+    ? `${formatTime(currentTime)} / ${formatTime(duration)}`
+    : '0:14'
+
+  return (
+    <div className="title-page-narration">
+      <button
+        type="button"
+        className="title-page-listen"
+        onClick={togglePlay}
+        aria-pressed={isPlaying}
+        aria-label={isPlaying ? 'Pause French narration' : 'Play French narration'}
+      >
+        <span className="title-page-listen-icon" aria-hidden="true">
+          {isPlaying ? '◼' : '▶'}
+        </span>
+        <span>{isPlaying ? 'En pause' : 'Écouter'}</span>
+        <span className="title-page-listen-time" aria-hidden="true">
+          · {timeLabel}
+        </span>
+      </button>
+      <p className="title-page-narration-credit">
+        Voice by ElevenLabs · multilingual_v2
+      </p>
+      {error ? <p className="title-page-narration-error">{error}</p> : null}
+      <audio ref={audioRef} src={AUDIO_SRC} preload="metadata">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  )
+}
