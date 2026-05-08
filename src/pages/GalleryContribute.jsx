@@ -392,10 +392,10 @@ export default function GalleryContribute() {
     <article className="page-column">
       <PageHeader
         kicker="Gallery Contribution"
-        title="图版补录"
-        summary="把标题、日期、地点和图片传上来即可。"
+        title="Plate addenda · 图版补录"
+        summary="Upload title, date, location, and image. · 把标题、日期、地点和图片传上来即可。"
         backTo="/manage"
-        backLabel="返回协作入口"
+        backLabel="Back to collaboration · 返回协作入口"
       />
 
       <section className="page-section">

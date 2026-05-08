@@ -68,13 +68,13 @@ export default function Home() {
           </div>
           <TitlePageNarration />
           <p className="title-page-ledger">{`Édition du ${editionDateLabel}`}</p>
-          <nav className="title-page-nav" aria-label="作品展示入口">
+          <nav className="title-page-nav" aria-label="Showcase entry · 作品展示入口">
             <Link to="/hackathon">View Hackathon Showcase</Link>
           </nav>
         </div>
       </header>
 
-      <section className="home-fragment theorem-fragment" aria-label="定理回顾">
+      <section className="home-fragment theorem-fragment" aria-label="Theorem review · 定理回顾">
         <article className="daily-entry theorem-entry">
           <p className="daily-entry-kicker">Rappel mathematique</p>
           <h2>{dailyTheorem.title}</h2>
@@ -121,13 +121,13 @@ export default function Home() {
       </section>
 
       <section className="page-section" id="courses">
-        <h2 className="section-title">§1 课程表</h2>
+        <h2 className="section-title">§1 Schedule · 课程表</h2>
         <pre className="editorial-pre">{courseTable}</pre>
         <DailyMeditation offset={0} />
       </section>
 
       <section className="page-section" id="plates">
-        <h2 className="section-title">§2 图版</h2>
+        <h2 className="section-title">§2 Plates · 图版</h2>
         <ol className="plate-list">
           {plates.map((album, index) => (
             <li key={album.id}>
@@ -138,13 +138,13 @@ export default function Home() {
           ))}
         </ol>
         <p className="plate-overview-reference">
-          <Link to="/gallery">→ 进入图版总览</Link>
+          <Link to="/gallery">→ Open the plate index · 进入图版总览</Link>
         </p>
         <DailyMeditation offset={1} />
       </section>
 
       <section className="page-section" id="books">
-        <h2 className="section-title">§3 阅读线</h2>
+        <h2 className="section-title">§3 Reading lines · 阅读线</h2>
         <ol className="record-list compact">
           {homeReadingPaths.map((path) => (
             <li key={path.id} className="record-entry reading-line-entry">
@@ -165,7 +165,7 @@ export default function Home() {
           ))}
         </ol>
         <p className="editorial-note">
-          <Link to="/resources">进入完整资源目录</Link>
+          <Link to="/resources">Open the full resource directory · 进入完整资源目录</Link>
         </p>
         <DailyMeditation offset={2} />
       </section>

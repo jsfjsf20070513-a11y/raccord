@@ -2,9 +2,9 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 
 const navItems = [
-  { to: '/', label: '扉页' },
-  { to: '/resources', label: '资源' },
-  { to: '/manage', label: '协作' },
+  { to: '/', label: 'Home · 扉页' },
+  { to: '/resources', label: 'Resources · 资源' },
+  { to: '/manage', label: 'Collaboration · 协作' },
 ]
 
 export default function Layout() {
@@ -25,8 +25,8 @@ export default function Layout() {
       return navItems[1]
     }
 
-    if (pathname.startsWith('/hackathon')) {
-      return { to: '/hackathon', label: '展示' }
+    if (pathname.startsWith('/hackathon') || pathname.startsWith('/web3-profile')) {
+      return { to: '/hackathon', label: 'Showcase · 展示' }
     }
 
     return navItems[2]
@@ -48,7 +48,7 @@ export default function Layout() {
             <p className="site-branding-kicker">Carnet de classe</p>
           </div>
 
-          <nav className="site-header-focus" aria-label="当前位置">
+          <nav className="site-header-focus" aria-label="Current location · 当前位置">
             {primaryNav ? (
               <Link to={primaryNav.to} className="is-active" aria-current="page">
                 {primaryNav.label}

@@ -23,7 +23,7 @@ function isVisibleComment(comment) {
   return Number(comment?.album_id) !== OPS_QUEUE_ALBUM_ID
 }
 
-export default function Comments({ albumId, title = '留言板' }) {
+export default function Comments({ albumId, title = 'Comments · 留言板' }) {
   const { user } = useAuth()
   const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState('')
@@ -105,7 +105,9 @@ export default function Comments({ albumId, title = '留言板' }) {
             setComments(legacyData)
           } catch (legacyError) {
             if (!active) return
-            setErrorMsg(`无法加载留言：${legacyError.message || '网络错误'}`)
+            setErrorMsg(
+              `Failed to load comments: ${legacyError.message || 'network error'} · 无法加载留言：${legacyError.message || '网络错误'}`,
+            )
           } finally {
             if (active) setLoading(false)
           }
@@ -113,7 +115,9 @@ export default function Comments({ albumId, title = '留言板' }) {
         }
 
         if (!active) return
-        setErrorMsg(`无法加载留言：${error.message || '网络错误'}`)
+        setErrorMsg(
+          `Failed to load comments: ${error.message || 'network error'} · 无法加载留言：${error.message || '网络错误'}`,
+        )
       } finally {
         if (active) setLoading(false)
       }
@@ -174,7 +178,7 @@ export default function Comments({ albumId, title = '留言板' }) {
       content: newComment.trim(),
       user_id: user.id,
       user_email: user.email,
-      user_nickname: user.user_metadata?.nickname || user.user_metadata?.real_name || '同学',
+      user_nickname: user.user_metadata?.nickname || user.user_metadata?.real_name || 'Classmate · 同学',
       created_at: new Date().toISOString(),
       ...(includeAlbumId ? { album_id: Number(albumId) } : {}),
     })
@@ -274,19 +278,19 @@ export default function Comments({ albumId, title = '留言板' }) {
       {user ? (
         <form className="editorial-form" onSubmit={handleSubmit}>
           <label>
-            <span>留下附记</span>
+            <span>Leave a marginal note · 留下附记</span>
             <textarea
               className="comment-textarea"
               rows="4"
               value={newComment}
               onChange={(event) => setNewComment(event.target.value)}
-              placeholder="写下对这本相册的记忆、补注或更正。"
+              placeholder="Write your memory, addendum, or correction for this album. · 写下对这本相册的记忆、补注或更正。"
             />
           </label>
           <div className="editorial-actions">
-            <span className="muted-copy">署名：{user.user_metadata?.nickname || user.email}</span>
+            <span className="muted-copy">Signed · 署名：{user.user_metadata?.nickname || user.email}</span>
             <button type="submit" className="text-button" disabled={submitting}>
-              {submitting ? '送出中' : '提交留言'}
+              {submitting ? 'Submitting…' : 'Submit comment · 提交留言'}
             </button>
           </div>
         </form>
@@ -297,11 +301,15 @@ export default function Comments({ albumId, title = '留言板' }) {
         </p>
       )}
 
-      {loading ? <p className="muted-copy">正在调入旧页边批注……</p> : null}
+      {loading ? (
+        <p className="muted-copy">Loading marginal notes… · 正在调入旧页边批注……</p>
+      ) : null}
 
       {!loading && !comments.length ? (
         <p className="muted-copy">
-          {albumId ? '这本相册暂时还没有页边批注。' : '暂时还没有站内留言。'}
+          {albumId
+            ? 'No marginal notes on this album yet. · 这本相册暂时还没有页边批注。'
+            : 'No comments yet. · 暂时还没有站内留言。'}
         </p>
       ) : null}
 
@@ -311,12 +319,12 @@ export default function Comments({ albumId, title = '留言板' }) {
             <li key={comment.id} className="record-entry">
               <div className="record-entry-head">
                 <div>
-                  <h3>{comment.user_nickname || '同学'}</h3>
+                  <h3>{comment.user_nickname || 'Classmate · 同学'}</h3>
                   <p className="record-meta">{formatDate(comment.created_at)}</p>
                 </div>
                 {user && (isAdmin || user.id === comment.user_id) ? (
                   <button type="button" className="text-button subtle" onClick={() => handleDelete(comment.id)}>
-                    删除
+                    Delete · 删除
                   </button>
                 ) : null}
               </div>

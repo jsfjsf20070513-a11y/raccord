@@ -8,13 +8,25 @@ import { buildSubmissionTitle, getSubmissionStateLabel } from '../lib/submission
 import { useOpsSubmissions } from '../hooks/useOpsSubmissions'
 
 const focusModules = [
-  { key: 'gallery', kind: 'gallery', title: '图版补录', description: '补图片、日期和地点。', to: '/gallery/contribute' },
-  { key: 'resources', kind: 'resource', title: '资源增补', description: '补书目与课程链接。', to: '/resources/curate' },
+  {
+    key: 'gallery',
+    kind: 'gallery',
+    title: 'Plate addenda · 图版补录',
+    description: 'Add images, dates, and locations. · 补图片、日期和地点。',
+    to: '/gallery/contribute',
+  },
+  {
+    key: 'resources',
+    kind: 'resource',
+    title: 'Resource curation · 资源增补',
+    description: 'Add bibliography and course links. · 补书目与课程链接。',
+    to: '/resources/curate',
+  },
 ]
 const reviewableKinds = new Set(focusModules.map((item) => item.kind))
 
 function formatShortDate(value) {
-  if (!value) return '待补日期'
+  if (!value) return 'Date pending · 待补日期'
   return `${value}`.replace('T', ' ').slice(0, 16)
 }
 
@@ -31,13 +43,13 @@ function AdminReviewShortcut() {
 
   return (
     <p className="manage-review-rail">
-      <Link to="/manage/review">审核发布</Link>
+      <Link to="/manage/review">Moderation &amp; publishing · 审核发布</Link>
       <span>
         {backendMode !== 'official'
-          ? '正式相册表还没建好；现在去审核页会看到建表提示。'
+          ? 'The official album table has not been built yet — the review page will show a setup prompt. · 正式相册表还没建好；现在去审核页会看到建表提示。'
           : pendingCount
-          ? `现在还有 ${pendingCount} 条待处理；在这里点“发布”，图版会进入相册，资源会进入公开书架。`
-          : '这里处理协作稿的发布与撤下。'}
+          ? `${pendingCount} item${pendingCount === 1 ? '' : 's'} pending; click "Publish" here to push plates into the album and resources onto the public shelf. · 现在还有 ${pendingCount} 条待处理；在这里点"发布"，图版会进入相册，资源会进入公开书架。`
+          : 'This is where collaborative drafts are published or withdrawn. · 这里处理协作稿的发布与撤下。'}
       </span>
     </p>
   )
@@ -89,10 +101,10 @@ export default function ManageHub() {
     <article className="page-column manage-hub-page">
       <PageHeader
         kicker="Table de travail"
-        title="协作"
-        summary="图版补录与资源增补。"
+        title="Collaboration · 协作"
+        summary="Plate addenda and resource contributions. · 图版补录与资源增补。"
         backTo="/"
-        backLabel="返回扉页"
+        backLabel="Back to title page · 返回扉页"
         meta={[displayName]}
         showRule={false}
       />
@@ -112,8 +124,8 @@ export default function ManageHub() {
 
       <section className="page-section manage-desk-section">
         <div className="manage-desk-shell">
-          <p className="manage-desk-kicker">案头近记</p>
-          <h2 className="manage-desk-heading">最近三条</h2>
+          <p className="manage-desk-kicker">Recent on the desk · 案头近记</p>
+          <h2 className="manage-desk-heading">Last three entries · 最近三条</h2>
           {user ? (
             <>
               {myEntries.length ? (

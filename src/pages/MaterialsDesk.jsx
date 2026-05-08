@@ -17,11 +17,11 @@ export default function MaterialsDesk() {
     <article className="page-column">
       <PageHeader
         kicker="Materials Desk"
-        title="素材入册"
-        summary="只看扉页、图版和资源。"
+        title="Materials intake · 素材入册"
+        summary="Title page, plates, and resources only. · 只看扉页、图版和资源。"
         backTo="/manage"
-        backLabel="返回协作入口"
-        meta={[`${highestPriorityCount} 项先交`]}
+        backLabel="Back to collaboration · 返回协作入口"
+        meta={[`${highestPriorityCount} priority item${highestPriorityCount === 1 ? '' : 's'} · ${highestPriorityCount} 项先交`]}
       />
 
       <section className="page-section manage-focus">

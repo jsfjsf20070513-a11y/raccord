@@ -5,7 +5,7 @@ export default function PageHeader({
   title,
   summary,
   backTo = '/',
-  backLabel = '返回扉页',
+  backLabel = 'Back to title page · 返回扉页',
   meta = [],
   note = '',
   showRule = true,

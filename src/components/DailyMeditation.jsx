@@ -16,7 +16,7 @@ export default function DailyMeditation({ offset = 0, className = '' }) {
   const entry = dailyFrenchPhrases[(getDailyIndex(dailyFrenchPhrases.length) + offset) % dailyFrenchPhrases.length]
 
   return (
-    <aside className={['section-coda', className].filter(Boolean).join(' ')} aria-label="每日哲思">
+    <aside className={['section-coda', className].filter(Boolean).join(' ')} aria-label="Daily meditation · 每日哲思">
       <p className="section-coda-kicker">Meditation du jour</p>
       <p className="section-coda-quote" lang="fr">
         {entry.text}

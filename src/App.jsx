@@ -165,6 +165,8 @@ function AppRoutes() {
         <Route index element={<ReadyPage><Home /></ReadyPage>} />
         <Route path="hackathon" element={<DeferredPage><HackathonShowcase /></DeferredPage>} />
         <Route path="web3-profile" element={<DeferredPage><Web3StudentProfile /></DeferredPage>} />
+        {/* Backwards-compat: I previously shared /web3-student-profile in convo. Redirect so any saved link still works. */}
+        <Route path="web3-student-profile" element={<Navigate to="/web3-profile" replace />} />
         <Route path="class-info" element={<Navigate to="/" replace />} />
         <Route path="gallery" element={<DeferredPage><Gallery /></DeferredPage>} />
         <Route path="gallery/contribute" element={<DeferredPage><GalleryContribute /></DeferredPage>} />

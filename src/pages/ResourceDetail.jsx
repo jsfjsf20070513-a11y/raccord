@@ -53,7 +53,7 @@ export default function ResourceDetail() {
         title={resource.title}
         summary={getResourceHeaderSummary(resource)}
         backTo="/resources"
-        backLabel="返回资源"
+        backLabel="Back to resources · 返回资源"
         showRule={false}
       />
 

@@ -194,11 +194,11 @@ export default function ModerationCenter() {
     <article className="page-column">
       <PageHeader
         kicker="Moderation Center"
-        title="审核发布"
-        summary="在这里点“发布”，图版会进入相册，资源会进入公开书架。"
+        title="Moderation &amp; publishing · 审核发布"
+        summary={'Click "Publish" here — plates enter the album, resources join the public bookshelf. · 在这里点"发布"，图版会进入相册，资源会进入公开书架。'}
         backTo="/manage"
-        backLabel="返回协作入口"
-        meta={[roleLabel, backendMode === 'official' ? '正式栏' : '兼容栏']}
+        backLabel="Back to collaboration · 返回协作入口"
+        meta={[roleLabel, backendMode === 'official' ? 'Official channel · 正式栏' : 'Compat channel · 兼容栏']}
       />
 
       {status ? <p className={`status-line ${status.type === 'error' ? 'is-error' : 'is-success'}`}>{status.text}</p> : null}

@@ -321,10 +321,10 @@ export default function ResourceCurate() {
     <article className="page-column">
       <PageHeader
         kicker="Resource Curation"
-        title="资源扩充"
-        summary="把分栏、标题、链接和材料写进去即可。"
+        title="Resource curation · 资源扩充"
+        summary="Fill in section, title, link, and materials. · 把分栏、标题、链接和材料写进去即可。"
         backTo="/manage"
-        backLabel="返回协作入口"
+        backLabel="Back to collaboration · 返回协作入口"
       />
 
       <section className="page-section">
