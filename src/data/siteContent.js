@@ -77,23 +77,23 @@ export const courseSchedule = [
     slots: [
       {
         time: '08:00-09:35',
-        course: 'Calculus',
-        note: 'Teacher Name · Classroom A101 · 1-2',
+        course: '初级法语视听说 II',
+        note: 'BRAHAMI GUILLAUME · 修远206 · 1-2节 · 1-9,11-16周',
       },
       {
         time: '10:00-11:35',
-        course: 'French Language',
-        note: 'Teacher Name · Classroom A102 · 3-4',
+        course: '初级法语 II',
+        note: '段铭钰 / 朱波 · 修远204 / 317 · 3-4节 · 1-9,11-16周',
       },
       {
         time: '14:00-15:35',
-        course: 'Linear Algebra',
-        note: 'Teacher Name · Classroom A103 · 7-8',
+        course: '高等代数 II',
+        note: '刘晓艳 · 修远317 · 7-8节 · 1-9,11-16周',
       },
       {
         time: '16:00-17:35',
-        course: 'Mathematical French',
-        note: 'Teacher Name · Classroom A104 · 9-10',
+        course: '数学法语（法） / 高等代数（法）',
+        note: '法方专业教师 M · 修远317 · 9-10节 · 分周段开设',
       },
     ],
   },
@@ -102,23 +102,23 @@ export const courseSchedule = [
     slots: [
       {
         time: '08:00-09:35',
-        course: 'Mathematical Analysis',
-        note: 'Teacher Name · Classroom B101 · 1-2',
+        course: '数学分析 II',
+        note: '朱来义 / 刘晓艳 · 修远315 · 1-2节 · 1-16周',
       },
       {
         time: '10:00-11:35',
-        course: 'Academic English',
-        note: 'Teacher Name · Classroom B102 · 3-4',
+        course: '大学英语 IV',
+        note: '陈丽丽 · 修远311 · 3-4节 · 1-16周',
       },
       {
         time: '14:00-15:35',
-        course: 'Python Programming',
-        note: 'Teacher Name · Computer Lab · 7-8',
+        course: 'Python 程序设计 / 数据管理与数据挖掘',
+        note: '修远楼 B 区 305 / 修远117 · 7-8节 · 1-16周',
       },
       {
         time: '18:00-19:35',
-        course: 'Career Seminar',
-        note: 'Teacher Name · Lecture Hall · 11-12',
+        course: '职业生涯教育（理论）',
+        note: '于坤 · 修远报告厅 · 11-12节 · 13-16周',
       },
     ],
   },
@@ -127,23 +127,23 @@ export const courseSchedule = [
     slots: [
       {
         time: '08:00-09:35',
-        course: 'French Language',
-        note: 'Teacher Name · Classroom C101 · 1-2',
+        course: '初级法语 II',
+        note: '朱波 · 修远317 · 1-2节 · 1-16周',
       },
       {
         time: '10:00-11:35',
-        course: 'Linear Algebra',
-        note: 'Teacher Name · Classroom C102 · 3-4',
+        course: '数学法语（法） / 高等代数（法）',
+        note: '法方专业教师 M · 修远317 · 3-4节 · 分周段开设',
       },
       {
         time: '14:00-15:35',
-        course: 'AI Foundations',
-        note: 'Teacher Name · Classroom C103 · 7-8',
+        course: '法语音调与朗读 / 人工智能与数据技术基础',
+        note: '修远207 / 225 · 7-8节 · 按周次与分组开设',
       },
       {
         time: '19:40-21:15',
-        course: 'Culture Seminar',
-        note: 'Teacher Name · Evening session',
+        course: '法国地缘与历史',
+        note: '郭兰芳 / 杨燕萍 / 张莉 · 晚间课程',
       },
     ],
   },
@@ -152,23 +152,23 @@ export const courseSchedule = [
     slots: [
       {
         time: '08:00-09:35',
-        course: 'French Language',
-        note: 'Teacher Name · Classroom D101 · 1-2',
+        course: '初级法语 II',
+        note: '朱波 · 修远317 · 1-2节 · 1-16周',
       },
       {
         time: '10:00-11:35',
-        course: 'Mathematical Analysis',
-        note: 'Teacher Name · Classroom D102 · 3-5',
+        course: '数学分析 II',
+        note: '朱来义 / 刘晓艳 · 修远315 · 3-5节 · 1-16周',
       },
       {
         time: '14:00-15:35',
-        course: 'French Writing',
-        note: 'Teacher Name · Classroom D103 · 7-8',
+        course: '初级法语 II',
+        note: '段铭钰 · 修远214 · 7-8节 · 1-16周',
       },
       {
         time: '16:00-17:35',
-        course: 'Listening and Speaking',
-        note: 'Teacher Name · Classroom D104 · 9-10',
+        course: '初级法语视听说 II',
+        note: 'Clément PEPIN · 修远315 · 9-10节 · 1-16周',
       },
     ],
   },
@@ -177,18 +177,18 @@ export const courseSchedule = [
     slots: [
       {
         time: '08:00-09:35',
-        course: 'Mathematical French',
-        note: 'Teacher Name · Classroom E101 · 1-2',
+        course: '数学法语（法）',
+        note: '法方专业教师 M · 修远317 · 1-2节 · 6周',
       },
       {
         time: '10:00-11:35',
-        course: 'Reading and Writing',
-        note: 'Teacher Name · Classroom E102 · 3-4',
+        course: '初级法语阅读与写作',
+        note: 'BRAHAMI GUILLAUME / Clément PEPIN · 修远104 / 214 · 3-4节',
       },
       {
         time: '16:00-17:35',
-        course: 'General Education',
-        note: 'Teacher Name · Lecture Hall · 11-14',
+        course: '毛泽东思想和中国特色社会主义理论体系概论',
+        note: '孙愉慧 · 修远报告厅 · 11-14节 · 1-12周',
       },
     ],
   },
@@ -197,18 +197,18 @@ export const courseSchedule = [
     slots: [
       {
         time: '08:00-09:35',
-        course: 'Optional Workshop',
-        note: 'Teacher Name · Classroom F101 · 1-2',
+        course: '初级法语视听说 II',
+        note: 'BRAHAMI GUILLAUME · 修远206 · 1-2节 · 第 10 周',
       },
       {
         time: '10:00-11:35',
-        course: 'Problem Session',
-        note: 'Teacher Name · Classroom F102 · 3-4',
+        course: '初级法语 II',
+        note: '段铭钰 / 朱波 · 修远204 / 317 · 3-4节 · 第 10 周',
       },
       {
         time: '16:00-17:35',
-        course: 'Project Studio',
-        note: 'Teacher Name · Classroom F103 · 9-10',
+        course: '高等代数（法）',
+        note: '法方专业教师 M · 修远317 · 9-10节 · 第 10 周',
       },
     ],
   },
@@ -216,13 +216,13 @@ export const courseSchedule = [
 
 export const classProfile = {
   campus: '中国人民大学中法学院（苏州）',
-  name: 'Anonymized Mathematics Cohort',
+  name: '中法 2025 级数学与应用数学班',
   slogan: '数学与法语并修，课程与记忆并存。',
-  vision: 'This public version keeps the product structure while replacing private class records with sample content.',
-  keywords: ['Anonymized cohort', 'Mathematics', 'French', 'Public-safe sample'],
+  vision: '把班级网站从示意首页逐步编修成兼具法语语境、课程脉络与班级档案的长期记录。',
+  keywords: ['中法学院', '数学', '法语', '长期编修'],
   intro: [
-    'This public repository uses anonymized sample course, album, and archive data. The real deployed class content is kept outside GitHub unless explicit permission is confirmed.',
-    'The structure still demonstrates the product idea: a lightweight class knowledge hub with schedules, albums, resources, and collaboration workflows.',
+    '这个站点所记录的是中国人民大学中法学院 2025 级数学与应用数学班。课程结构并不只是普通数学课表，而是在数学分析、高等代数、Python 等课程之外，同时并入初级法语、法语阅读写作、数学法语与法语音调训练。',
+    '因此这里的资源、纪事与相册都不再按单一工科班的方式整理，而是更强调双语课程的真实脉络、长期可回查的资料目录，以及一届人共同学习时留下的秩序感。',
   ],
 }
 
