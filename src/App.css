@@ -1239,78 +1239,21 @@
 .plate-list {
   list-style: none;
   padding-left: 0;
-  margin: 0;
 }
 
-/* Single-column livre-d'artiste rhythm: each plate breathes vertically,
-   the figure is its own page break, no card chrome. */
-.plate-entry + .plate-entry {
-  margin-top: 64px;
+.plate-list li {
+  margin-bottom: 18px;
 }
 
-.plate-link {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-  border-bottom: none;
-}
-
-.plate-link:hover .plate-headline,
-.plate-link:focus-visible .plate-headline {
-  color: var(--accent);
-  outline: none;
-}
-
-.plate-figure {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.plate-figure picture {
-  display: block;
-  max-width: 580px;
-  width: 100%;
-}
-
-.plate-figure img {
-  display: block;
-  width: 100%;
-  height: auto;
-  /* Whisper of a printed-page edge, no full-bleed card border. */
-  box-shadow: 0 0 0 1px rgba(26, 26, 26, 0.06);
-}
-
-.plate-caption {
-  display: block;
-  margin-top: 18px;
-  max-width: 580px;
-  line-height: 1.55;
-}
-
+/* Title-page rhythm: §2 stays text-only on the home page on purpose —
+   the title page is a cover sheet, not a gallery. Real plates live at
+   /album/:id and /gallery. The Roman numeral keeps the editorial book
+   feel; the Chinese title sits muted next to the English overlay. */
 .plate-roman {
-  display: block;
-  margin-bottom: 2px;
   color: var(--muted);
-  font-style: italic;
   font-variant: small-caps;
-  letter-spacing: 0.08em;
-  font-size: 13px;
-}
-
-.plate-headline {
-  display: block;
-  color: var(--ink);
-  font-size: 16px;
-  transition: color 0.18s ease;
-}
-
-.plate-description {
-  display: block;
-  margin-top: 4px;
-  font-size: 14px;
+  letter-spacing: 0.04em;
+  margin-right: 2px;
 }
 
 .plate-headline-zh {
@@ -1324,15 +1267,6 @@
   font-size: 13px;
   font-variant: small-caps;
   letter-spacing: 0.08em;
-}
-
-@media (max-width: 640px) {
-  .plate-entry + .plate-entry {
-    margin-top: 44px;
-  }
-  .plate-caption {
-    max-width: 100%;
-  }
 }
 
 .plate-overview-reference {
