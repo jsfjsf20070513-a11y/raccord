@@ -7,6 +7,7 @@ import {
 } from '../data/siteContent'
 import { dailyTheoremNotes } from '../data/dailyTheoremNotes.generated'
 import { homeReadingPaths } from '../data/homeReadingPaths'
+import { explanationsCredit, theoremExplanations } from '../data/theoremExplanations'
 import { usePublicAlbums } from '../hooks/usePublicAlbums'
 import { formatCourseSchedule } from '../lib/courseSchedule'
 
@@ -82,6 +83,27 @@ export default function Home() {
             dangerouslySetInnerHTML={{ __html: dailyTheorem.displayHtml || dailyTheorem.fallback }}
           />
           <p className="daily-entry-meta">{dailyTheorem.note}</p>
+          {theoremExplanations[dailyTheorem.title] ? (
+            <details className="theorem-explanation">
+              <summary>
+                <span className="theorem-explanation-arrow" aria-hidden="true">→</span>
+                <span>Voir la preuve · 查看证明思路</span>
+              </summary>
+              <div className="theorem-explanation-body">
+                <div className="theorem-explanation-block">
+                  <p className="theorem-explanation-lang" aria-hidden="true">中文</p>
+                  <p>{theoremExplanations[dailyTheorem.title].zh}</p>
+                </div>
+                <div className="theorem-explanation-block">
+                  <p className="theorem-explanation-lang" aria-hidden="true">Français</p>
+                  <p>{theoremExplanations[dailyTheorem.title].fr}</p>
+                </div>
+                <p className="theorem-explanation-credit">
+                  Bilingual reasoning by {explanationsCredit.generator}
+                </p>
+              </div>
+            </details>
+          ) : null}
         </article>
       </section>
 

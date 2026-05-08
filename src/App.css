@@ -648,6 +648,93 @@
   font-size: 15px;
 }
 
+.theorem-explanation {
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.theorem-explanation > summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  user-select: none;
+  transition: color 0.18s ease;
+}
+
+.theorem-explanation > summary::-webkit-details-marker {
+  display: none;
+}
+
+.theorem-explanation > summary:hover,
+.theorem-explanation > summary:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.theorem-explanation-arrow {
+  display: inline-block;
+  font-style: normal;
+  transition: transform 0.2s ease;
+}
+
+.theorem-explanation[open] > summary .theorem-explanation-arrow {
+  transform: rotate(90deg);
+}
+
+.theorem-explanation-body {
+  margin: 14px 0 0;
+  display: grid;
+  gap: 18px;
+  animation: theorem-explanation-fade 0.32s ease;
+}
+
+.theorem-explanation-block p:last-child {
+  margin-bottom: 0;
+}
+
+.theorem-explanation-lang {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.theorem-explanation-block > p:not(.theorem-explanation-lang) {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.theorem-explanation-credit {
+  margin: 6px 0 0;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(26, 26, 26, 0.16);
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@keyframes theorem-explanation-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .page-header {
   margin-bottom: 16px;
 }
