@@ -90,6 +90,12 @@ public/uploads/
 setup_admin.sql
 setup_admin_v2.sql
 
+# Allow OG/branding/screenshots that have been explicitly approved as public
+!public/og/
+!public/og/*
+!docs/screenshots/
+!docs/screenshots/*
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
