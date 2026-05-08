@@ -10,6 +10,7 @@ import { homeReadingPaths } from '../data/homeReadingPaths'
 import { explanationsCredit, theoremExplanations } from '../data/theoremExplanations'
 import { usePublicAlbums } from '../hooks/usePublicAlbums'
 import { formatCourseSchedule } from '../lib/courseSchedule'
+import { renderMathTextToHtml } from '../lib/mathText'
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000
 const THEOREM_ROTATION_START_DAY = Math.floor(Date.UTC(2025, 8, 1) / DAY_IN_MS)
@@ -92,11 +93,23 @@ export default function Home() {
               <div className="theorem-explanation-body">
                 <div className="theorem-explanation-block">
                   <p className="theorem-explanation-lang" aria-hidden="true">中文</p>
-                  <p>{theoremExplanations[dailyTheorem.title].zh}</p>
+                  <p
+                    dangerouslySetInnerHTML={{
+                      __html: renderMathTextToHtml(
+                        theoremExplanations[dailyTheorem.title].zh,
+                      ),
+                    }}
+                  />
                 </div>
                 <div className="theorem-explanation-block">
                   <p className="theorem-explanation-lang" aria-hidden="true">Français</p>
-                  <p>{theoremExplanations[dailyTheorem.title].fr}</p>
+                  <p
+                    dangerouslySetInnerHTML={{
+                      __html: renderMathTextToHtml(
+                        theoremExplanations[dailyTheorem.title].fr,
+                      ),
+                    }}
+                  />
                 </div>
                 <p className="theorem-explanation-credit">
                   Bilingual reasoning by {explanationsCredit.generator}
