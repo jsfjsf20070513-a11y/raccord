@@ -2,7 +2,15 @@
 // room numbers, and activity details are intentionally anonymized before
 // publishing this repository.
 
-export const albums = [
+// Two-mode pattern for plate photos:
+//   - Default (GitHub-public): use the anonymized PUBLIC_ALBUMS below.
+//   - Production-private: deploy.sh writes a sibling file
+//     `privateAlbumOverrides.js` (gitignored) and copies the matching
+//     `public/uploads/*.{jpg,webp}` from the private repo. When that
+//     file exists, the import.meta.glob below picks it up at build time
+//     and replaces PUBLIC_ALBUMS — so the production VPS shows the real
+//     plates while the GitHub repo never carries identifying class data.
+const PUBLIC_ALBUMS = [
   {
     id: 1,
     title: 'Sample Class Activity',
@@ -70,6 +78,32 @@ export const albums = [
     ],
   },
 ]
+
+// Vite inlines this glob result at build time. When the override file
+// does not exist (GitHub repo or any plain `npm run build` from this
+// public source), `overrideModules` is `{}` and `albums` falls back to
+// the public-safe placeholders. The import path is intentionally a
+// glob so the import is silent when missing.
+//
+// import.meta.glob is a Vite-only API. The prebuild scripts in
+// scripts/*.mjs import this file with raw Node ESM, where the function
+// doesn't exist — the try/catch keeps both environments happy. Raw
+// Node always falls back to PUBLIC_ALBUMS, which is fine because the
+// prebuild scripts only consume `dailyTheoremNotes`.
+let overrideAlbums
+try {
+  const overrideModules = import.meta.glob('./privateAlbumOverrides.js', {
+    eager: true,
+    import: 'default',
+  })
+  overrideAlbums = Object.values(overrideModules)[0]
+} catch {
+  overrideAlbums = undefined
+}
+
+export const albums = Array.isArray(overrideAlbums) && overrideAlbums.length > 0
+  ? overrideAlbums
+  : PUBLIC_ALBUMS
 
 export const courseSchedule = [
   {
