@@ -697,7 +697,8 @@ export default function Web3StudentProfile() {
           This page lets the class leave a tiny, permanent mark on a public ledger
           called <em>Solana</em>. No money changes hands. No password leaves your
           device. Just a quiet &ldquo;I was here&rdquo;, written into a place no one
-          can erase later — including me, the builder, on this server.
+          can take back later — not the institute, not the platform, not even me,
+          the builder.
         </p>
         <p className="web3-class-letter-pull">
           Anchored, not stored.
