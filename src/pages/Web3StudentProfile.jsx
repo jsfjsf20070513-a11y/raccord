@@ -689,6 +689,38 @@ export default function Web3StudentProfile() {
         </aside>
       </header>
 
+      <section className="web3-class-letter" aria-label="A short note for the class">
+        <p className="web3-class-letter-kicker">
+          Pourquoi cette page existe · 为何在这里
+        </p>
+        <p>
+          This page lets the class leave a tiny, permanent mark on a public ledger
+          called <em>Solana</em>. No money changes hands. No password leaves your
+          device. Just a quiet &ldquo;I was here&rdquo;, written into a place no one
+          can erase later — including me, the builder, on this server.
+        </p>
+        <p className="web3-class-letter-pull">
+          Anchored, not stored.
+        </p>
+        <p>
+          If you have a Solana wallet, you can leave that mark in &sect;01–&sect;03
+          below. If you don&rsquo;t, &sect;04 still shows everyone else&rsquo;s
+          marks without installing anything. That&rsquo;s the whole idea.
+        </p>
+        <p className="web3-class-letter-rule" aria-hidden="true">
+          —
+        </p>
+        <p lang="zh">
+          致班级的同学：你不必懂区块链。这页只是想试一下，能不能让&ldquo;我曾来过&rdquo;
+          这件事变成一个公共可验证的事实——不在我的服务器上，不在学校的数据库里。
+          每一条记录都已经被固定，没人能后悔删除，也包括我。
+        </p>
+        <p lang="zh">
+          如果你没有 Solana 钱包，看 &sect;04 就够了；如果你想留一笔，
+          &sect;01–&sect;03 会一步一步带你过去。
+        </p>
+      </section>
+
       <ProfileSection id="wallet-identity" kicker="01 · Wallet Identity" title="Solana-ready student identity">
         <article className="hackathon-card">
           <div className="feature-card-head">

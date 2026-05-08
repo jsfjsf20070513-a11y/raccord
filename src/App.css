@@ -1239,17 +1239,17 @@
 .plate-list {
   list-style: none;
   padding-left: 0;
+  margin: 0;
 }
 
-.plate-list li {
-  margin-bottom: 28px;
+/* Single-column livre-d'artiste rhythm: each plate breathes vertically,
+   the figure is its own page break, no card chrome. */
+.plate-entry + .plate-entry {
+  margin-top: 64px;
 }
 
 .plate-link {
-  display: grid;
-  grid-template-columns: 156px 1fr;
-  gap: 18px;
-  align-items: start;
+  display: block;
   text-decoration: none;
   color: inherit;
   border-bottom: none;
@@ -1258,39 +1258,52 @@
 .plate-link:hover .plate-headline,
 .plate-link:focus-visible .plate-headline {
   color: var(--accent);
+  outline: none;
 }
 
-.plate-thumb {
+.plate-figure {
   margin: 0;
-  width: 156px;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  background: rgba(26, 26, 26, 0.04);
-  border: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
-.plate-thumb picture,
-.plate-thumb img {
+.plate-figure picture {
+  display: block;
+  max-width: 580px;
+  width: 100%;
+}
+
+.plate-figure img {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  /* Whisper of a printed-page edge, no full-bleed card border. */
+  box-shadow: 0 0 0 1px rgba(26, 26, 26, 0.06);
 }
 
 .plate-caption {
   display: block;
+  margin-top: 18px;
+  max-width: 580px;
   line-height: 1.55;
 }
 
 .plate-roman {
+  display: block;
+  margin-bottom: 2px;
   color: var(--muted);
+  font-style: italic;
   font-variant: small-caps;
-  letter-spacing: 0.04em;
-  margin-right: 2px;
+  letter-spacing: 0.08em;
+  font-size: 13px;
 }
 
 .plate-headline {
+  display: block;
   color: var(--ink);
+  font-size: 16px;
   transition: color 0.18s ease;
 }
 
@@ -1314,12 +1327,11 @@
 }
 
 @media (max-width: 640px) {
-  .plate-link {
-    grid-template-columns: 1fr;
+  .plate-entry + .plate-entry {
+    margin-top: 44px;
   }
-  .plate-thumb {
-    width: 100%;
-    aspect-ratio: 16 / 10;
+  .plate-caption {
+    max-width: 100%;
   }
 }
 
@@ -2337,6 +2349,56 @@
   font-size: 12px;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+/* The "letter to the class" sits between the hero and the four
+   technical sections. It mirrors the home daily-entry rhythm —
+   centred narrow column, serif body, no card chrome — so a
+   classmate landing here doesn't see a wall of feature cards. */
+.web3-class-letter {
+  max-width: 580px;
+  margin: 0 auto 56px;
+  padding: 0 4px;
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--ink);
+}
+
+.web3-class-letter p {
+  margin: 0 0 16px;
+}
+
+.web3-class-letter p:last-child {
+  margin-bottom: 0;
+}
+
+.web3-class-letter-kicker {
+  margin: 0 0 14px;
+  color: var(--accent);
+  font-style: italic;
+  font-size: 13px;
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+}
+
+.web3-class-letter-pull {
+  margin: 22px 0;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--accent);
+  text-align: center;
+}
+
+.web3-class-letter-rule {
+  margin: 26px 0;
+  text-align: center;
+  color: var(--muted);
+  letter-spacing: 0.6em;
+}
+
+.web3-class-letter [lang="zh"] {
+  line-height: 1.85;
 }
 
 .class-registry-panel {

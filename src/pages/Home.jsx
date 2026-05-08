@@ -141,9 +141,9 @@ export default function Home() {
         <h2 className="section-title">§2 Plates · 图版</h2>
         <ol className="plate-list">
           {plates.map((album, index) => (
-            <li key={album.id}>
+            <li key={album.id} className="plate-entry">
               <Link to={`/album/${album.id}`} className="plate-link">
-                <figure className="plate-thumb">
+                <figure className="plate-figure">
                   <picture>
                     {album.coverWebp ? <source srcSet={album.coverWebp} type="image/webp" /> : null}
                     <img
@@ -155,14 +155,16 @@ export default function Home() {
                       height={album.coverHeight}
                     />
                   </picture>
+                  <figcaption className="plate-caption">
+                    <span className="plate-roman">Plate {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][index] || `${index + 1}`}.</span>
+                    <span className="plate-headline">
+                      {album.titleEn ? <>{album.titleEn}<span className="plate-headline-zh"> · {album.title}</span></> : album.title}
+                    </span>
+                    {album.description ? (
+                      <span className="plate-description muted-copy">{album.description}</span>
+                    ) : null}
+                  </figcaption>
                 </figure>
-                <span className="plate-caption">
-                  <span className="plate-roman">Plate {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][index] || `${index + 1}`}. </span>
-                  <span className="plate-headline">
-                    {album.titleEn ? <>{album.titleEn}<span className="plate-headline-zh"> · {album.title}</span></> : `${album.date}，${album.title}。`}
-                  </span>
-                  <span className="plate-description muted-copy"> {album.description}</span>
-                </span>
               </Link>
             </li>
           ))}
