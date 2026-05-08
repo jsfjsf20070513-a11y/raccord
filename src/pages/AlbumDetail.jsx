@@ -14,10 +14,10 @@ export default function AlbumDetail() {
       <article className="page-column album-page">
         <PageHeader
           kicker="Planches"
-          title="相册不存在"
-          summary="这一本图版未能调出。"
+          title="Album not found · 相册不存在"
+          summary="This plate album could not be loaded. · 这一本图版未能调出。"
           backTo="/"
-          backLabel="返回扉页"
+          backLabel="Back to title page · 返回扉页"
           showRule={false}
         />
       </article>
@@ -37,8 +37,8 @@ export default function AlbumDetail() {
         kicker="Planches"
         title={album.title}
         backTo="/"
-        backLabel="返回扉页"
-        meta={[album.date, album.location, `${album.photos.length} 张图版`]}
+        backLabel="Back to title page · 返回扉页"
+        meta={[album.date, album.location, `${album.photos.length} plate${album.photos.length === 1 ? '' : 's'} · ${album.photos.length} 张图版`]}
         showRule={false}
       />
 
@@ -66,12 +66,12 @@ export default function AlbumDetail() {
         <DailyMeditation offset={meditationOffset} />
       </section>
 
-      <Comments albumId={commentScopeId} title="页边批注" />
+      <Comments albumId={commentScopeId} title="Marginal notes · 页边批注" />
 
       <nav className="pager-nav">
-        {previousAlbum ? <Link to={`/album/${previousAlbum.id}`}>上一篇</Link> : <span />}
-        <Link to="/">返回扉页</Link>
-        {nextAlbum ? <Link to={`/album/${nextAlbum.id}`}>下一篇</Link> : <span />}
+        {previousAlbum ? <Link to={`/album/${previousAlbum.id}`}>← Previous · 上一篇</Link> : <span />}
+        <Link to="/">Back to title page · 返回扉页</Link>
+        {nextAlbum ? <Link to={`/album/${nextAlbum.id}`}>Next · 下一篇 →</Link> : <span />}
       </nav>
     </article>
   )

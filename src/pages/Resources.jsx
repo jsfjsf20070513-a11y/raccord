@@ -45,20 +45,20 @@ export default function Resources() {
     <article className="page-column">
       <PageHeader
         kicker="Bibliotheque"
-        title="资源与书目"
+        title="Resources &amp; bibliography · 资源与书目"
         note="Classer n'est pas clore; c'est laisser les chemins demeurer lisibles. 编目不是封存，而是让路径仍可辨认。"
         backTo="/"
-        backLabel="返回扉页"
+        backLabel="Back to title page · 返回扉页"
       />
 
       {shelves.length ? (
         <section className="page-section resource-directory-section">
-          <h2 className="section-title">书架索引</h2>
+          <h2 className="section-title">Shelf index · 书架索引</h2>
           <ol className="resource-directory-list">
             {shelves.map((shelf) => (
               <li key={`directory-${shelf.title}`} className="resource-directory-entry">
                 <a href={`#${shelfAnchors[shelf.title]}`}>{shelf.title}</a>
-                <span>{shelf.items.length} 条</span>
+                <span>{shelf.items.length} {shelf.items.length === 1 ? 'entry' : 'entries'} · {shelf.items.length} 条</span>
               </li>
             ))}
           </ol>
@@ -79,9 +79,9 @@ export default function Resources() {
                   {item.tag ? <p className="record-meta">{item.tag}</p> : null}
                   {getResourceLead(item) ? <p className="resource-entry-note">{getResourceLead(item)}</p> : null}
                   <p className="resource-entry-links">
-                    <a href={item.url} target="_blank" rel="noreferrer">直达原网站</a>
+                    <a href={item.url} target="_blank" rel="noreferrer">Open original · 直达原网站</a>
                     <span> · </span>
-                    <Link to={`/resources/${encodeURIComponent(item.id)}`}>查看站内条目</Link>
+                    <Link to={`/resources/${encodeURIComponent(item.id)}`}>In-site note · 查看站内条目</Link>
                   </p>
                 </li>
               ))}
@@ -97,7 +97,7 @@ export default function Resources() {
       ))}
 
       <section className="page-section">
-        <h2 className="section-title">附录</h2>
+        <h2 className="section-title">Appendix · 附录</h2>
         <ol className="record-list compact appendix-list">
           {resourceArticles.map((article) => (
             <li key={article.title} className="record-entry">

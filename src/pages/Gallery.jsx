@@ -8,22 +8,25 @@ export default function Gallery() {
   const orderedAlbums = [...albums].sort((a, b) => b.date.localeCompare(a.date))
   const totalPhotos = orderedAlbums.reduce((sum, album) => sum + album.count, 0)
   const gallerySummary = orderedAlbums.length
-    ? `${orderedAlbums.length} 册图版，按日期编列。`
-    : '图版暂未编入。'
+    ? `${orderedAlbums.length} plate album${orderedAlbums.length === 1 ? '' : 's'}, ordered by date. · ${orderedAlbums.length} 册图版，按日期编列。`
+    : 'No plates indexed yet. · 图版暂未编入。'
 
   return (
     <article className="page-column">
       <PageHeader
         kicker="Planches"
-        title="图版目录"
+        title="Plate index · 图版目录"
         summary={gallerySummary}
         backTo="/"
-        backLabel="返回扉页"
-        meta={[`${orderedAlbums.length} 册`, `${totalPhotos} 张图版`]}
+        backLabel="Back to title page · 返回扉页"
+        meta={[
+          `${orderedAlbums.length} album${orderedAlbums.length === 1 ? '' : 's'} · ${orderedAlbums.length} 册`,
+          `${totalPhotos} plate${totalPhotos === 1 ? '' : 's'} · ${totalPhotos} 张图版`,
+        ]}
       />
 
       <section className="page-section">
-        <h2 className="section-title">图版目录</h2>
+        <h2 className="section-title">Plate index · 图版目录</h2>
         <ol className="record-list">
           {orderedAlbums.map((album) => (
             <li key={album.id} className="record-entry">
