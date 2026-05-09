@@ -102,12 +102,25 @@ A subtle but important detail: when Xray itself routes outbound `rucmathclass.co
 
 ### 3 — Real on-chain devnet anchor (Section 03)
 
+Two anchor paths share this section, both real and both on Solana devnet:
+
+**Path A — SPL Memo program v2** (the lightweight, no-program-state route)
+
 - Builds a `TransactionInstruction` against `MemoSq4gqAB...mfcHr` (SPL Memo program v2)
 - ASCII-only payload: `math-class-website:1|tag=student-profile|wallet=<addr>|issued=<iso>` — readable on Solscan without specialized tooling
 - Sends via `provider.signAndSendTransaction` with a 90s timeout safeguard
 - Confirms at `confirmed` commitment, gracefully soft-fails confirmation timeout (signature is already on-chain)
 - Auto-detects insufficient devnet SOL (< 0.005) and surfaces a deep-link to `faucet.solana.com`
 - Pre-empts Phantom's "Request blocked" warning with an explicit notice + GitHub source-code link so judges can audit the exact instruction bytes before approving
+
+**Path B — Custom `class_anchor` Anchor program** (a Rust program written for Dev3pack)
+
+- A minimal Rust program written with the Anchor framework, source in [`programs/class-anchor/src/lib.rs`](programs/class-anchor/src/lib.rs)
+- Single instruction `anchor_statement(nonce, statement)` creating a `ClassAnchor` PDA seeded by `[b"class_anchor", signer.key, nonce_le_bytes]`
+- Per-anchor account stores `author: Pubkey`, `statement: String (≤200)`, `timestamp: i64`, `nonce: u64`, `bump: u8`
+- Deployed to **Solana devnet** (program ID + deploy transaction in [`docs/anchor-program.md`](docs/anchor-program.md))
+- Front-end client [`src/lib/classAnchorProgram.js`](src/lib/classAnchorProgram.js) hand-builds the borsh-encoded instruction (no `@coral-xyz/anchor` runtime dependency in the browser bundle) and shares the same Phantom `signAndSendTransaction` flow as Path A
+- Open-sourced under MIT alongside this repo
 
 ### 4 — Live class collective memo feed (Section 04)
 
@@ -121,11 +134,14 @@ A subtle but important detail: when Xray itself routes outbound `rucmathclass.co
 
 ### 5 — ElevenLabs French narration (Home page)
 
+**Integration path used: Generate Speech** (one of the seven Eligible Integration Paths listed in the ElevenLabs Dev3pack track — the others being Transcribe Speech, Compose Music, Create Sound Effects, Dub Audio, Create Voices, and Deploy Agents).
+
 - 14-second French intro (`Trente mathématiciens, une classe / Fenêtre sur le présent / class introduction / Pour la classe`)
-- Voice: George (warm, captivating storyteller), model: `eleven_multilingual_v2`
+- Voice: **George** (warm, captivating storyteller), model: **`eleven_multilingual_v2`**
 - API key was used in-memory only during generation; never written to any file or commit
-- Static `public/audio/carnet-fr-intro.mp3` (229 KB, 128 kbps mono) served by Nginx with `Content-Type: audio/mpeg`
+- Static [`public/audio/carnet-fr-intro.mp3`](public/audio/carnet-fr-intro.mp3) (229 KB, 128 kbps mono) served by Nginx with `Content-Type: audio/mpeg`
 - Custom play/pause control preserves the editorial book-page aesthetic (red italic underlined text, small-caps `Voice by ElevenLabs · multilingual_v2` credit)
+- User flow: visitor lands on the home title page → sees the bilingual motto `Trente mathématiciens, une classe / Fenêtre sur le présent` → clicks `▶ Écouter` → hears the same line spoken in French in the George voice. No login, no install, no extra clicks.
 
 ### 6 — Claude bilingual proof reasoning (Home page)
 
