@@ -15,9 +15,9 @@ export const walletIdentity = {
 
 export const onchainAnchor = {
   prompt:
-    'Sign and send a real Solana transaction on devnet that anchors a short tag identifying this student profile. The transaction calls the SPL Memo program v2. No SOL is transferred between accounts; only the standard signature fee (~0.000005 SOL) is paid by the wallet.',
+    'Sign and send a real Solana transaction on devnet that anchors a short tag identifying this student profile. Two write paths share this section: the SPL Memo program v2 (lightweight, no program state) and a custom class_anchor Anchor program written in Rust for this hackathon (creates a per-call PDA storing author, statement, timestamp, nonce). No SOL is transferred between accounts; only the standard signature fee (~0.000005 SOL) is paid by the wallet, plus rent for the small PDA when the Anchor program path is used.',
   safety:
-    'Devnet only. Devnet SOL has no monetary value and cannot be exchanged for mainnet SOL. The memo payload is short and ASCII-only, designed to remain readable on Solscan without specialized tooling.',
+    'Devnet only. Devnet SOL has no monetary value and cannot be exchanged for mainnet SOL. The payload (memo or PDA `statement`) is short and ASCII-only, designed to remain readable on Solscan without specialized tooling.',
   faucetUrl: 'https://faucet.solana.com',
   faucetHelp:
     'Wallet has insufficient devnet SOL. Visit faucet.solana.com, paste this wallet address, request 1 SOL (free), then retry.',

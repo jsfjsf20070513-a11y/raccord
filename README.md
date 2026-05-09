@@ -8,21 +8,23 @@
 
 ---
 
-## TL;DR — Six things judges can verify in under 5 minutes
+## TL;DR — Seven things judges can verify in under 5 minutes
 
 | # | Capability | What to check | Where |
 |---|---|---|---|
 | 1 | **Real Solana wallet connection** | Connect Phantom on `/web3-profile`, see public key | https://rucmathclass.com/web3-profile |
 | 2 | **Off-chain ed25519 ownership proof** | Section 02 — sign a bilingual student statement, copy base58 signature | https://rucmathclass.com/web3-profile#identity-proof |
-| 3 | **Real on-chain devnet transaction (write)** | Section 03 — anchor a memo on Solana devnet, view on Solscan | [Solscan tx](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet) |
-| 4 | **Live class collective memo feed (read)** | Section 04 — `getSignaturesForAddress` + memo decode across class wallets | https://rucmathclass.com/web3-profile#onchain-feed |
-| 5 | **ElevenLabs French narration** | Home title page — `▶ Écouter` button plays a `multilingual_v2` mp3 | https://rucmathclass.com/ |
+| 3a | **Real on-chain devnet write — SPL Memo path** | Section 03 — anchor a memo via SPL Memo v2, view on Solscan | [first anchor tx](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet) |
+| 3b | **Custom Rust Anchor program (`class_anchor`) on devnet** | Section 03 — anchor via the custom program; source in `programs/class-anchor/`; deployment notes in [`docs/anchor-program.md`](docs/anchor-program.md) | [`programs/class-anchor/src/lib.rs`](programs/class-anchor/src/lib.rs) |
+| 4 | **Live class collective memo feed (read)** | Section 04 — `getSignaturesForAddress` + parsed-tx decode across class wallets | https://rucmathclass.com/web3-profile#onchain-feed |
+| 5 | **ElevenLabs French narration — Generate Speech path** | Home title page — `▶ Écouter` button plays a `multilingual_v2` mp3 | https://rucmathclass.com/ |
 | 6 | **Claude bilingual proof reasoning** | Home daily theorem — expand `Voir la preuve · 查看证明思路`, see Chinese + French side-by-side | https://rucmathclass.com/ |
 
 Verifiable artefacts:
 
-- Public GitHub: https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public
-- First on-chain anchor: [tx 5L76cFugq…56gv846](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet) (devnet)
+- Public GitHub (MIT): https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public
+- First on-chain anchor (SPL Memo): [tx 5L76cFugq…56gv846](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet) (devnet)
+- Custom Anchor program: see [`docs/anchor-program.md`](docs/anchor-program.md) for program ID + deploy tx
 - Architectural narration: see [§ Architecture](#architecture) below
 
 ---
@@ -31,7 +33,7 @@ Verifiable artefacts:
 
 Math Class Website started as a small portfolio for a bilingual mathematics class — Chinese and French students learning the same subject in two languages. The original site keeps a calm, book-page tone: course schedule, daily theorem, photo plates, reading paths, collaboration drafts. It looks more like a shared class notebook than a typical dApp.
 
-For Dev3pack, I extended that book — without tearing pages out of it — with a parallel `/web3-profile` route that anchors student identity and contribution memory onto Solana. The bilingual nature of the class also matched two of the Dev3pack co-host tracks: **ElevenLabs** (real French voice narration) and **AI in general** (Anthropic Claude generating bilingual proof reasoning).
+For Dev3pack, I extended that book — without tearing pages out of it — with a parallel `/web3-profile` route that anchors student identity and contribution memory onto Solana. The bilingual nature of the class matched both Dev3pack co-host tracks I am submitting against: **Solana** (real on-chain anchor in §03 — both via SPL Memo v2 and via a custom Rust Anchor program `class_anchor` written and deployed to devnet for this hackathon) and **ElevenLabs** (real French voice narration on the home page via the Generate Speech integration path). Anthropic Claude is used as a development assistant — most visibly in the 24 bilingual theorem proofs rendered with KaTeX, surfaced under each daily theorem.
 
 The class is the protagonist. Web3 and AI are layers on top of the class, not a replacement for it.
 
