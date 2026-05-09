@@ -528,6 +528,17 @@ export default function Web3StudentProfile() {
         // bounded by RPC retention) and class_anchor PDAs (permanent
         // on-chain accounts surviving any RPC pruning). Failures on
         // either side are isolated so the other still renders.
+        //
+        // Asymmetric filter strategy on purpose:
+        //  - SPL Memo MUST be filtered by classRegistry because the
+        //    read path is per-wallet (one RPC call each). Unbounded
+        //    memo scans on devnet would not scale.
+        //  - class_anchor PDAs are a single
+        //    program.account.classAnchor.all() round-trip, so we
+        //    show every on-chain PDA regardless of the local
+        //    registry. The whole point of "Class collective memory"
+        //    is to surface what classmates anchored, even if the
+        //    local browser's registry hasn't seen their wallet yet.
         const [memos, anchors] = await Promise.all([
           fetchCollectiveMemos({
             connection,
@@ -539,7 +550,6 @@ export default function Web3StudentProfile() {
           }),
           fetchAllClassAnchors({
             connection,
-            walletAddresses: classRegistry,
             limit: 30,
           }).catch((err) => {
             console.error('[memoFeed] collective anchors failed', err)
@@ -1347,11 +1357,12 @@ export default function Web3StudentProfile() {
 
           <p className="hackathon-ai-badge">
             <ShieldCheck size={15} aria-hidden="true" />
-            Read-only RPC, public devnet endpoint, no API key required. SPL Memo path
-            (transient, RPC-bounded) and class_anchor PDA path (permanent on-chain
-            accounts) are merged into one chronological feed; up to 5 memos per wallet
-            and 30 PDAs total. Older SPL Memo history stays fully verifiable on Solscan.
-            The class registry persists locally and seeds with the original anchor wallet.
+            Read-only RPC, public devnet endpoint, no API key required. SPL Memo
+            rows are filtered to the class wallet registry (per-wallet RPC);
+            class_anchor PDA rows show every on-chain record from the deployed
+            program (single round-trip, surfaces classmates whose wallet is not
+            yet in the local registry). Up to 5 memos per registry wallet and 30
+            PDAs total. Older SPL Memo history stays fully verifiable on Solscan.
           </p>
         </article>
       </ProfileSection>
