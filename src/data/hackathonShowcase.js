@@ -52,8 +52,8 @@ export const keyFeatures = [
     status: 'Shipped',
   },
   {
-    title: '03 — Real on-chain devnet anchor',
-    benefit: 'One-click signAndSendTransaction calling SPL Memo program v2; Solscan-verifiable; first anchor tx 5L76cFugq…56gv846 already on devnet.',
+    title: '03 — Real on-chain devnet anchor (two paths)',
+    benefit: 'Two real Solana devnet write paths share §03: (a) SPL Memo program v2 (lightweight, first anchor tx 5L76cFugq…56gv846 already on devnet), and (b) a custom Rust Anchor program `class_anchor` written for this hackathon, source in programs/class-anchor/, deployed to devnet, full Solscan-verifiable.',
     status: 'Shipped',
   },
   {
@@ -91,8 +91,8 @@ export const techStack = [
   },
   {
     category: 'Solana',
-    value: '@solana/web3.js v1.95, bs58 v6, SPL Memo program v2, Phantom-compatible injected wallet',
-    note: 'Both write-side (signAndSendTransaction) and read-side (getSignaturesForAddress + getParsedTransaction) implemented in src/lib/solanaMemo.js.',
+    value: '@solana/web3.js v1.95, bs58 v6, SPL Memo program v2, custom class_anchor Anchor program (Rust 0.30), Phantom-compatible injected wallet',
+    note: 'Write paths: SPL Memo (src/lib/solanaMemo.js) and the custom Rust Anchor program (programs/class-anchor/, src/lib/classAnchorProgram.js). Read path: getSignaturesForAddress + getParsedTransaction directly from api.devnet.solana.com.',
   },
   {
     category: 'AI partners',
@@ -129,7 +129,8 @@ export const techStack = [
 export const roleItems = [
   'Product direction, scope, and the bilingual class narrative',
   'AI-assisted implementation across React pages, Solana flows, and bilingual content',
-  'Solana integration: real devnet memo write, RPC read across multiple wallets, base58 encoder',
+  'Solana write side: SPL Memo flow + writing and deploying a custom Rust Anchor program (class_anchor) to devnet',
+  'Solana read side: live RPC indexing across the class wallet registry, no third-party indexer',
   'ElevenLabs and Anthropic Claude integration as static build-time assets (no runtime API keys)',
   'Deployment and HTTPS via Cloudflare proxy without disturbing the unrelated VPS proxy on port 443',
   'README, architecture diagram, hackathon submission materials, and demo storytelling',
@@ -158,10 +159,11 @@ export const roadmap = [
   {
     phase: 'Before Dev3pack submission',
     tasks: [
-      'Record an updated 60-second demo video covering the six shipped features and the live Solscan anchor.',
-      'Run a final Supabase RLS pass on every public-facing table.',
-      'Update demoVideo URL and final screenshot set in the README.',
-      'Submit via the Dev3pack Project page with verifiable artefacts table.',
+      'Deploy the custom class_anchor Anchor program to Solana devnet, pin program ID in README + docs/anchor-program.md.',
+      'Record a sub-2-minute demo video covering both anchor paths (SPL Memo + class_anchor), the ElevenLabs French narration, the Claude bilingual proof reasoning, and a live Solscan verification.',
+      'Coordinate 2-3 classmate wallets to anchor real memos so §04 collective feed shows multi-wallet activity.',
+      'Capture four screenshots: home title page, /web3-profile §03 anchor flow with Phantom popup, /web3-profile §04 collective feed, and the home daily theorem with the bilingual proof expanded.',
+      'Submit via hack.dev3pack.xyz/member/projects with the verifiable artefacts table — primary track Solana, partner track ElevenLabs (Generate Speech path).',
     ],
   },
   {

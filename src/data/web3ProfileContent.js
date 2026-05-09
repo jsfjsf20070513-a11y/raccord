@@ -66,12 +66,12 @@ export const contributionRecords = [
 ]
 
 export const contributionSummary =
-  'This student profile summarizes contributions across class collaboration, documentation, deployment, and hackathon preparation. The next version will connect wallet identity to real contribution records and optionally generate AI-assisted summaries from verified project activity.'
+  'This student profile summarizes contributions across class collaboration, documentation, deployment, and hackathon preparation. The on-chain anchor in §03 — both the SPL Memo path and the custom class_anchor Anchor program — turns each acknowledged contribution into a permanently verifiable signature, while the §04 collective feed reads them back in real time from devnet RPC across the class wallet registry.'
 
 export const stretchGoals = [
-  'Streaming Claude Q&A via Cloudflare Worker (server-side API key)',
-  'Wallet-linked Supabase student profile (Web2 ↔ Web3 bridge)',
-  'Class-wide collective memo feed (multi-wallet indexing)',
-  'Soulbound contribution badge for active class members',
-  'Cross-class identity portability via wallet signature exchange',
+  'Append-only `anchor_message` instruction extending the class_anchor program for in-class threaded comments under each plate',
+  'Streaming Claude Q&A via Cloudflare Worker (server-side API key) so the bilingual proof tutor can answer arbitrary new theorems instead of the pinned 24',
+  'Wallet-linked Supabase student profile via Sign-in with Solana (SIWS) — JWT bridges devnet identity to the existing Supabase RLS layer',
+  'Soulbound contribution badge for active class members as a Solana cNFT via Metaplex Bubblegum',
+  'Helius webhook indexer replacing the public devnet RPC polling, so the §04 feed reflects new anchors within seconds even after RPC pruning',
 ]
