@@ -2285,6 +2285,27 @@
   word-break: break-all;
 }
 
+.memo-feed-source {
+  display: inline-block;
+  padding: 1px 6px;
+  margin-right: 4px;
+  border: 1px solid var(--rule);
+  font-size: 10px;
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+  vertical-align: 1px;
+}
+
+.memo-feed-source-memo {
+  color: var(--muted);
+}
+
+.memo-feed-source-anchor {
+  color: var(--accent);
+  border-color: rgba(139, 0, 0, 0.35);
+  background: rgba(139, 0, 0, 0.04);
+}
+
 /* The "letter to the class" sits between the hero and the four
    technical sections. It mirrors the home daily-entry rhythm —
    centred narrow column, serif body, no card chrome — so a

@@ -159,5 +159,51 @@ export const fetchAnchorsByAuthor = async (authorPubkey) => {
     .sort((a, b) => b.timestamp - a.timestamp);
 };
 
+/**
+ * Fetch every class_anchor PDA on-chain, optionally filtered to a list of
+ * known authors (the class wallet registry). One RPC round-trip via
+ * `program.account.classAnchor.all()` followed by client-side filter +
+ * sort + slice. Used by the /web3-profile §04 collective feed to merge
+ * SPL Memo writes and class_anchor PDAs into one timeline.
+ */
+export const fetchAllClassAnchors = async ({
+  connection,
+  walletAddresses = null,
+  limit = 50,
+} = {}) => {
+  const conn = connection ?? getConnection();
+  const placeholderAuthor = walletAddresses?.[0]
+    ? new PublicKey(walletAddresses[0])
+    : new PublicKey('11111111111111111111111111111111');
+  const readOnlyWallet = {
+    publicKey: placeholderAuthor,
+    signTransaction: async () => {
+      throw new Error('Read-only wallet cannot sign');
+    },
+    signAllTransactions: async () => {
+      throw new Error('Read-only wallet cannot sign');
+    },
+  };
+  const program = buildProgram(readOnlyWallet, conn);
+
+  const allAccounts = await program.account.classAnchor.all();
+  const wanted = walletAddresses
+    ? new Set(walletAddresses.map((value) => `${value}`))
+    : null;
+
+  return allAccounts
+    .filter(({ account }) => (wanted ? wanted.has(account.author.toBase58()) : true))
+    .map(({ publicKey, account }) => ({
+      pda: publicKey.toBase58(),
+      author: account.author.toBase58(),
+      statement: account.statement,
+      timestamp: account.timestamp.toNumber(),
+      nonce: account.nonce.toString(),
+      bump: account.bump,
+    }))
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, limit);
+};
+
 export const programExplorerLink = () =>
   `https://solscan.io/account/${PROGRAM_ID.toBase58()}?cluster=${CLUSTER}`;

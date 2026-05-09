@@ -37,6 +37,7 @@ import {
   MIN_LAMPORTS_FOR_MEMO,
   submitMemoViaWallet,
 } from '../lib/solanaMemo'
+import { fetchAllClassAnchors } from '../lib/classAnchor'
 import {
   addLocalWallet,
   getMergedRegistry,
@@ -200,6 +201,7 @@ export default function Web3StudentProfile() {
   const [isCheckingBalance, setIsCheckingBalance] = useState(false)
 
   const [memoFeed, setMemoFeed] = useState([])
+  const [classAnchorFeed, setClassAnchorFeed] = useState([])
   const [memoFeedState, setMemoFeedState] = useState('idle')
   const [memoFeedError, setMemoFeedError] = useState('')
   const [feedView, setFeedView] = useState('mine') // 'mine' | 'collective'
@@ -257,12 +259,49 @@ export default function Web3StudentProfile() {
         ? 'Retry anchor'
         : 'Anchor on Devnet'
 
+  // Unified §04 timeline: SPL Memo writes (transient, RPC-bounded)
+  // merged with class_anchor PDAs (permanent on-chain accounts) into
+  // a single chronological feed so a judge sees both anchor paths in
+  // one place. Source-tagged so the UI can label each row.
+  const unifiedFeed = useMemo(() => {
+    const memoEntries = memoFeed.map((entry) => ({
+      source: 'memo',
+      key: `memo:${entry.signature}`,
+      blockTime: entry.blockTime || 0,
+      walletAddress: entry.walletAddress || '',
+      payload: entry.memo,
+      signature: entry.signature,
+      slot: entry.slot,
+      detailUrl: buildSolscanUrl(entry.signature, 'devnet'),
+    }))
+    const anchorEntries = classAnchorFeed.map((entry) => ({
+      source: 'anchor',
+      key: `anchor:${entry.pda}:${entry.nonce}`,
+      blockTime: entry.timestamp || 0,
+      walletAddress: entry.author || '',
+      payload: entry.statement,
+      pda: entry.pda,
+      nonce: entry.nonce,
+      detailUrl: `https://solscan.io/account/${entry.pda}?cluster=devnet`,
+    }))
+    return [...memoEntries, ...anchorEntries].sort(
+      (a, b) => (b.blockTime || 0) - (a.blockTime || 0),
+    )
+  }, [memoFeed, classAnchorFeed])
+
   const memoFeedStatusLabel = memoFeedState === 'loading'
     ? 'Reading from devnet RPC'
     : memoFeedState === 'loaded'
-      ? memoFeed.length === 0
-        ? 'No memos yet'
-        : `${memoFeed.length} memo${memoFeed.length === 1 ? '' : 's'} indexed`
+      ? unifiedFeed.length === 0
+        ? 'No records yet'
+        : (() => {
+            const memoCount = memoFeed.length
+            const anchorCount = classAnchorFeed.length
+            const parts = []
+            if (memoCount) parts.push(`${memoCount} SPL Memo${memoCount === 1 ? '' : 's'}`)
+            if (anchorCount) parts.push(`${anchorCount} class_anchor PDA${anchorCount === 1 ? '' : 's'}`)
+            return parts.join(' + ')
+          })()
       : memoFeedState === 'error'
         ? 'RPC read failed'
         : feedView === 'mine' && !isConnected
@@ -485,12 +524,30 @@ export default function Web3StudentProfile() {
       const connection = createDevnetConnection()
 
       if (feedView === 'collective') {
-        const memos = await fetchCollectiveMemos({
-          connection,
-          walletAddresses: classRegistry,
-          perWalletLimit: 5,
-        })
+        // Pull both anchor paths in parallel: SPL Memo (transient,
+        // bounded by RPC retention) and class_anchor PDAs (permanent
+        // on-chain accounts surviving any RPC pruning). Failures on
+        // either side are isolated so the other still renders.
+        const [memos, anchors] = await Promise.all([
+          fetchCollectiveMemos({
+            connection,
+            walletAddresses: classRegistry,
+            perWalletLimit: 5,
+          }).catch((err) => {
+            console.error('[memoFeed] collective memos failed', err)
+            return []
+          }),
+          fetchAllClassAnchors({
+            connection,
+            walletAddresses: classRegistry,
+            limit: 30,
+          }).catch((err) => {
+            console.error('[memoFeed] collective anchors failed', err)
+            return []
+          }),
+        ])
         setMemoFeed(memos)
+        setClassAnchorFeed(anchors)
         setMemoFeedState('loaded')
         return
       }
@@ -498,15 +555,26 @@ export default function Web3StudentProfile() {
       // 'mine' view requires a connected wallet
       if (!walletAddress) {
         setMemoFeed([])
+        setClassAnchorFeed([])
         setMemoFeedState('idle')
         return
       }
-      const memos = await fetchWalletMemos({
-        connection,
-        walletAddress,
-        limit: 8,
-      })
+      const [memos, anchors] = await Promise.all([
+        fetchWalletMemos({ connection, walletAddress, limit: 8 }).catch((err) => {
+          console.error('[memoFeed] wallet memos failed', err)
+          return []
+        }),
+        fetchAllClassAnchors({
+          connection,
+          walletAddresses: [walletAddress],
+          limit: 30,
+        }).catch((err) => {
+          console.error('[memoFeed] wallet anchors failed', err)
+          return []
+        }),
+      ])
       setMemoFeed(memos.map((entry) => ({ ...entry, walletAddress })))
+      setClassAnchorFeed(anchors)
       setMemoFeedState('loaded')
     } catch (error) {
       setMemoFeedError(error?.message || 'Failed to read memos from devnet RPC.')
@@ -1138,11 +1206,11 @@ export default function Web3StudentProfile() {
             </p>
           ) : null}
 
-          {memoFeedState === 'loading' && memoFeed.length === 0 ? (
+          {memoFeedState === 'loading' && unifiedFeed.length === 0 ? (
             <p className="hackathon-section-lead">Reading recent transactions from devnet RPC…</p>
           ) : null}
 
-          {memoFeedState === 'loaded' && memoFeed.length === 0 && (feedView === 'collective' || isConnected) ? (
+          {memoFeedState === 'loaded' && unifiedFeed.length === 0 && (feedView === 'collective' || isConnected) ? (
             <div className="memo-feed-empty">
               <p className="hackathon-section-lead">
                 {feedView === 'collective'
@@ -1232,35 +1300,46 @@ export default function Web3StudentProfile() {
             </div>
           ) : null}
 
-          {memoFeed.length > 0 ? (
+          {unifiedFeed.length > 0 ? (
             <ol className="memo-feed-list">
-              {memoFeed.map((entry, idx) => (
-                <li key={`${entry.signature}-${idx}`} className="memo-feed-entry">
-                  <div className="memo-feed-head">
-                    <span className="memo-feed-time">
-                      {formatBlockTime(entry.blockTime) || `slot ${entry.slot}`}
-                    </span>
-                    <a
-                      className="memo-feed-link"
-                      href={buildSolscanUrl(entry.signature, 'devnet')}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <ExternalLink size={13} aria-hidden="true" />
-                      Solscan
-                    </a>
-                  </div>
-                  <pre className="signed-statement">{entry.memo}</pre>
-                  <p className="memo-feed-sig">
-                    {feedView === 'collective' && entry.walletAddress ? (
-                      <>
-                        from {entry.walletAddress.slice(0, 6)}…{entry.walletAddress.slice(-6)} ·{' '}
-                      </>
-                    ) : null}
-                    sig: {entry.signature.slice(0, 12)}…{entry.signature.slice(-10)}
-                  </p>
-                </li>
-              ))}
+              {unifiedFeed.map((entry) => {
+                const isAnchor = entry.source === 'anchor'
+                const sourceLabel = isAnchor ? 'class_anchor PDA' : 'SPL Memo'
+                const sourceClassName = isAnchor
+                  ? 'memo-feed-source memo-feed-source-anchor'
+                  : 'memo-feed-source memo-feed-source-memo'
+                return (
+                  <li key={entry.key} className="memo-feed-entry">
+                    <div className="memo-feed-head">
+                      <span className="memo-feed-time">
+                        <span className={sourceClassName}>{sourceLabel}</span>
+                        {' · '}
+                        {formatBlockTime(entry.blockTime) || (entry.slot ? `slot ${entry.slot}` : 'unknown time')}
+                      </span>
+                      <a
+                        className="memo-feed-link"
+                        href={entry.detailUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink size={13} aria-hidden="true" />
+                        {isAnchor ? 'PDA on Solscan' : 'Tx on Solscan'}
+                      </a>
+                    </div>
+                    <pre className="signed-statement">{entry.payload}</pre>
+                    <p className="memo-feed-sig">
+                      {feedView === 'collective' && entry.walletAddress ? (
+                        <>
+                          from {entry.walletAddress.slice(0, 6)}…{entry.walletAddress.slice(-6)} ·{' '}
+                        </>
+                      ) : null}
+                      {isAnchor
+                        ? `pda: ${entry.pda.slice(0, 8)}…${entry.pda.slice(-8)} · nonce ${entry.nonce}`
+                        : `sig: ${entry.signature.slice(0, 12)}…${entry.signature.slice(-10)}`}
+                    </p>
+                  </li>
+                )
+              })}
             </ol>
           ) : null}
 
@@ -1268,9 +1347,11 @@ export default function Web3StudentProfile() {
 
           <p className="hackathon-ai-badge">
             <ShieldCheck size={15} aria-hidden="true" />
-            Read-only RPC, public devnet endpoint, no API key required. Up to 5 memos per wallet;
-            older history is fully verifiable on Solscan. The class registry persists locally and
-            seeds with the original anchor wallet.
+            Read-only RPC, public devnet endpoint, no API key required. SPL Memo path
+            (transient, RPC-bounded) and class_anchor PDA path (permanent on-chain
+            accounts) are merged into one chronological feed; up to 5 memos per wallet
+            and 30 PDAs total. Older SPL Memo history stays fully verifiable on Solscan.
+            The class registry persists locally and seeds with the original anchor wallet.
           </p>
         </article>
       </ProfileSection>

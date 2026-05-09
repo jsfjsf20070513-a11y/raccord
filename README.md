@@ -4,7 +4,21 @@
 
 [![Live Site](https://img.shields.io/badge/live-rucmathclass.com-8b0000?style=flat-square)](https://rucmathclass.com/)
 [![Web3 Profile](https://img.shields.io/badge/web3-profile-2f6a63?style=flat-square)](https://rucmathclass.com/web3-profile)
-[![Solana Devnet](https://img.shields.io/badge/solana-devnet--anchored-9945ff?style=flat-square)](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet)
+[![Witness Page](https://img.shields.io/badge/witness-class__anchor-2f6a63?style=flat-square)](https://rucmathclass.com/witness)
+[![Anchor Program](https://img.shields.io/badge/program-Cmv8pnxA…BC4fu-9945ff?style=flat-square)](https://solscan.io/account/Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu?cluster=devnet)
+[![SPL Memo Path](https://img.shields.io/badge/SPL_Memo-anchored-9945ff?style=flat-square)](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet)
+[![License: MIT](https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square)](LICENSE)
+
+## 🏛 At a glance
+
+| Field | Value |
+|---|---|
+| **Custom Anchor program (Solana devnet)** | [`Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu`](https://solscan.io/account/Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu?cluster=devnet) — `executable: true`, owner `BPFLoaderUpgradeab1e…` ([source](programs/class-anchor/src/lib.rs) · [docs](docs/anchor-program.md)) |
+| **First public anchor_statement call** | [`tx TLYjToQB…m9vX`](https://solscan.io/tx/TLYjToQBbvDioD8NqByiBxhH6UqSgftss29NJ6LAxSZKTENLYdHFtfYrq27pEXRHZnJUY7H6y7PMjub2Qtmm9vX?cluster=devnet) → [`PDA 65RxSkm4…DaC2G8`](https://solscan.io/account/65RxSkm4UtE8tbAknGxRe9LCfDssJtGaAvZAmXDaC2G8?cluster=devnet) (statement: *"2026 春季黑客松 — 第一笔从 production 站点写的 anchor"*) |
+| **First SPL Memo anchor** (path A) | [`tx 5L76cFugq…56gv846`](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet) |
+| **Live demo entry** | https://rucmathclass.com/witness (no Phantom required to read history) |
+| **Stack** | React 18 + Vite 5 · `@solana/web3.js` 1.95 · `@coral-xyz/anchor` 0.29 · ElevenLabs `multilingual_v2` · Anthropic `claude-opus-4.7` · Supabase (anon-only, RLS) · Cloudflare proxy + Vultr Nginx |
+| **License / audit** | MIT · `npm audit --omit=dev --audit-level=high` → 0 vulnerabilities |
 
 ---
 
