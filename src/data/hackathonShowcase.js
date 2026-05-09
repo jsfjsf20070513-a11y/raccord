@@ -102,7 +102,7 @@ export const techStack = [
   {
     category: 'Solana',
     value: '@solana/web3.js v1.95, bs58 v6, SPL Memo program v2, custom class_anchor Anchor program (Rust 0.30), Phantom-compatible injected wallet',
-    note: 'Write paths: SPL Memo (src/lib/solanaMemo.js) and the custom Rust Anchor program (programs/class-anchor/, src/lib/classAnchorProgram.js). Read path: getSignaturesForAddress + getParsedTransaction directly from api.devnet.solana.com.',
+    note: 'Write paths: SPL Memo (src/lib/solanaMemo.js) and the custom Rust Anchor program (programs/class-anchor/ + src/lib/classAnchor.js using @coral-xyz/anchor 0.29). Read paths: getSignaturesForAddress + getParsedTransaction for SPL Memo, and program.account.classAnchor.all([memcmp on author]) for the deployed program.',
   },
   {
     category: 'AI partners',

@@ -25,7 +25,11 @@ export default function Layout() {
       return navItems[1]
     }
 
-    if (pathname.startsWith('/hackathon') || pathname.startsWith('/web3-profile')) {
+    if (
+      pathname.startsWith('/hackathon')
+      || pathname.startsWith('/web3-profile')
+      || pathname.startsWith('/witness')
+    ) {
       return { to: '/hackathon', label: 'Showcase · 展示' }
     }
 

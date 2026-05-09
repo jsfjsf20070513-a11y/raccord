@@ -2,12 +2,19 @@ import { Anchor, ExternalLink, History, ShieldCheck, Sparkles, Wallet } from 'lu
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
+import { SEED_CLASS_WALLETS } from '../data/classRegistry'
 import {
   PROGRAM_ID,
   anchorStatement,
   fetchAnchorsByAuthor,
   programExplorerLink,
 } from '../lib/classAnchor'
+
+// Seed wallet whose anchored statements should always be visible to a
+// non-wallet judge skimming /witness §03. This is the wallet that
+// performed the project's first public `anchor_statement` call from
+// the production site (tx TLYjToQB…m9vX → PDA 65RxSkm4…DaC2G8).
+const SEED_BROWSE_WALLET = SEED_CLASS_WALLETS[0] || null
 
 const MAX_BYTES = 200
 
@@ -28,6 +35,7 @@ export default function SolanaWitness() {
   const [statement, setStatement] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [history, setHistory] = useState([])
+  const [historyAuthor, setHistoryAuthor] = useState(null)
   const [historyLoading, setHistoryLoading] = useState(false)
   const [feedback, setFeedback] = useState(null)
   const [error, setError] = useState(null)
@@ -40,11 +48,24 @@ export default function SolanaWitness() {
       setHistoryLoading(true)
       const items = await fetchAnchorsByAuthor(pubkey)
       setHistory(items)
+      setHistoryAuthor(pubkey)
     } catch (err) {
       console.error('[witness] fetchAnchorsByAuthor failed', err)
     } finally {
       setHistoryLoading(false)
     }
+  }, [])
+
+  // Default browse — load the seed wallet's PDA history on mount so a
+  // judge with no Phantom installed still sees real class_anchor PDAs
+  // proving the program works end-to-end. The seed list is read-only
+  // and read-back is permissionless (program.account.classAnchor.all).
+  useEffect(() => {
+    if (!SEED_BROWSE_WALLET) return
+    refreshHistory(SEED_BROWSE_WALLET)
+    // Intentionally only once on mount; per-wallet refresh is wired in
+    // the Phantom listener effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const connectWallet = useCallback(async () => {
@@ -81,7 +102,13 @@ export default function SolanaWitness() {
     }
     const onDisconnect = () => {
       setWalletKey(null)
-      setHistory([])
+      // Fall back to the seed wallet's history rather than blanking the
+      // section, so the read-back proof stays visible for judges.
+      if (SEED_BROWSE_WALLET) {
+        refreshHistory(SEED_BROWSE_WALLET)
+      } else {
+        setHistory([])
+      }
     }
     provider.on?.('connect', onConnect)
     provider.on?.('disconnect', onDisconnect)
@@ -298,7 +325,7 @@ export default function SolanaWitness() {
 
       <section className="hackathon-section">
         <p className="hackathon-kicker">03 · History</p>
-        <h2>What this wallet has anchored</h2>
+        <h2>{walletKey ? 'What this wallet has anchored' : 'What the seed wallet has anchored'}</h2>
         <article className="hackathon-card">
           <div className="feature-card-head">
             <h3>Read straight from the program</h3>
@@ -310,13 +337,22 @@ export default function SolanaWitness() {
           <p>
             Every entry below is fetched with{' '}
             <code>program.account.classAnchor.all([memcmp on author])</code> — no third-party
-            indexer, just the deployed Anchor program and devnet RPC.
+            indexer, just the deployed Anchor program and devnet RPC.{' '}
+            {walletKey ? (
+              <>Showing the records owned by your connected wallet.</>
+            ) : historyAuthor ? (
+              <>
+                Showing the seed wallet&rsquo;s records (
+                <code className="wallet-address-value">{historyAuthor.slice(0, 6)}…{historyAuthor.slice(-6)}</code>
+                ) so this section is not blank for judges without a Phantom wallet. Connect to see your own.
+              </>
+            ) : null}
           </p>
-          {!walletKey ? (
-            <p className="hackathon-section-lead">Connect a wallet to view its history.</p>
-          ) : history.length === 0 && !historyLoading ? (
+          {history.length === 0 && !historyLoading ? (
             <p className="hackathon-section-lead">
-              This wallet has not anchored any statement yet. Anchor one above to see it appear here.
+              {walletKey
+                ? 'This wallet has not anchored any statement yet. Anchor one above to see it appear here.'
+                : 'No PDAs yet. Reload to retry, or anchor one yourself in §02 above.'}
             </p>
           ) : (
             <ol className="memo-feed-list">

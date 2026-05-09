@@ -108,7 +108,7 @@ ClassAnchor {
 4. Switch the cluster selector (bottom-left) to **Devnet**.
 5. Top up the Playground wallet from https://faucet.solana.com (≈ 5 SOL).
 6. Build → Deploy → record the program ID + the deploy tx signature.
-7. Export the IDL JSON, save it as `src/lib/classAnchorIdl.json`.
+7. Export the IDL JSON, save it as [`src/lib/classAnchor.idl.json`](../src/lib/classAnchor.idl.json) (Anchor 0.29 format with `isMut` / `isSigner` / `publicKey` field names).
 
 ## Reproducible build (local Anchor CLI)
 
@@ -127,11 +127,22 @@ anchor deploy --provider.cluster devnet
 
 ## Front-end client
 
-[`src/lib/classAnchorProgram.js`](../src/lib/classAnchorProgram.js)
-hand-builds the borsh-encoded `anchor_statement` instruction so the
-browser bundle does not need to import `@coral-xyz/anchor` at
-runtime. The wallet signing flow reuses the same Phantom
-`signAndSendTransaction` path as the SPL Memo button — see
+[`src/lib/classAnchor.js`](../src/lib/classAnchor.js) drives the
+browser-side flow with `@coral-xyz/anchor` 0.29:
+
+- `anchorStatement(statement)` — connects Phantom (forces Devnet),
+  derives the per-`(signer, nonce)` PDA, calls
+  `program.methods.anchorStatement(nonce, statement).rpc()`, and
+  returns `{signature, pda, nonce, explorerTx, explorerAccount}`.
+- `fetchAnchorsByAuthor(pubkey)` — read-only,
+  `program.account.classAnchor.all([memcmp on author])`, sorted by
+  `timestamp` descending.
+
+The Buffer + `global` polyfill required by `@solana/web3.js` and
+`@coral-xyz/anchor` is loaded once at app boot via
+[`src/lib/solanaPolyfill.js`](../src/lib/solanaPolyfill.js)
+(imported at the top of [`src/main.jsx`](../src/main.jsx)). The
+SPL Memo path remains untouched in
 [`src/lib/solanaMemo.js`](../src/lib/solanaMemo.js).
 
 ## License
