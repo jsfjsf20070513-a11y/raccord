@@ -24,7 +24,7 @@ marketing team.
 | 0:18–0:28 | Click → land on `/web3-profile`. §01: click Connect. Phantom popup appears → Approve. | "Now to the Web3 entry. Section 1 — connect a real Phantom wallet. Devnet only, no mainnet, no money." |
 | 0:28–0:40 | Wallet connected. Scroll to §02. Click Sign with wallet. Phantom popup → Approve. Show base58 signature. | "Section 2 — sign a bilingual student statement with `ed25519`. The wallet never exposes private keys. Anyone can verify the signature with `web3.js` or `tweetnacl`." |
 | 0:40–0:52 | Scroll to §03. **Hold the cursor on `Anchored, not stored.` for one beat.** Then click "Anchor on Devnet". Phantom popup → Confirm. | "Section 3 — above the anchor button sits a letter to the class. *Anchored, not stored.* Now I anchor a memo via SPL Memo program v2 on devnet." |
-| 0:52–1:02 | Show new tx signature. Click "View on Solscan". 1-second pause showing the Confirmed transaction. Back to §03. | "Real on-chain write. Memo program `MemoSq4gqAB`. The first project anchor was tx `5L76cFugq` — verifiable on Solscan in ten seconds." |
+| 0:52–1:02 | Show new tx signature. Click "View on Solscan". Solscan opens showing this transaction's detail page — `Result: SUCCESS · Finalized`, `Memo Program V2` in the instruction list. 1-second pause. Back to §03. | "Real on-chain write. SPL Memo program v2 — program ID `MemoSq4gqAB`. This transaction just confirmed on Solana devnet, Solscan-verifiable in seconds." |
 | 1:02–1:22 | Scroll to §04. Click **Class collective** tab. Wait 1s for RPC. **Stop on the Zhu Laiyi PDA row.** | "Section 4 reads both anchor paths from devnet RPC. Look at this entry — *I love Zhu Laiyi's mathematical analysis class*. Zhu Laiyi is a real professor on our class schedule. A classmate wrote that to Solana — permanent. No one can take it back. **Anchored, not stored.**" |
 | 1:22–1:38 | Scroll back to §03. Click "Try class_anchor on /witness →". Page navigates to `/witness`. Stop on the program ID + Anchor 0.29 stat panel. | "And here's my custom Rust Anchor program — program ID `Cmv8`. Source in 82 lines of Rust. Each call mints a unique PDA. Read-back via `program.account.classAnchor` — no third-party indexer." |
 | 1:38–1:48 | Return home. Scroll to the daily theorem. Click "Voir la preuve · 查看证明思路" to expand the bilingual proof. | "Home page also exposes 24 bilingual theorem proofs — Chinese and French side by side, generated with Anthropic Claude, rendered with KaTeX." |
@@ -58,9 +58,11 @@ Section 3 — above the anchor button sits a letter to the class.
 Anchored, not stored. Now I anchor a memo via SPL Memo program v2
 on devnet.
 
-[0:52, click Solscan link, brief pause]
-Real on-chain write. Memo program MemoSq4gqAB. The first project
-anchor was tx 5L76cFugq — verifiable on Solscan in ten seconds.
+[0:52, click Solscan link, Solscan opens with SUCCESS / Finalized
++ Memo Program V2, brief pause]
+Real on-chain write. SPL Memo program v2 — program ID
+MemoSq4gqAB. This transaction just confirmed on Solana devnet,
+Solscan-verifiable in seconds.
 
 [1:02, switch to Class collective tab, stop on Zhu Laiyi PDA]
 Section 4 reads both anchor paths from devnet RPC. Look at this
