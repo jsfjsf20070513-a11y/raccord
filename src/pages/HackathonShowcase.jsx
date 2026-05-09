@@ -197,6 +197,10 @@ export default function HackathonShowcase() {
             <span>class_anchor program on Solscan (devnet)</span>
             <strong>{showcaseLinks.classAnchorProgramId}</strong>
           </a>
+          <a className="demo-link-row" href={showcaseLinks.classAnchorFirstWriteTx} target="_blank" rel="noreferrer">
+            <span>First public anchor_statement call</span>
+            <strong>tx TLYjToQB…m9vX (Solscan, devnet)</strong>
+          </a>
           <a className="demo-link-row" href={showcaseLinks.github} target="_blank" rel="noreferrer">
             <span>GitHub repository (MIT)</span>
             <strong>{showcaseLinks.github}</strong>

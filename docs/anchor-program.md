@@ -56,6 +56,22 @@ That page connects Phantom on devnet, calls
 reads back every PDA owned by the connected wallet using
 `program.account.classAnchor.all` filtered by author memcmp.
 
+### First production-site `anchor_statement` call (2026-05-09)
+
+| Field | Value |
+|---|---|
+| Wallet (signer) | `Fo7H3z7r47RSJs7jLLQGdgcShUrdC9o3yWx1fmrigHJQ` (the project's seed class wallet) |
+| Statement | `2026 春季黑客松 — 第一笔从 production 站点写的 anchor` |
+| Nonce | `1778311679695` (Unix-millis at submission time) |
+| PDA | [`65RxSkm4UtE8tbAknGxRe9LCfDssJtGaAvZAmXDaC2G8`](https://solscan.io/account/65RxSkm4UtE8tbAknGxRe9LCfDssJtGaAvZAmXDaC2G8?cluster=devnet) |
+| Transaction | [`TLYjToQB…m9vX`](https://solscan.io/tx/TLYjToQBbvDioD8NqByiBxhH6UqSgftss29NJ6LAxSZKTENLYdHFtfYrq27pEXRHZnJUY7H6y7PMjub2Qtmm9vX?cluster=devnet) |
+| Verified by | A live `program.account.classAnchor.all([memcmp on author])` round-trip on `/witness §03` immediately after the write |
+
+This is the project's first public proof that the deployed
+program accepts external signers, mints a unique PDA per
+`(signer, nonce)`, emits a `StatementAnchored` event, and is
+read-back-verifiable end to end without a third-party indexer.
+
 ## Instruction
 
 ### `anchor_statement(nonce: u64, statement: String) -> Result<()>`

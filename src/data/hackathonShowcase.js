@@ -10,6 +10,10 @@ export const showcaseLinks = {
     'https://solscan.io/account/Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu?cluster=devnet',
   classAnchorDeployTx:
     'https://solscan.io/tx/3t33ioCpWyHZ6uWGyZvaJBwejhANxs6DGFMnL2ucXSc7Tr8kxUhGe53AwL4BWMGfu3BLv4hhtch7fmVr6umgVXgo?cluster=devnet',
+  classAnchorFirstWriteTx:
+    'https://solscan.io/tx/TLYjToQBbvDioD8NqByiBxhH6UqSgftss29NJ6LAxSZKTENLYdHFtfYrq27pEXRHZnJUY7H6y7PMjub2Qtmm9vX?cluster=devnet',
+  classAnchorFirstWritePda:
+    'https://solscan.io/account/65RxSkm4UtE8tbAknGxRe9LCfDssJtGaAvZAmXDaC2G8?cluster=devnet',
   solscanFirstAnchor:
     'https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet',
 }
