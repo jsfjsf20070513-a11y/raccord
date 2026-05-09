@@ -150,7 +150,7 @@ YouTube description template (copy verbatim):
 
 ```
 A bilingual class memory anchored on Solana devnet. Solo Dev3pack
-2026 submission by Jin Shuofeng, freshman at Renmin University of
+2026 submission by Jin Shuopeng, freshman at Renmin University of
 China Sino-French Institute Suzhou.
 
 🔗 Live: https://www.rucmathclass.com

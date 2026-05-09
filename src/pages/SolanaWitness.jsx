@@ -401,7 +401,7 @@ export default function SolanaWitness() {
           </p>
           <p className="hackathon-ai-badge">
             <Sparkles size={15} aria-hidden="true" />
-            Built solo by Jin Shuofeng for Dev3pack 2026. AI-assisted dev, human-verified, MIT.
+            Built solo by Jin Shuopeng for Dev3pack 2026. AI-assisted dev, human-verified, MIT.
           </p>
         </article>
       </section>
