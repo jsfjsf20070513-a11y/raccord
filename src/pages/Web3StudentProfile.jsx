@@ -650,7 +650,7 @@ export default function Web3StudentProfile() {
           <p className="hackathon-hero-context">
             This page extends the existing class collaboration website toward the Dev3pack Solana track with a
             real browser wallet connection, an optional ed25519 signature, and a real on-chain memo
-            transaction on devnet — without smart contracts, mainnet writes, or new Supabase schema.
+            transaction on devnet — using both the SPL Memo program and a custom Anchor program written for this hackathon, with no mainnet writes and no new Supabase schema.
           </p>
           <div className="hackathon-actions" aria-label="Web3 profile links">
             <Link className="hackathon-button is-primary" to={web3ProfileLinks.hackathon}>
@@ -669,7 +669,7 @@ export default function Web3StudentProfile() {
           <p className="hackathon-ai-badge">
             <Sparkles size={15} aria-hidden="true" />
             Real wallet connection, optional off-chain ed25519 signature, and an on-chain memo anchor on
-            Solana devnet. No smart contract, no mainnet write, no real money.
+            Solana devnet. SPL Memo plus a custom Anchor program — both on devnet, no mainnet write, no real money.
           </p>
         </div>
 

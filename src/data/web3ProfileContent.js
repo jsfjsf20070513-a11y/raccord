@@ -22,7 +22,7 @@ export const onchainAnchor = {
   faucetHelp:
     'Wallet has insufficient devnet SOL. Visit faucet.solana.com, paste this wallet address, request 1 SOL (free), then retry.',
   phantomWarningNotice:
-    'Phantom may flag this domain as "could be malicious" because rucmathclass.com is a new dApp not yet listed in the Blowfish dApp registry. This is the default behavior for any new hackathon project. The transaction only invokes the SPL Memo program (no SOL transfer, no smart contract). You can audit the exact instruction code below before approving.',
+    'Phantom may flag this domain as "could be malicious" because rucmathclass.com is a new dApp not yet listed in the Blowfish dApp registry. This is the default behavior for any new hackathon project. The transaction invokes either the SPL Memo program v2 or our custom Anchor program (both on devnet, no SOL transfer to other accounts). You can audit the exact instruction code below before approving.',
   sourceCodeLabel: 'Audit the memo transaction source code',
   sourceCodeUrl:
     'https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public/blob/main/src/lib/solanaMemo.js',
@@ -32,7 +32,7 @@ export const messageStatement = {
   prompt:
     'Sign a short bilingual student statement with the connected wallet. The signature is produced locally by the wallet using ed25519, never exposes private keys, and does not send any transaction.',
   safety:
-    'Off-chain ownership proof. No fee, no transaction, no smart contract. The signature can be independently verified by anyone holding the public wallet address using standard ed25519 verification (for example @solana/web3.js verify or tweetnacl).',
+    'Off-chain ownership proof. No fee, no transaction, no on-chain write at this step. The signature can be independently verified by anyone holding the public wallet address using standard ed25519 verification (for example @solana/web3.js verify or tweetnacl). The on-chain write happens in the next section using either the SPL Memo program or our custom Anchor program.',
   buildStatement: ({ address, issuedAt }) =>
     `I am a student of the bilingual mathematics class at Renmin University of China — Suzhou campus.
 Je suis étudiant·e de la classe de mathématiques bilingue à RUC — campus de Suzhou.
