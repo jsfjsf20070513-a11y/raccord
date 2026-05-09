@@ -245,4 +245,4 @@ For HTTPS, the canonical setup is **Cloudflare proxy + Flexible SSL** so HTTPS t
 
 ## License
 
-License pending. Class photos are **not** part of this public repository (they're injected at deploy time from a private sibling clone). The code is intended to be reusable; specific class content (photo binaries, admin SQL, production `.env`) is reserved. The bilingual class schedule and the bilingual proof outlines, by contrast, are intentionally part of this public source — see "Security & honest scope" above.
+**MIT License** — see [`LICENSE`](LICENSE). Class photos are **not** part of this public repository (they're injected at deploy time from a private sibling clone). The MIT grant covers the source code; specific class content (photo binaries, admin SQL, production `.env`) is reserved. The bilingual class schedule and the bilingual proof outlines, by contrast, are intentionally part of this public source — see "Security & honest scope" above.
