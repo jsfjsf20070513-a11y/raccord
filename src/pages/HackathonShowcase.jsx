@@ -185,18 +185,22 @@ export default function HackathonShowcase() {
             <span>Live class website</span>
             <strong>Open deployed product</strong>
           </Link>
+          <Link className="demo-link-row" to="/web3-profile">
+            <span>Web3 Student Profile</span>
+            <strong>Open the Solana entry — connect, sign, anchor, read</strong>
+          </Link>
           <a className="demo-link-row" href={showcaseLinks.github} target="_blank" rel="noreferrer">
-            <span>GitHub repository</span>
+            <span>GitHub repository (MIT)</span>
             <strong>{showcaseLinks.github}</strong>
+          </a>
+          <a className="demo-link-row" href={showcaseLinks.solscanFirstAnchor} target="_blank" rel="noreferrer">
+            <span>First on-chain anchor — Solana devnet</span>
+            <strong>tx 5L76cFugq…56gv846 (Solscan)</strong>
           </a>
           <a className="demo-link-row" href={showcaseLinks.demoVideo} target="_blank" rel="noreferrer">
             <span>Demo video</span>
             <strong>{showcaseLinks.demoVideo}</strong>
           </a>
-          <Link className="demo-link-row" to="/web3-profile">
-            <span>Web3 Student Profile</span>
-            <strong>Open Solana-ready MVP page</strong>
-          </Link>
         </div>
       </ShowcaseSection>
 
