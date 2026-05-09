@@ -2,6 +2,7 @@ import { Fragment, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import DailyMeditation from '../components/DailyMeditation'
 import PageHeader from '../components/PageHeader'
+import { externalLinkProps } from '../lib/safeUrl'
 import { resourceArticles, resourceCategories } from '../data/resourceCatalog'
 import { useResourceCatalog } from '../hooks/useResourceCatalog'
 import { getResourceLead } from '../lib/resourceText'
@@ -74,12 +75,12 @@ export default function Resources() {
               {shelf.items.map((item) => (
                 <li key={item.id} className="record-entry">
                   <h3>
-                    <a href={item.url} target="_blank" rel="noreferrer">{item.title}</a>
+                    <a {...externalLinkProps(item.url)}>{item.title}</a>
                   </h3>
                   {item.tag ? <p className="record-meta">{item.tag}</p> : null}
                   {getResourceLead(item) ? <p className="resource-entry-note">{getResourceLead(item)}</p> : null}
                   <p className="resource-entry-links">
-                    <a href={item.url} target="_blank" rel="noreferrer">Open original · 直达原网站</a>
+                    <a {...externalLinkProps(item.url)}>Open original · 直达原网站</a>
                     <span> · </span>
                     <Link to={`/resources/${encodeURIComponent(item.id)}`}>In-site note · 查看站内条目</Link>
                   </p>
@@ -102,7 +103,7 @@ export default function Resources() {
           {resourceArticles.map((article) => (
             <li key={article.title} className="record-entry">
               <h3>
-                <a href={article.url} target="_blank" rel="noreferrer">{article.title}</a>
+                <a {...externalLinkProps(article.url)}>{article.title}</a>
               </h3>
               <p className="record-meta">
                 {[article.author, article.date, article.tag].filter(Boolean).join(' · ')}

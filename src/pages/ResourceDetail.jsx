@@ -6,6 +6,7 @@ import {
   getResourceHeaderSummary,
   getResourceMaterials,
 } from '../lib/resourceText'
+import { externalLinkProps } from '../lib/safeUrl'
 
 export default function ResourceDetail() {
   const params = useParams()
@@ -84,7 +85,7 @@ export default function ResourceDetail() {
         </dl>
         {resource.url ? (
           <p className="resource-slip-link">
-            <a href={resource.url} target="_blank" rel="noreferrer">
+            <a {...externalLinkProps(resource.url)}>
               Open original page · 打开原始页面
             </a>
           </p>
