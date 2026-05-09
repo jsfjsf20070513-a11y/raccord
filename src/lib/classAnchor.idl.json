@@ -1,0 +1,47 @@
+{
+  "version": "0.1.0",
+  "name": "class_anchor",
+  "instructions": [
+    {
+      "name": "anchorStatement",
+      "accounts": [
+        { "name": "classAnchor", "isMut": true, "isSigner": false },
+        { "name": "signer", "isMut": true, "isSigner": true },
+        { "name": "systemProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [
+        { "name": "nonce", "type": "u64" },
+        { "name": "statement", "type": "string" }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ClassAnchor",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "author", "type": "publicKey" },
+          { "name": "statement", "type": "string" },
+          { "name": "timestamp", "type": "i64" },
+          { "name": "nonce", "type": "u64" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "StatementAnchored",
+      "fields": [
+        { "name": "author", "type": "publicKey", "index": false },
+        { "name": "nonce", "type": "u64", "index": false },
+        { "name": "timestamp", "type": "i64", "index": false }
+      ]
+    }
+  ],
+  "errors": [
+    { "code": 6000, "name": "StatementEmpty", "msg": "Statement must not be empty" },
+    { "code": 6001, "name": "StatementTooLong", "msg": "Statement exceeds 200 byte limit (~66 Chinese chars / 200 ASCII)" }
+  ]
+}

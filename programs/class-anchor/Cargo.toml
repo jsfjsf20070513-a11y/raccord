@@ -1,21 +1,22 @@
 [package]
-name = "class-anchor"
+name = "class_anchor"
 version = "0.1.0"
-description = "A minimal Anchor program for Math Class Website (Dev3pack 2026)"
+description = "Minimal Anchor program for the Math Class Website hackathon submission. Lets any signer anchor a short statement on-chain."
 edition = "2021"
-license = "MIT"
 
 [lib]
 crate-type = ["cdylib", "lib"]
 name = "class_anchor"
 
 [features]
-default = []
-cpi = ["no-entrypoint"]
 no-entrypoint = []
 no-idl = []
 no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
 idl-build = ["anchor-lang/idl-build"]
 
 [dependencies]
-anchor-lang = "0.30.1"
+# Pinned to match the version Solana Playground used to build the deployed
+# program. The exported IDL is in 0.29 format (isMut/isSigner/publicKey).
+anchor-lang = "0.29.0"

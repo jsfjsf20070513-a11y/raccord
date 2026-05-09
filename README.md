@@ -115,13 +115,15 @@ Two anchor paths share this section, both real and both on Solana devnet:
 - Auto-detects insufficient devnet SOL (< 0.005) and surfaces a deep-link to `faucet.solana.com`
 - Pre-empts Phantom's "Request blocked" warning with an explicit notice + GitHub source-code link so judges can audit the exact instruction bytes before approving
 
-**Path B — Custom `class_anchor` Anchor program** (a Rust program written for Dev3pack)
+**Path B — Custom `class_anchor` Anchor program** (a Rust program written + deployed for Dev3pack)
 
-- A minimal Rust program written with the Anchor framework, source in [`programs/class-anchor/src/lib.rs`](programs/class-anchor/src/lib.rs)
+- A minimal Rust program written with the Anchor framework (0.29), source in [`programs/class-anchor/src/lib.rs`](programs/class-anchor/src/lib.rs)
 - Single instruction `anchor_statement(nonce, statement)` creating a `ClassAnchor` PDA seeded by `[b"class_anchor", signer.key, nonce_le_bytes]`
-- Per-anchor account stores `author: Pubkey`, `statement: String (≤200)`, `timestamp: i64`, `nonce: u64`, `bump: u8`
-- Deployed to **Solana devnet** (program ID + deploy transaction in [`docs/anchor-program.md`](docs/anchor-program.md))
-- Front-end client [`src/lib/classAnchorProgram.js`](src/lib/classAnchorProgram.js) hand-builds the borsh-encoded instruction (no `@coral-xyz/anchor` runtime dependency in the browser bundle) and shares the same Phantom `signAndSendTransaction` flow as Path A
+- Per-anchor account stores `author: Pubkey`, `statement: String (≤200)`, `timestamp: i64`, `nonce: u64`, `bump: u8` and emits a `StatementAnchored` event
+- **Deployed to Solana devnet at program ID `Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu`** ([Solscan account](https://solscan.io/account/Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu?cluster=devnet) · [latest deploy tx](https://solscan.io/tx/3t33ioCpWyHZ6uWGyZvaJBwejhANxs6DGFMnL2ucXSc7Tr8kxUhGe53AwL4BWMGfu3BLv4hhtch7fmVr6umgVXgo?cluster=devnet))
+- Front-end client [`src/lib/classAnchor.js`](src/lib/classAnchor.js) calls the program through `@coral-xyz/anchor` 0.29 with the IDL pinned in [`src/lib/classAnchor.idl.json`](src/lib/classAnchor.idl.json)
+- Dedicated demo page at **[/witness](https://www.rucmathclass.com/witness)** ([source](src/pages/SolanaWitness.jsx)) — connect Phantom on devnet, anchor a statement, see the PDA appear in the read-back history
+- Full deployment notes in [`docs/anchor-program.md`](docs/anchor-program.md)
 - Open-sourced under MIT alongside this repo
 
 ### 4 — Live class collective memo feed (Section 04)

@@ -32,6 +32,7 @@ const GalleryContribute = lazy(() => import('./pages/GalleryContribute'))
 const Login = lazy(() => import('./pages/Login'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const NotFound = lazy(() => import('./pages/NotFound'))
+const SolanaWitness = lazy(() => import('./pages/SolanaWitness'))
 
 const LOADING_FADE_DURATION = 180
 const INITIAL_LOADING_DURATION = 760
@@ -165,6 +166,7 @@ function AppRoutes() {
         <Route index element={<ReadyPage><Home /></ReadyPage>} />
         <Route path="hackathon" element={<DeferredPage><HackathonShowcase /></DeferredPage>} />
         <Route path="web3-profile" element={<DeferredPage><Web3StudentProfile /></DeferredPage>} />
+        <Route path="witness" element={<DeferredPage><SolanaWitness /></DeferredPage>} />
         {/* Backwards-compat: I previously shared /web3-student-profile in convo. Redirect so any saved link still works. */}
         <Route path="web3-student-profile" element={<Navigate to="/web3-profile" replace />} />
         <Route path="class-info" element={<Navigate to="/" replace />} />

@@ -4,6 +4,12 @@ export const showcaseLinks = {
   github: 'https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public',
   demoVideo: 'https://youtu.be/kz9K5mWtC20',
   web3Profile: '/web3-profile',
+  witnessPage: '/witness',
+  classAnchorProgramId: 'Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu',
+  classAnchorProgramSolscan:
+    'https://solscan.io/account/Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu?cluster=devnet',
+  classAnchorDeployTx:
+    'https://solscan.io/tx/3t33ioCpWyHZ6uWGyZvaJBwejhANxs6DGFMnL2ucXSc7Tr8kxUhGe53AwL4BWMGfu3BLv4hhtch7fmVr6umgVXgo?cluster=devnet',
   solscanFirstAnchor:
     'https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet',
 }

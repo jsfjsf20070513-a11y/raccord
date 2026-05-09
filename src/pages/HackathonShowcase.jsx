@@ -189,12 +189,20 @@ export default function HackathonShowcase() {
             <span>Web3 Student Profile</span>
             <strong>Open the Solana entry — connect, sign, anchor, read</strong>
           </Link>
+          <Link className="demo-link-row" to={showcaseLinks.witnessPage}>
+            <span>Solana Witness · class_anchor program demo</span>
+            <strong>Anchor a statement via the custom Rust program</strong>
+          </Link>
+          <a className="demo-link-row" href={showcaseLinks.classAnchorProgramSolscan} target="_blank" rel="noreferrer">
+            <span>class_anchor program on Solscan (devnet)</span>
+            <strong>{showcaseLinks.classAnchorProgramId}</strong>
+          </a>
           <a className="demo-link-row" href={showcaseLinks.github} target="_blank" rel="noreferrer">
             <span>GitHub repository (MIT)</span>
             <strong>{showcaseLinks.github}</strong>
           </a>
           <a className="demo-link-row" href={showcaseLinks.solscanFirstAnchor} target="_blank" rel="noreferrer">
-            <span>First on-chain anchor — Solana devnet</span>
+            <span>First on-chain anchor — SPL Memo path</span>
             <strong>tx 5L76cFugq…56gv846 (Solscan)</strong>
           </a>
           <a className="demo-link-row" href={showcaseLinks.demoVideo} target="_blank" rel="noreferrer">

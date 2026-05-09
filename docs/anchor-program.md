@@ -18,15 +18,43 @@ a new PDA owned by the signer that stores a bilingual statement
 | Cluster | Solana **devnet** |
 | Program name | `class_anchor` |
 | Source | [`programs/class-anchor/src/lib.rs`](../programs/class-anchor/src/lib.rs) |
-| Framework | Anchor (0.30.x) |
-| Program ID | `_pending Session A deployment_` |
-| Deploy transaction | `_pending_` |
-| Solana Playground project | `_pending_` |
-| IDL | [`src/lib/classAnchorIdl.json`](../src/lib/classAnchorIdl.json) (pinned post-deploy) |
+| Framework | **Anchor 0.29** (Rust) |
+| **Program ID** | `Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu` |
+| Latest deploy / IDL transaction | [`3t33ioCpWyHZ6uWGyZvaJBwejhANxs6DGFMnL2ucXSc7Tr8kxUhGe53AwL4BWMGfu3BLv4hhtch7fmVr6umgVXgo`](https://solscan.io/tx/3t33ioCpWyHZ6uWGyZvaJBwejhANxs6DGFMnL2ucXSc7Tr8kxUhGe53AwL4BWMGfu3BLv4hhtch7fmVr6umgVXgo?cluster=devnet) |
+| Program account on Solscan | [`Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu`](https://solscan.io/account/Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu?cluster=devnet) |
+| Solana Playground project | Built and deployed in [Solana Playground](https://beta.solpg.io) on 2026-05-09 |
+| IDL | [`src/lib/classAnchor.idl.json`](../src/lib/classAnchor.idl.json) (Anchor 0.29 format — `isMut` / `isSigner` / `publicKey` field names) |
 
-> **Note**: this file is updated in the same commit that flips
-> `IS_ANCHOR_PROGRAM_LIVE` to `true` in
-> [`src/lib/classAnchorProgram.js`](../src/lib/classAnchorProgram.js).
+### Independent on-chain verification
+
+```bash
+solana account Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu \
+  --url https://api.devnet.solana.com
+```
+
+Returns:
+
+```
+executable: true
+owner:      BPFLoaderUpgradeab1e11111111111111111111111
+type:       program
+lamports:   1,398,960
+```
+
+The program is executable, owned by the upgradeable BPF loader,
+and unique to this hackathon submission — meeting the Solana
+track Qualification Requirement above.
+
+### Demo entry point
+
+The program has a dedicated demo page at
+[`/witness`](https://www.rucmathclass.com/witness) (route in
+[`src/App.jsx`](../src/App.jsx); component in
+[`src/pages/SolanaWitness.jsx`](../src/pages/SolanaWitness.jsx)).
+That page connects Phantom on devnet, calls
+`anchor_statement(nonce, statement)` against the program, and
+reads back every PDA owned by the connected wallet using
+`program.account.classAnchor.all` filtered by author memcmp.
 
 ## Instruction
 

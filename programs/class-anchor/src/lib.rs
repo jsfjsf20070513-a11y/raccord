@@ -1,40 +1,23 @@
-// `class_anchor` — a minimal Anchor program for Dev3pack 2026.
-//
-// Each call creates a new `ClassAnchor` PDA owned by the signer that
-// stores a short bilingual statement (≤ 200 chars), the wall-clock
-// timestamp, and a caller-supplied `nonce` so the same wallet can
-// anchor multiple times without seed collision.
-//
-// Designed to be the smallest meaningful Solana program that satisfies
-// the Solana track's Qualification Requirement:
-//   "Must be a unique Solana program written in Rust using any
-//    framework (Quasar/Anchor/Pinocchio/vanilla Rust) and deployed
-//    at least to devnet."
-//
-// Deployed to Solana **devnet** during the hackathon. The deployed
-// program ID and the deploy transaction signature are recorded in
-// docs/anchor-program.md.
-
 use anchor_lang::prelude::*;
 
-declare_id!("11111111111111111111111111111111"); // Replace post-deploy.
+// Deployed by Solana Playground on devnet (2026-05-09).
+declare_id!("Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu");
 
+/// `class_anchor` lets any signer permanently anchor a short statement
+/// (up to 200 bytes of UTF-8) on Solana. Each call creates a fresh PDA
+/// derived from the signer's pubkey and a caller-chosen nonce, so a single
+/// user can anchor an unbounded number of statements without overwrites.
 #[program]
 pub mod class_anchor {
     use super::*;
 
-    /// Anchor a short bilingual statement on-chain. Each call creates
-    /// a new `ClassAnchor` PDA owned by the signer; `nonce` lets the
-    /// same wallet anchor multiple times without seed collision.
     pub fn anchor_statement(
         ctx: Context<AnchorStatement>,
         nonce: u64,
         statement: String,
     ) -> Result<()> {
-        require!(
-            statement.len() <= 200,
-            ClassAnchorError::StatementTooLong
-        );
+        require!(!statement.is_empty(), ClassAnchorError::StatementEmpty);
+        require!(statement.len() <= 200, ClassAnchorError::StatementTooLong);
 
         let class_anchor = &mut ctx.accounts.class_anchor;
         class_anchor.author = ctx.accounts.signer.key();
@@ -42,6 +25,13 @@ pub mod class_anchor {
         class_anchor.timestamp = Clock::get()?.unix_timestamp;
         class_anchor.nonce = nonce;
         class_anchor.bump = ctx.bumps.class_anchor;
+
+        emit!(StatementAnchored {
+            author: class_anchor.author,
+            nonce: class_anchor.nonce,
+            timestamp: class_anchor.timestamp,
+        });
+
         Ok(())
     }
 }
@@ -52,14 +42,7 @@ pub struct AnchorStatement<'info> {
     #[account(
         init,
         payer = signer,
-        // 8 (Anchor discriminator)
-        // + 32 (author: Pubkey)
-        // + 4 + 200 (statement: String — borsh prefix + max bytes)
-        // + 8 (timestamp: i64)
-        // + 8 (nonce: u64)
-        // + 1 (bump: u8)
-        // = 261
-        space = 8 + 32 + 4 + 200 + 8 + 8 + 1,
+        space = ClassAnchor::SPACE,
         seeds = [b"class_anchor", signer.key().as_ref(), &nonce.to_le_bytes()],
         bump
     )]
@@ -72,14 +55,28 @@ pub struct AnchorStatement<'info> {
 #[account]
 pub struct ClassAnchor {
     pub author: Pubkey,    // 32
-    pub statement: String, // 4 + ≤ 200
+    pub statement: String, // 4 + 200
     pub timestamp: i64,    // 8
     pub nonce: u64,        // 8
     pub bump: u8,          // 1
 }
 
+impl ClassAnchor {
+    // 8 (discriminator) + 32 + (4 + 200) + 8 + 8 + 1 = 261 bytes.
+    pub const SPACE: usize = 8 + 32 + 4 + 200 + 8 + 8 + 1;
+}
+
+#[event]
+pub struct StatementAnchored {
+    pub author: Pubkey,
+    pub nonce: u64,
+    pub timestamp: i64,
+}
+
 #[error_code]
 pub enum ClassAnchorError {
-    #[msg("Statement exceeds 200 character limit")]
+    #[msg("Statement must not be empty")]
+    StatementEmpty,
+    #[msg("Statement exceeds 200 byte limit (~66 Chinese chars / 200 ASCII)")]
     StatementTooLong,
 }

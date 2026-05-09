@@ -977,6 +977,15 @@ export default function Web3StudentProfile() {
             <p className="status-line is-error">{memoError}</p>
           ) : null}
 
+          <div className="hackathon-section-lead">
+            <strong>Second anchor path · custom Rust Anchor program.</strong>{' '}
+            The button above writes via the SPL Memo program. The custom{' '}
+            <code>class_anchor</code> program written and deployed to devnet for this
+            hackathon (program ID <code>Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu</code>)
+            has its own dedicated demo page.{' '}
+            <Link to="/witness">→ Open /witness · 见证墙</Link>
+          </div>
+
           <p className="hackathon-ai-badge">
             <ShieldCheck size={15} aria-hidden="true" />
             {onchainAnchor.safety}
