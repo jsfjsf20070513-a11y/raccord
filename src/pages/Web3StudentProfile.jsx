@@ -915,6 +915,10 @@ export default function Web3StudentProfile() {
               <Anchor size={17} aria-hidden="true" />
               {memoButtonLabel}
             </button>
+            <Link className="hackathon-button" to="/witness">
+              <Sparkles size={17} aria-hidden="true" />
+              Try class_anchor on /witness →
+            </Link>
             {hasMemoSignature && solscanUrl ? (
               <a
                 className="hackathon-button"
@@ -1147,10 +1151,10 @@ export default function Web3StudentProfile() {
               </p>
               <div className="memo-feed-historical">
                 <p className="memo-feed-historical-kicker">
-                  Verified historical anchor (outside the current RPC window)
+                  Verified historical anchors (outside the current RPC window)
                 </p>
                 <p className="memo-feed-historical-meta">
-                  First on-chain memo from this project · Solana devnet · 2026-05-08
+                  Path A · SPL Memo program v2 · 2026-05-08
                 </p>
                 <pre className="signed-statement memo-feed-historical-payload">
                   math-class-website:1|tag=student-profile|wallet=Fo7H3z7r47RSJs7jLLQGdgcShUrdC9o3yWx1fmrigHJQ|issued=2026-05-08T…
@@ -1165,6 +1169,38 @@ export default function Web3StudentProfile() {
                     <ExternalLink size={13} aria-hidden="true" />
                     View tx 5L76cFugq…56gv846 on Solscan →
                   </a>
+                </p>
+
+                <p className="memo-feed-historical-meta" style={{ marginTop: 16 }}>
+                  Path B · custom class_anchor program (PDA, permanent) · 2026-05-09
+                </p>
+                <pre className="signed-statement memo-feed-historical-payload">
+                  2026 春季黑客松 — 第一笔从 production 站点写的 anchor
+                </pre>
+                <p className="hackathon-section-lead">
+                  <a
+                    href="https://solscan.io/tx/TLYjToQBbvDioD8NqByiBxhH6UqSgftss29NJ6LAxSZKTENLYdHFtfYrq27pEXRHZnJUY7H6y7PMjub2Qtmm9vX?cluster=devnet"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="memo-feed-link"
+                  >
+                    <ExternalLink size={13} aria-hidden="true" />
+                    View tx TLYjToQB…m9vX on Solscan →
+                  </a>
+                  {' · '}
+                  <a
+                    href="https://solscan.io/account/65RxSkm4UtE8tbAknGxRe9LCfDssJtGaAvZAmXDaC2G8?cluster=devnet"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="memo-feed-link"
+                  >
+                    <ExternalLink size={13} aria-hidden="true" />
+                    PDA 65RxSkm4…DaC2G8 →
+                  </a>
+                </p>
+                <p className="hackathon-section-lead" style={{ marginTop: 8, fontSize: 13 }}>
+                  Class-anchor PDAs are permanent on-chain accounts and survive RPC pruning.{' '}
+                  <Link to="/witness">Read all class_anchor PDAs at /witness §03 →</Link>
                 </p>
               </div>
 

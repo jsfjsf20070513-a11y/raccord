@@ -129,13 +129,16 @@ Two anchor paths share this section, both real and both on Solana devnet:
 
 ### 4 — Live class collective memo feed (Section 04)
 
-- Reads `getSignaturesForAddress` + `getParsedTransaction` directly from `api.devnet.solana.com`
-- Filters instructions to the Memo program and decodes UTF-8 payloads
+This is the **SPL Memo read side** — `class_anchor` PDAs are read separately from the deployed program at [/witness §03](https://www.rucmathclass.com/witness) using `program.account.classAnchor.all([memcmp on author])`. The two views complement each other: §04 covers many wallets but is bounded by the public devnet RPC retention window (~1–2 hours); /witness §03 covers the connected wallet only but reads permanent on-chain PDAs that survive RPC pruning.
+
+- §04 reads `getSignaturesForAddress` + `getParsedTransaction` directly from `api.devnet.solana.com`
+- Filters instructions to the SPL Memo program and decodes UTF-8 payloads
 - Two views:
   - **My wallet** — connected wallet's last 8 memos
   - **Class collective · N** — aggregated across N registered class wallets, sorted by `blockTime`
-- New wallets register automatically when they connect (persisted in `localStorage`)
+- New wallets register automatically when they connect (persisted in `localStorage`); visitors can paste a base58 address in-page to add more
 - Each entry deep-links to Solscan, attributable to the originating wallet
+- Empty state shows two verified historical anchors (one SPL Memo tx, one class_anchor PDA) so the section never reads as empty even when the RPC window has pruned recent memos
 
 ### 5 — ElevenLabs French narration (Home page)
 

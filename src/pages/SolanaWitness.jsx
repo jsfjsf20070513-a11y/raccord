@@ -356,6 +356,13 @@ export default function SolanaWitness() {
             quiet bilingual class notebook. This page is its hard-edged twin — written in Rust,
             deployed to a public ledger, and verifiable by anyone with a browser.
           </p>
+          <p>
+            Pair with{' '}
+            <Link to="/web3-profile#onchain-feed">/web3-profile §04 — Class collective memo feed</Link>{' '}
+            (live RPC read across the class wallet registry, SPL Memo path) for a complementary
+            view of what the class has written on Solana. The history above is the persistent
+            class_anchor PDA path; §04 is the SPL Memo path with a wider class scope.
+          </p>
           <p className="hackathon-ai-badge">
             <Sparkles size={15} aria-hidden="true" />
             Built solo by Jin Shuofeng for Dev3pack 2026. AI-assisted dev, human-verified, MIT.
