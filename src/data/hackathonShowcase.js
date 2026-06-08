@@ -2,7 +2,7 @@ export const showcaseLinks = {
   liveDemo: '/',
   projectUrl: 'https://rucmathclass.com/hackathon',
   github: 'https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public',
-  demoVideo: 'https://youtu.be/kz9K5mWtC20',
+  demoVideo: 'https://youtu.be/oPqHPeYOeIc',
   web3Profile: '/web3-profile',
   witnessPage: '/witness',
   classAnchorProgramId: 'Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu',

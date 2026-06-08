@@ -1,7 +1,7 @@
 export const web3ProfileLinks = {
   hackathon: '/hackathon',
   github: 'https://github.com/jsfjsf20070513-a11y/MathClassWebsite-public',
-  demoVideo: 'https://youtu.be/kz9K5mWtC20',
+  demoVideo: 'https://youtu.be/oPqHPeYOeIc',
 }
 
 export const walletIdentity = {

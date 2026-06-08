@@ -39,6 +39,11 @@ import {
 } from '../lib/solanaMemo'
 import { fetchAllClassAnchors } from '../lib/classAnchor'
 import {
+  eagerReconnect,
+  getInjectedSolanaProvider,
+  waitForInjectedSolanaProvider,
+} from '../lib/walletProvider'
+import {
   addLocalWallet,
   getMergedRegistry,
   isSeedWallet,
@@ -129,15 +134,6 @@ async function copyToClipboardSafe(text) {
   } catch {
     return false
   }
-}
-
-function getInjectedSolanaProvider() {
-  if (typeof window === 'undefined') {
-    return null
-  }
-
-  const provider = window.phantom?.solana || window.solana
-  return typeof provider?.connect === 'function' ? provider : null
 }
 
 function formatAddress(publicKey = '') {
@@ -365,48 +361,83 @@ export default function Web3StudentProfile() {
   }, [resetSignature, resetMemo])
 
   useEffect(() => {
-    refreshWalletState()
+    let cancelled = false
+    let listening = null // { provider, handleConnect, handleDisconnect, handleAccountChanged }
 
-    const currentProvider = getInjectedSolanaProvider()
-    if (!currentProvider?.on) {
-      return undefined
-    }
-
-    const handleConnect = (publicKey) => {
-      setWalletError('')
-      setWalletAddress(getAddressFromProvider(currentProvider, { publicKey }))
-      setWalletStatus('Connected')
-    }
-
-    const handleDisconnect = () => {
-      setWalletAddress('')
-      setWalletStatus('Ready to connect')
-      resetSignature()
-      resetMemo()
-    }
-
-    const handleAccountChanged = (publicKey) => {
-      resetSignature()
-      resetMemo()
-      if (publicKey) {
-        setWalletError('')
-        setWalletAddress(publicKey.toBase58 ? publicKey.toBase58() : `${publicKey}`)
-        setWalletStatus('Connected')
+    const attachListeners = (provider) => {
+      if (!provider?.on || listening) {
         return
       }
 
-      setWalletAddress('')
-      setWalletStatus('Ready to connect')
+      const handleConnect = (publicKey) => {
+        setWalletError('')
+        setWalletAddress(getAddressFromProvider(provider, { publicKey }))
+        setWalletStatus('Connected')
+      }
+
+      const handleDisconnect = () => {
+        setWalletAddress('')
+        setWalletStatus('Ready to connect')
+        resetSignature()
+        resetMemo()
+      }
+
+      const handleAccountChanged = (publicKey) => {
+        resetSignature()
+        resetMemo()
+        if (publicKey) {
+          setWalletError('')
+          setWalletAddress(publicKey.toBase58 ? publicKey.toBase58() : `${publicKey}`)
+          setWalletStatus('Connected')
+          return
+        }
+
+        setWalletAddress('')
+        setWalletStatus('Ready to connect')
+      }
+
+      provider.on('connect', handleConnect)
+      provider.on('disconnect', handleDisconnect)
+      provider.on('accountChanged', handleAccountChanged)
+      listening = { provider, handleConnect, handleDisconnect, handleAccountChanged }
     }
 
-    currentProvider.on('connect', handleConnect)
-    currentProvider.on('disconnect', handleDisconnect)
-    currentProvider.on('accountChanged', handleAccountChanged)
+    // Immediate best-effort: the provider may already be injected.
+    refreshWalletState()
+    attachListeners(getInjectedSolanaProvider())
+
+    // Wallets inject asynchronously, so wait for the provider before deciding
+    // it's missing, then silently restore a previously-approved session so the
+    // "connected" condition survives reloads and navigation.
+    waitForInjectedSolanaProvider().then(async (provider) => {
+      if (cancelled || !provider) {
+        return
+      }
+
+      setProvider(provider)
+      attachListeners(provider)
+
+      const restored = await eagerReconnect(provider, getAddressFromProvider)
+      if (cancelled) {
+        return
+      }
+      if (restored) {
+        setWalletError('')
+        setWalletAddress(restored)
+        setWalletStatus('Connected')
+      } else {
+        refreshWalletState()
+      }
+    })
 
     return () => {
-      currentProvider.off?.('connect', handleConnect)
-      currentProvider.off?.('disconnect', handleDisconnect)
-      currentProvider.off?.('accountChanged', handleAccountChanged)
+      cancelled = true
+      if (listening) {
+        const { provider, handleConnect, handleDisconnect, handleAccountChanged } = listening
+        provider.off?.('connect', handleConnect)
+        provider.off?.('disconnect', handleDisconnect)
+        provider.off?.('accountChanged', handleAccountChanged)
+      }
     }
   }, [refreshWalletState, resetSignature, resetMemo])
 

@@ -9,6 +9,11 @@ import {
   fetchAnchorsByAuthor,
   programExplorerLink,
 } from '../lib/classAnchor'
+import {
+  eagerReconnect,
+  getInjectedSolanaProvider,
+  waitForInjectedSolanaProvider,
+} from '../lib/walletProvider'
 
 // Seed wallet whose anchored statements should always be visible to a
 // non-wallet judge skimming /witness §03. This is the wallet that
@@ -39,8 +44,10 @@ export default function SolanaWitness() {
   const [historyLoading, setHistoryLoading] = useState(false)
   const [feedback, setFeedback] = useState(null)
   const [error, setError] = useState(null)
-
-  const phantomMissing = typeof window !== 'undefined' && !window.solana?.isPhantom
+  // Start optimistic: wallets inject `window.solana` asynchronously, so a sync
+  // read on first paint races the injection. We confirm true/false once the
+  // injection wait resolves (effect below) to avoid a wrong "install" flash.
+  const [phantomMissing, setPhantomMissing] = useState(false)
 
   const refreshHistory = useCallback(async (pubkey) => {
     if (!pubkey) return
@@ -70,51 +77,80 @@ export default function SolanaWitness() {
 
   const connectWallet = useCallback(async () => {
     setError(null)
-    if (phantomMissing) {
+    const provider = getInjectedSolanaProvider()
+    if (!provider) {
       setError(
         'Phantom wallet not detected. Install Phantom in this browser, then refresh. · 未检测到 Phantom 钱包，请安装后刷新页面。',
       )
       return
     }
     try {
-      const resp = await window.solana.connect()
+      const resp = await provider.connect()
       const pk = resp.publicKey.toBase58()
       setWalletKey(pk)
       await refreshHistory(pk)
     } catch (err) {
       setError(err?.message ?? 'Wallet connection failed · 钱包连接失败')
     }
-  }, [phantomMissing, refreshHistory])
+  }, [refreshHistory])
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined
-    const provider = window.solana
-    if (!provider?.isPhantom) return undefined
-    if (provider.isConnected && provider.publicKey) {
-      const pk = provider.publicKey.toBase58()
-      setWalletKey(pk)
-      refreshHistory(pk)
-    }
-    const onConnect = (publicKey) => {
-      const pk = publicKey?.toBase58?.() ?? null
-      setWalletKey(pk)
-      if (pk) refreshHistory(pk)
-    }
-    const onDisconnect = () => {
-      setWalletKey(null)
-      // Fall back to the seed wallet's history rather than blanking the
-      // section, so the read-back proof stays visible for judges.
-      if (SEED_BROWSE_WALLET) {
-        refreshHistory(SEED_BROWSE_WALLET)
-      } else {
-        setHistory([])
+    let cancelled = false
+    let listening = null
+
+    const attach = (provider) => {
+      if (!provider?.on || listening) return
+      const onConnect = (publicKey) => {
+        const pk = publicKey?.toBase58?.() ?? null
+        setWalletKey(pk)
+        if (pk) refreshHistory(pk)
       }
+      const onDisconnect = () => {
+        setWalletKey(null)
+        // Fall back to the seed wallet's history rather than blanking the
+        // section, so the read-back proof stays visible for judges.
+        if (SEED_BROWSE_WALLET) {
+          refreshHistory(SEED_BROWSE_WALLET)
+        } else {
+          setHistory([])
+        }
+      }
+      provider.on?.('connect', onConnect)
+      provider.on?.('disconnect', onDisconnect)
+      listening = { provider, onConnect, onDisconnect }
     }
-    provider.on?.('connect', onConnect)
-    provider.on?.('disconnect', onDisconnect)
+
+    // Wait for the (asynchronously injected) provider before deciding the
+    // wallet is missing, then silently restore a previously-approved session
+    // so the connected state survives a reload.
+    waitForInjectedSolanaProvider().then(async (provider) => {
+      if (cancelled) return
+      setPhantomMissing(!provider)
+      if (!provider) return
+      attach(provider)
+
+      const restored = await eagerReconnect(
+        provider,
+        (_p, resp) => (resp?.publicKey ?? provider.publicKey)?.toBase58?.() ?? null,
+      )
+      if (cancelled) return
+      if (restored) {
+        setWalletKey(restored)
+        refreshHistory(restored)
+      } else if (provider.isConnected && provider.publicKey) {
+        const pk = provider.publicKey.toBase58()
+        setWalletKey(pk)
+        refreshHistory(pk)
+      }
+    })
+
     return () => {
-      provider.removeListener?.('connect', onConnect)
-      provider.removeListener?.('disconnect', onDisconnect)
+      cancelled = true
+      if (listening) {
+        listening.provider.removeListener?.('connect', listening.onConnect)
+        listening.provider.removeListener?.('disconnect', listening.onDisconnect)
+      }
     }
   }, [refreshHistory])
 

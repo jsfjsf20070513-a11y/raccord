@@ -210,20 +210,89 @@ export async function fetchWalletMemos({
   return memos
 }
 
+// 60 秒 sessionStorage 缓存窗口：覆盖一次主页停留期间的反复重渲染，
+// 同时不至于让真实新交易在用户主动刷新后还隐身太久。
+const COLLECTIVE_CACHE_TTL_MS = 60_000
+const COLLECTIVE_CACHE_KEY_PREFIX = 'solanaMemo:collective:'
+
+function getSessionStorage() {
+  if (typeof window === 'undefined') {
+    return null
+  }
+  try {
+    return window.sessionStorage
+  } catch {
+    // Safari private mode / cookies disabled
+    return null
+  }
+}
+
+function buildCollectiveCacheKey(walletAddresses, perWalletLimit) {
+  const sorted = [...walletAddresses].sort().join(',')
+  return `${COLLECTIVE_CACHE_KEY_PREFIX}${perWalletLimit}:${sorted}`
+}
+
+function readCollectiveCache(key) {
+  const store = getSessionStorage()
+  if (!store) return null
+  try {
+    const raw = store.getItem(key)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (!parsed || typeof parsed.fetchedAt !== 'number' || !Array.isArray(parsed.data)) {
+      return null
+    }
+    if (Date.now() - parsed.fetchedAt > COLLECTIVE_CACHE_TTL_MS) {
+      return null
+    }
+    return parsed.data
+  } catch {
+    return null
+  }
+}
+
+function writeCollectiveCache(key, data) {
+  const store = getSessionStorage()
+  if (!store) return
+  try {
+    store.setItem(key, JSON.stringify({ fetchedAt: Date.now(), data }))
+  } catch {
+    // Quota errors etc. — cache write is best-effort
+  }
+}
+
 /**
  * Aggregate memo entries across multiple wallets into a single time-sorted
  * feed. Useful for showing a "class collective memory" view: each wallet
  * is queried independently (sequentially, with the same per-wallet limit),
  * then results are merged by blockTime descending.
+ *
+ * Results are cached in sessionStorage for 60s keyed on the wallet set +
+ * per-wallet limit. This protects the public devnet RPC from being hammered
+ * when a user navigates back and forth between pages that consume the same
+ * feed, without affecting freshness on a hard reload (sessionStorage clears
+ * with the tab, so opening in a new tab still goes to the network).
+ *
+ * Pass { forceRefresh: true } to bypass the cache (e.g. for a "refresh"
+ * button users can click after sending a new memo).
  */
 export async function fetchCollectiveMemos({
   connection,
   walletAddresses,
   perWalletLimit = 5,
   rpcDelayMs = 100,
+  forceRefresh = false,
 }) {
   if (!walletAddresses || walletAddresses.length === 0) {
     return []
+  }
+
+  const cacheKey = buildCollectiveCacheKey(walletAddresses, perWalletLimit)
+  if (!forceRefresh) {
+    const cached = readCollectiveCache(cacheKey)
+    if (cached) {
+      return cached
+    }
   }
 
   const all = []
@@ -243,11 +312,27 @@ export async function fetchCollectiveMemos({
     }
   }
 
-  return all.sort((a, b) => {
+  const sorted = all.sort((a, b) => {
     const at = a.blockTime || 0
     const bt = b.blockTime || 0
     return bt - at
   })
+
+  writeCollectiveCache(cacheKey, sorted)
+  return sorted
+}
+
+// 暴露给上层 UI 的"清空缓存"接口：用户在主动刷新或提交完新 memo 后
+// 调用，确保下一次 fetchCollectiveMemos 走真实 RPC 拉到最新数据。
+export function invalidateCollectiveMemosCache(walletAddresses, perWalletLimit = 5) {
+  const store = getSessionStorage()
+  if (!store) return
+  if (!walletAddresses || walletAddresses.length === 0) return
+  try {
+    store.removeItem(buildCollectiveCacheKey(walletAddresses, perWalletLimit))
+  } catch {
+    // ignore
+  }
 }
 
 export function formatBlockTime(blockTimeSeconds) {
