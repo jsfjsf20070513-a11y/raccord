@@ -115,21 +115,39 @@ const moduleSource = [
 writeFileSync(OVERRIDE_PATH, moduleSource, 'utf8')
 console.log(`[prepare-private-assets] wrote ${OVERRIDE_PATH}`)
 
-// 3. Copy the matching uploads/ directory from the private repo into
-//    this repo's public/uploads/ so vite picks them up as static assets.
-const privateUploads = join(PRIVATE_REPO, 'public', 'uploads')
-if (!existsSync(privateUploads)) {
-  console.warn(`[prepare-private-assets] private uploads/ not found at ${privateUploads} — albums override may reference missing files.`)
+// 3. Extract the matching uploads/ directory from the SAME private COMMIT
+//    (not the private working tree) into this repo's public/uploads/ so
+//    vite picks them up as static assets. The album metadata in step 1 is
+//    read from PRIVATE_COMMIT via `git show`, so the photos must come from
+//    the same commit — the private repo's working tree may be checked out
+//    at a later commit that no longer tracks these historical plates,
+//    which would silently ship the real album titles with broken images.
+const uploadsList = execFileSync(
+  'git',
+  ['-C', PRIVATE_REPO, 'ls-tree', '-r', '--name-only', PRIVATE_COMMIT, '--', 'public/uploads/'],
+  { encoding: 'utf8' },
+)
+  .split('\n')
+  .map((line) => line.trim())
+  .filter(Boolean)
+
+if (uploadsList.length === 0) {
+  console.warn(`[prepare-private-assets] no uploads found in ${PRIVATE_COMMIT}:public/uploads/ — albums override may reference missing files.`)
 } else {
   mkdirSync(UPLOADS_DEST, { recursive: true })
-  const entries = readdirSync(privateUploads, { withFileTypes: true })
   let copied = 0
-  for (const entry of entries) {
-    if (!entry.isFile()) continue
-    copyFileSync(join(privateUploads, entry.name), join(UPLOADS_DEST, entry.name))
+  for (const repoPath of uploadsList) {
+    const name = repoPath.slice('public/uploads/'.length)
+    if (!name) continue
+    const blob = execFileSync(
+      'git',
+      ['-C', PRIVATE_REPO, 'show', `${PRIVATE_COMMIT}:${repoPath}`],
+      { encoding: 'buffer', maxBuffer: 64 * 1024 * 1024 },
+    )
+    writeFileSync(join(UPLOADS_DEST, name), blob)
     copied += 1
   }
-  console.log(`[prepare-private-assets] copied ${copied} file(s) from ${privateUploads} → ${UPLOADS_DEST}`)
+  console.log(`[prepare-private-assets] extracted ${copied} file(s) from ${PRIVATE_COMMIT}:public/uploads/ → ${UPLOADS_DEST}`)
 }
 
 console.log('[prepare-private-assets] done.')
