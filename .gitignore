@@ -74,6 +74,7 @@ typings/
 .env.test
 .env.local
 .env.*.local
+.env*.save
 
 # Private keys and local credentials
 *.pem
