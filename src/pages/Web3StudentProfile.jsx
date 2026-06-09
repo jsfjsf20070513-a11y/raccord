@@ -28,142 +28,33 @@ import {
   buildSolscanAccountUrl,
   buildSolscanUrl,
   createDevnetConnection,
-  fetchCollectiveMemos,
   fetchLamportBalance,
-  fetchWalletMemos,
   formatBlockTime,
   formatSol,
-  isValidSolanaAddress,
   MIN_LAMPORTS_FOR_MEMO,
   submitMemoViaWallet,
 } from '../lib/solanaMemo'
-import { fetchAllClassAnchors } from '../lib/classAnchor'
 import {
   eagerReconnect,
   getInjectedSolanaProvider,
   waitForInjectedSolanaProvider,
 } from '../lib/walletProvider'
 import {
-  addLocalWallet,
-  getMergedRegistry,
   isSeedWallet,
-  removeLocalWallet,
 } from '../data/classRegistry'
+import {
+  base58Encode,
+  buildIssuedTimestamp,
+  copyToClipboardSafe,
+  formatAddress,
+  getAddressFromProvider,
+  resolveProviderName,
+} from '../lib/web3ProfileHelpers'
+import { useClassMemoFeed } from './useClassMemoFeed'
 
 const MEMO_PROGRAM_ID_STRING = MEMO_PROGRAM_ID.toBase58()
 
 const PHANTOM_DOWNLOAD_URL = 'https://phantom.app/download'
-
-// Base58 encoder for Solana signatures. Kept inline (no dependency) to avoid
-// pulling @solana/web3.js / bs58 which previously triggered high-severity npm
-// audit warnings for this public-safe repository.
-const BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-
-function base58Encode(input) {
-  if (!input) {
-    return ''
-  }
-
-  const bytes = input instanceof Uint8Array ? input : new Uint8Array(input)
-  if (bytes.length === 0) {
-    return ''
-  }
-
-  let leadingZeros = 0
-  for (const byte of bytes) {
-    if (byte === 0) {
-      leadingZeros += 1
-    } else {
-      break
-    }
-  }
-
-  const digits = [0]
-  for (let byteIndex = 0; byteIndex < bytes.length; byteIndex += 1) {
-    let carry = bytes[byteIndex]
-    for (let digitIndex = 0; digitIndex < digits.length; digitIndex += 1) {
-      carry += digits[digitIndex] << 8
-      digits[digitIndex] = carry % 58
-      carry = (carry / 58) | 0
-    }
-    while (carry > 0) {
-      digits.push(carry % 58)
-      carry = (carry / 58) | 0
-    }
-  }
-
-  let encoded = ''
-  for (let i = 0; i < leadingZeros; i += 1) {
-    encoded += BASE58_ALPHABET[0]
-  }
-  for (let i = digits.length - 1; i >= 0; i -= 1) {
-    encoded += BASE58_ALPHABET[digits[i]]
-  }
-  return encoded
-}
-
-function buildIssuedTimestamp() {
-  return new Date().toISOString().replace(/\.\d+Z$/, 'Z')
-}
-
-async function copyToClipboardSafe(text) {
-  if (!text) {
-    return false
-  }
-
-  try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text)
-      return true
-    }
-  } catch {
-    // fall through to legacy path
-  }
-
-  try {
-    const textarea = document.createElement('textarea')
-    textarea.value = text
-    textarea.setAttribute('readonly', '')
-    textarea.style.position = 'fixed'
-    textarea.style.opacity = '0'
-    document.body.appendChild(textarea)
-    textarea.select()
-    document.execCommand('copy')
-    document.body.removeChild(textarea)
-    return true
-  } catch {
-    return false
-  }
-}
-
-function formatAddress(publicKey = '') {
-  if (!publicKey) {
-    return ''
-  }
-
-  if (publicKey.length <= 14) {
-    return publicKey
-  }
-
-  return `${publicKey.slice(0, 6)}...${publicKey.slice(-6)}`
-}
-
-function getAddressFromProvider(provider, response) {
-  const publicKey = response?.publicKey || provider?.publicKey
-  return publicKey?.toBase58 ? publicKey.toBase58() : `${publicKey || ''}`
-}
-
-function resolveProviderName(provider) {
-  if (!provider) {
-    return 'No wallet detected'
-  }
-
-  if (provider.isPhantom) {
-    return 'Phantom'
-  }
-
-  return 'Injected Solana wallet'
-}
 
 function ProfileSection({ id, kicker, title, children }) {
   return (
@@ -196,18 +87,29 @@ export default function Web3StudentProfile() {
   const [balanceLamports, setBalanceLamports] = useState(null)
   const [isCheckingBalance, setIsCheckingBalance] = useState(false)
 
-  const [memoFeed, setMemoFeed] = useState([])
-  const [classAnchorFeed, setClassAnchorFeed] = useState([])
-  const [memoFeedState, setMemoFeedState] = useState('idle')
-  const [memoFeedError, setMemoFeedError] = useState('')
-  const [feedView, setFeedView] = useState('mine') // 'mine' | 'collective'
-  const [classRegistry, setClassRegistry] = useState(() => getMergedRegistry())
-  const [addWalletInput, setAddWalletInput] = useState('')
-  const [addWalletStatus, setAddWalletStatus] = useState('')
 
   const providerName = useMemo(() => resolveProviderName(provider), [provider])
   const shortAddress = useMemo(() => formatAddress(walletAddress), [walletAddress])
   const isConnected = Boolean(walletAddress)
+
+  // 班级 feed 逻辑已抽到 useClassMemoFeed（devnet 只读，与钱包/签名核心解耦）。
+  const {
+    memoFeedState,
+    memoFeedError,
+    feedView,
+    setFeedView,
+    classRegistry,
+    addWalletInput,
+    setAddWalletInput,
+    addWalletStatus,
+    unifiedFeed,
+    memoFeedStatusLabel,
+    collectiveWalletCount,
+    refreshMemoFeed,
+    resetFeed,
+    handleAddWalletToRegistry,
+    handleRemoveWalletFromRegistry,
+  } = useClassMemoFeed({ walletAddress, isConnected })
   const hasSignature = signingState === 'signed' && Boolean(signatureBase58)
 
   const signingStatusLabel = !isConnected
@@ -255,56 +157,6 @@ export default function Web3StudentProfile() {
         ? 'Retry anchor'
         : 'Anchor on Devnet'
 
-  // Unified §04 timeline: SPL Memo writes (transient, RPC-bounded)
-  // merged with class_anchor PDAs (permanent on-chain accounts) into
-  // a single chronological feed so a judge sees both anchor paths in
-  // one place. Source-tagged so the UI can label each row.
-  const unifiedFeed = useMemo(() => {
-    const memoEntries = memoFeed.map((entry) => ({
-      source: 'memo',
-      key: `memo:${entry.signature}`,
-      blockTime: entry.blockTime || 0,
-      walletAddress: entry.walletAddress || '',
-      payload: entry.memo,
-      signature: entry.signature,
-      slot: entry.slot,
-      detailUrl: buildSolscanUrl(entry.signature, 'devnet'),
-    }))
-    const anchorEntries = classAnchorFeed.map((entry) => ({
-      source: 'anchor',
-      key: `anchor:${entry.pda}:${entry.nonce}`,
-      blockTime: entry.timestamp || 0,
-      walletAddress: entry.author || '',
-      payload: entry.statement,
-      pda: entry.pda,
-      nonce: entry.nonce,
-      detailUrl: `https://solscan.io/account/${entry.pda}?cluster=devnet`,
-    }))
-    return [...memoEntries, ...anchorEntries].sort(
-      (a, b) => (b.blockTime || 0) - (a.blockTime || 0),
-    )
-  }, [memoFeed, classAnchorFeed])
-
-  const memoFeedStatusLabel = memoFeedState === 'loading'
-    ? 'Reading from devnet RPC'
-    : memoFeedState === 'loaded'
-      ? unifiedFeed.length === 0
-        ? 'No records yet'
-        : (() => {
-            const memoCount = memoFeed.length
-            const anchorCount = classAnchorFeed.length
-            const parts = []
-            if (memoCount) parts.push(`${memoCount} SPL Memo${memoCount === 1 ? '' : 's'}`)
-            if (anchorCount) parts.push(`${anchorCount} class_anchor PDA${anchorCount === 1 ? '' : 's'}`)
-            return parts.join(' + ')
-          })()
-      : memoFeedState === 'error'
-        ? 'RPC read failed'
-        : feedView === 'mine' && !isConnected
-          ? 'Connect wallet first'
-          : 'Idle'
-
-  const collectiveWalletCount = classRegistry.length
 
   const balanceLabel = !walletAddress
     ? 'Connect a wallet to view balance'
@@ -338,10 +190,8 @@ export default function Web3StudentProfile() {
     setMemoPayloadShown('')
     setBalanceLamports(null)
     setIsCheckingBalance(false)
-    setMemoFeed([])
-    setMemoFeedState('idle')
-    setMemoFeedError('')
-  }, [])
+    resetFeed()
+  }, [resetFeed])
 
   const refreshWalletState = useCallback(() => {
     const nextProvider = getInjectedSolanaProvider()
@@ -548,135 +398,8 @@ export default function Web3StudentProfile() {
     }
   }, [walletAddress])
 
-  const refreshMemoFeed = useCallback(async () => {
-    setMemoFeedState('loading')
-    setMemoFeedError('')
-    try {
-      const connection = createDevnetConnection()
 
-      if (feedView === 'collective') {
-        // Pull both anchor paths in parallel: SPL Memo (transient,
-        // bounded by RPC retention) and class_anchor PDAs (permanent
-        // on-chain accounts surviving any RPC pruning). Failures on
-        // either side are isolated so the other still renders.
-        //
-        // Asymmetric filter strategy on purpose:
-        //  - SPL Memo MUST be filtered by classRegistry because the
-        //    read path is per-wallet (one RPC call each). Unbounded
-        //    memo scans on devnet would not scale.
-        //  - class_anchor PDAs are a single
-        //    program.account.classAnchor.all() round-trip, so we
-        //    show every on-chain PDA regardless of the local
-        //    registry. The whole point of "Class collective memory"
-        //    is to surface what classmates anchored, even if the
-        //    local browser's registry hasn't seen their wallet yet.
-        const [memos, anchors] = await Promise.all([
-          fetchCollectiveMemos({
-            connection,
-            walletAddresses: classRegistry,
-            perWalletLimit: 5,
-          }).catch((err) => {
-            console.error('[memoFeed] collective memos failed', err)
-            return []
-          }),
-          fetchAllClassAnchors({
-            connection,
-            limit: 30,
-          }).catch((err) => {
-            console.error('[memoFeed] collective anchors failed', err)
-            return []
-          }),
-        ])
-        setMemoFeed(memos)
-        setClassAnchorFeed(anchors)
-        setMemoFeedState('loaded')
-        return
-      }
 
-      // 'mine' view requires a connected wallet
-      if (!walletAddress) {
-        setMemoFeed([])
-        setClassAnchorFeed([])
-        setMemoFeedState('idle')
-        return
-      }
-      const [memos, anchors] = await Promise.all([
-        fetchWalletMemos({ connection, walletAddress, limit: 8 }).catch((err) => {
-          console.error('[memoFeed] wallet memos failed', err)
-          return []
-        }),
-        fetchAllClassAnchors({
-          connection,
-          walletAddresses: [walletAddress],
-          limit: 30,
-        }).catch((err) => {
-          console.error('[memoFeed] wallet anchors failed', err)
-          return []
-        }),
-      ])
-      setMemoFeed(memos.map((entry) => ({ ...entry, walletAddress })))
-      setClassAnchorFeed(anchors)
-      setMemoFeedState('loaded')
-    } catch (error) {
-      setMemoFeedError(error?.message || 'Failed to read memos from devnet RPC.')
-      setMemoFeedState('error')
-    }
-  }, [walletAddress, feedView, classRegistry])
-
-  // When the user connects a wallet, register it locally so the
-  // 'Class collective' feed can pick it up.
-  useEffect(() => {
-    if (!walletAddress) {
-      return
-    }
-    const merged = addLocalWallet(walletAddress)
-    setClassRegistry((prev) => {
-      const next = Array.from(new Set([...prev, ...merged]))
-      return next.length === prev.length ? prev : next
-    })
-  }, [walletAddress])
-
-  const handleAddWalletToRegistry = (event) => {
-    event?.preventDefault?.()
-    const candidate = addWalletInput.trim()
-    setAddWalletStatus('')
-
-    if (!candidate) {
-      setAddWalletStatus('Paste a Solana base58 wallet address first.')
-      return
-    }
-    if (!isValidSolanaAddress(candidate)) {
-      setAddWalletStatus('Not a valid Solana base58 address (32–44 chars).')
-      return
-    }
-    if (classRegistry.includes(candidate)) {
-      setAddWalletStatus('This wallet is already in the class registry.')
-      return
-    }
-
-    addLocalWallet(candidate)
-    setClassRegistry(getMergedRegistry())
-    setAddWalletInput('')
-    setAddWalletStatus(`Added ${candidate.slice(0, 6)}…${candidate.slice(-6)} to registry.`)
-
-    // Trigger an immediate refresh so the new wallet's memos (if any)
-    // show up in the collective feed without an extra click.
-    if (feedView === 'collective') {
-      setTimeout(() => refreshMemoFeed(), 50)
-    }
-  }
-
-  const handleRemoveWalletFromRegistry = (address) => {
-    if (!address) {
-      return
-    }
-    removeLocalWallet(address)
-    setClassRegistry(getMergedRegistry())
-    setAddWalletStatus(`Removed ${address.slice(0, 6)}…${address.slice(-6)} from local registry.`)
-    if (feedView === 'collective') {
-      setTimeout(() => refreshMemoFeed(), 50)
-    }
-  }
 
   useEffect(() => {
     if (!walletAddress) {
@@ -684,8 +407,7 @@ export default function Web3StudentProfile() {
     } else {
       refreshBalance()
     }
-    refreshMemoFeed()
-  }, [walletAddress, refreshBalance, refreshMemoFeed])
+  }, [walletAddress, refreshBalance])
 
   const handleAnchorMemo = async () => {
     const currentProvider = getInjectedSolanaProvider()

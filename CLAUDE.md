@@ -1,0 +1,46 @@
+# CLAUDE.md — MathClassWebsite-public(math 线 · 双语链上版)
+
+主站的**公开发布 + Dev3pack 黑客松版**:在原班级站之上加了 Solana 链上锚定、ed25519 身份、ElevenLabs 法语朗读、Claude 双语证明。**班级是主角,web3/AI 是叠加层,不是替代。**
+
+## 定位
+
+- 线上:`https://rucmathclass.com/`(Cloudflare 代理 + Vultr Nginx);开源:GitHub `MathClassWebsite-public`(MIT)
+- 提交方向:Dev3pack 的 **Solana** 与 **ElevenLabs** 两条赛道
+- 评委 5 分钟可验证的 7 项能力见 README 顶部表
+
+## 比主站多出来的核心能力
+
+| 能力 | 代码位置 |
+|---|---|
+| Phantom 钱包连接 | `src/lib/walletProvider.js`、`src/pages/Web3StudentProfile.jsx` |
+| **off-chain ed25519 身份签名**(base58) | `Web3StudentProfile.jsx`(身份证明段) |
+| **链上写入 · SPL Memo v2** | `src/lib/solanaMemo.js` |
+| **自写 Rust Anchor 程序 `class_anchor`**(devnet) | `programs/class-anchor/src/lib.rs`、`src/lib/classAnchor.js`、`docs/anchor-program.md` |
+| 班级集体 memo feed(读链)| `getSignaturesForAddress` 解析,`src/data/classRegistry.js` |
+| **ElevenLabs 法语朗读**(multilingual_v2)| `src/components/TitlePageNarration.jsx` |
+| Claude 双语定理证明(24 条,KaTeX)| `Home.jsx` 每日定理展开 |
+| Solana 见证页 | `src/pages/SolanaWitness.jsx` |
+
+## 技术栈(在主站基础上)
+
+- React 18 + Vite 5 · **`@solana/web3.js` 1.98 · `@coral-xyz/anchor` 0.29 · bn.js · bs58 · buffer**(polyfill:`src/lib/solanaPolyfill.js`)
+- ElevenLabs `multilingual_v2` · Anthropic Claude(开发辅助 + 双语证明)
+- Supabase **anon-only + RLS** · Cloudflare proxy + Vultr Nginx
+- 安全:`npm audit --omit=dev --audit-level=high` → 0 漏洞
+
+## 运行 / 部署
+
+```bash
+npm install
+npm run dev
+npm run build
+```
+- Rust Anchor 程序在 `programs/class-anchor/`,部署说明见 `docs/anchor-program.md`(含 program ID + deploy tx)。
+- 链上为 **devnet**,读历史不需 Phantom。
+
+## 不要乱改 / 风险
+
+- **链上是不可逆的**:anchor/memo 写入 devnet 后无法撤回,改 `solanaMemo.js` / `classAnchor.js` 前想清楚。
+- Solana 依赖需要 Buffer/polyfill,动构建配置注意 `solanaPolyfill.js` 与 `vite.config.js`。
+- Supabase 仅 anon + RLS:别引入需要 service-role 的写法到前端。
+- `programs/class-anchor` 改了要重新 `anchor build && deploy`,并更新 program ID。
