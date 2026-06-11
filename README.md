@@ -66,9 +66,9 @@ flowchart LR
         CF["Cloudflare proxy<br/>Flexible SSL"]
     end
 
-    subgraph VPS["Vultr LA (149.28.69.75)"]
+    subgraph VPS["Vultr VPS (origin)"]
         Nginx["Nginx :80<br/>SPA + static assets<br/>+ /audio/*.mp3"]
-        Xray["Xray :443<br/>(unrelated proxy<br/>service, untouched)"]
+        Other["Unrelated service :443<br/>(out of scope, untouched)"]
     end
 
     subgraph Solana["Solana devnet"]
@@ -95,9 +95,7 @@ flowchart LR
     Claude -.->|"pre-generated bilingual<br/>proof outlines"| Nginx
 ```
 
-**Key separation that protected the user during development:** Xray on port 443 is a personal proxy out-of-scope to this project. The dApp's HTTPS terminates at the Cloudflare edge in **Flexible SSL** mode and reaches the origin Nginx on port 80 — so port 443 was never disturbed and the user's proxy service stayed live for the entire build.
-
-A subtle but important detail: when Xray itself routes outbound `rucmathclass.com` traffic via its own out-gateway IP, the local DNS resolver returned `149.28.69.75` (the VPS itself) and the Reality protocol fell back to `www.microsoft.com`, breaking the loop. Fixed by hardcoding Cloudflare anycast IPs into the VPS `/etc/hosts` and pointing `systemd-resolved` at `1.1.1.1` / `8.8.8.8`. Documented in commit history.
+**Key separation that protected the origin during development:** port 443 on the VPS is occupied by an unrelated, pre-existing service that this project deliberately never touched. The dApp's HTTPS terminates at the Cloudflare edge in **Flexible SSL** mode and reaches the origin Nginx on port 80 — so the existing service kept running undisturbed for the entire build.
 
 ---
 
