@@ -1,6 +1,6 @@
 import { supabase, isSupabaseConfigured, SUPABASE_MISSING_MESSAGE } from './supabase'
 import { publishOfficialContent, removeOfficialContent } from './contentBackend'
-import { sanitizeExternalUrl } from './urlSafety'
+import { sanitizeStoredUrl } from './safeUrl'
 
 export const OPS_QUEUE_ALBUM_ID = 0
 
@@ -153,7 +153,7 @@ export function normalizeResourcePayload(form) {
   return {
     category: trimValue(form.category),
     title: trimValue(form.title),
-    url: sanitizeExternalUrl(form.url),
+    url: sanitizeStoredUrl(form.url),
     tag: trimValue(form.tag),
     description: trimValue(form.description),
   }

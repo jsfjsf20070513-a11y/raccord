@@ -42,6 +42,35 @@ export function sanitizeHttpUrl(input, fallback = '#') {
 }
 
 /**
+ * Storage-layer counterpart to sanitizeHttpUrl. Used on the write path
+ * (resource submit / publish) to decide whether a user-supplied URL is
+ * even worth persisting. Differences from the render-layer helper:
+ *   - Requires an ABSOLUTE url (no base) so a bare "example.com" — which
+ *     the base-resolving sanitizeHttpUrl would mangle into
+ *     "https://placeholder.invalid/example.com" — is rejected instead of
+ *     stored broken.
+ *   - Returns '' (empty) for anything invalid, so callers store an empty
+ *     string rather than a placeholder '#'.
+ *   - Preserves the original string (no normalization round-trip).
+ * Allowed protocols are shared with the render layer.
+ */
+export function sanitizeStoredUrl(input) {
+  if (!input || typeof input !== 'string') {
+    return ''
+  }
+  const trimmed = input.trim()
+  if (!trimmed) {
+    return ''
+  }
+  try {
+    const parsed = new URL(trimmed)
+    return ALLOWED_PROTOCOLS.has(parsed.protocol) ? trimmed : ''
+  } catch {
+    return ''
+  }
+}
+
+/**
  * Convenience for inline external links: returns props that are safe
  * to spread onto an <a> tag. Always sets `rel="noopener noreferrer"`
  * even though modern browsers imply `noopener` for `target="_blank"`,

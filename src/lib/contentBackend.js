@@ -1,5 +1,5 @@
 import { isSupabaseConfigured, supabase } from './supabase'
-import { sanitizeExternalUrl } from './urlSafety'
+import { sanitizeStoredUrl } from './safeUrl'
 
 const FALLBACK_COVER = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
 
@@ -98,7 +98,7 @@ function mapOfficialResource(row) {
     id: `official-resource-${row.id}`,
     category: row.category || '未分类',
     title: row.title,
-    url: sanitizeExternalUrl(row.url),
+    url: sanitizeStoredUrl(row.url),
     tag: row.tag || '',
     description: row.description || '',
     curator: row.curator || '站点协作',
@@ -228,7 +228,7 @@ export async function publishOfficialContent(kind, submission, user) {
       .upsert([{
         category: payload.category || '未分类',
         title: payload.title || '未命名资源',
-        url: sanitizeExternalUrl(payload.url),
+        url: sanitizeStoredUrl(payload.url),
         tag: payload.tag || '',
         description: payload.description || '',
         curator: submission.authorName || '站点协作',
