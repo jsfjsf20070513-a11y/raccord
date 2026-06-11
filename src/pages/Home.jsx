@@ -7,10 +7,9 @@ import {
 } from '../data/siteContent'
 import { dailyTheoremNotes } from '../data/dailyTheoremNotes.generated'
 import { homeReadingPaths } from '../data/homeReadingPaths'
-import { explanationsCredit, theoremExplanations } from '../data/theoremExplanations'
+import { explanationsCredit, theoremExplanations } from '../data/theoremExplanations.generated'
 import { usePublicAlbums } from '../hooks/usePublicAlbums'
 import { formatCourseSchedule } from '../lib/courseSchedule'
-import { renderMathTextToHtml } from '../lib/mathText'
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000
 const THEOREM_ROTATION_START_DAY = Math.floor(Date.UTC(2025, 8, 1) / DAY_IN_MS)
@@ -99,9 +98,7 @@ export default function Home() {
                   <p className="theorem-explanation-lang" aria-hidden="true">中文</p>
                   <p
                     dangerouslySetInnerHTML={{
-                      __html: renderMathTextToHtml(
-                        theoremExplanations[dailyTheorem.title].zh,
-                      ),
+                      __html: theoremExplanations[dailyTheorem.title].zh,
                     }}
                   />
                 </div>
@@ -109,9 +106,7 @@ export default function Home() {
                   <p className="theorem-explanation-lang" aria-hidden="true">Français</p>
                   <p
                     dangerouslySetInnerHTML={{
-                      __html: renderMathTextToHtml(
-                        theoremExplanations[dailyTheorem.title].fr,
-                      ),
+                      __html: theoremExplanations[dailyTheorem.title].fr,
                     }}
                   />
                 </div>
