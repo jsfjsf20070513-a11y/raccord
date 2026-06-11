@@ -169,6 +169,20 @@ export async function fetchWalletMemos({
         continue
       }
 
+      // getSignaturesForAddress returns ANY tx touching the address —
+      // including txs where a stranger merely listed this wallet as a
+      // read-only account key. Only accept memos this wallet actually
+      // signed, otherwise anyone could plant text that shows up in the
+      // feed attributed to a class wallet.
+      const accountKeys = tx.transaction?.message?.accountKeys || []
+      const walletSigned = accountKeys.some((key) => {
+        const addr = key?.pubkey?.toBase58?.() || String(key?.pubkey || '')
+        return key?.signer === true && addr === pubkey.toBase58()
+      })
+      if (!walletSigned) {
+        continue
+      }
+
       const instructions = tx.transaction?.message?.instructions || []
       for (const instr of instructions) {
         const programId = instr.programId?.toBase58?.() || instr.programId
@@ -342,7 +356,9 @@ export function formatBlockTime(blockTimeSeconds) {
   return new Date(blockTimeSeconds * 1000).toISOString().replace(/\.\d+Z$/, 'Z')
 }
 
-function withTimeout(promise, ms, label) {
+// Shared by classAnchor.js as well — any wallet-popup-driven promise should
+// be wrapped so a closed/stuck popup cannot leave the UI in a busy state.
+export function withTimeout(promise, ms, label) {
   let timeoutId
   const timeout = new Promise((_, reject) => {
     timeoutId = setTimeout(() => {

@@ -23,6 +23,7 @@ import {
 import { AnchorProvider, BN, Program } from '@coral-xyz/anchor';
 
 import idlJson from './classAnchor.idl.json';
+import { withTimeout } from './solanaMemo';
 
 export const PROGRAM_ID = new PublicKey(
   'Cmv8pnxAaCfo8PtMZowcKTRv85Y5BvT7U2zYfspBC4fu'
@@ -61,7 +62,11 @@ const phantomWallet = () => {
 
 const ensureConnected = async (wallet) => {
   if (wallet.publicKey) return wallet.publicKey;
-  const { publicKey } = await wallet.connect();
+  const { publicKey } = await withTimeout(
+    wallet.connect(),
+    90_000,
+    'Wallet connect'
+  );
   return publicKey;
 };
 
@@ -101,14 +106,20 @@ export const anchorStatement = async (statement) => {
   const nonce = new BN(Date.now());
   const [pda] = deriveAnchorPda(publicKey, nonce);
 
-  const signature = await program.methods
-    .anchorStatement(nonce, statement)
-    .accounts({
-      classAnchor: pda,
-      signer: publicKey,
-      systemProgram: SystemProgram.programId,
-    })
-    .rpc();
+  // .rpc() blocks on the Phantom approve popup; without a timeout a closed
+  // popup leaves the caller (SolanaWitness UI) stuck in its busy state.
+  const signature = await withTimeout(
+    program.methods
+      .anchorStatement(nonce, statement)
+      .accounts({
+        classAnchor: pda,
+        signer: publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc(),
+    90_000,
+    'Anchor statement signing'
+  );
 
   return {
     signature,

@@ -89,16 +89,11 @@ export function useClassMemoFeed({ walletAddress, isConnected }) {
         // on-chain accounts surviving any RPC pruning). Failures on
         // either side are isolated so the other still renders.
         //
-        // Asymmetric filter strategy on purpose:
-        //  - SPL Memo MUST be filtered by classRegistry because the
-        //    read path is per-wallet (one RPC call each). Unbounded
-        //    memo scans on devnet would not scale.
-        //  - class_anchor PDAs are a single
-        //    program.account.classAnchor.all() round-trip, so we
-        //    show every on-chain PDA regardless of the local
-        //    registry. The whole point of "Class collective memory"
-        //    is to surface what classmates anchored, even if the
-        //    local browser's registry hasn't seen their wallet yet.
+        // Both paths are filtered by classRegistry. The on-chain program
+        // is open to any signer (anyone with devnet SOL can create a PDA),
+        // so an unfiltered collective view would let strangers plant
+        // arbitrary text on the class memory wall. Wallets join the wall
+        // via the Add wallet flow, which updates the registry.
         const [memos, anchors] = await Promise.all([
           fetchCollectiveMemos({
             connection,
@@ -110,6 +105,7 @@ export function useClassMemoFeed({ walletAddress, isConnected }) {
           }),
           fetchAllClassAnchors({
             connection,
+            walletAddresses: classRegistry,
             limit: 30,
           }).catch((err) => {
             console.error('[memoFeed] collective anchors failed', err)
