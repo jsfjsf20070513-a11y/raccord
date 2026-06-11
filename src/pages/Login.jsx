@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import DailyMeditation from '../components/DailyMeditation'
 import PageHeader from '../components/PageHeader'
@@ -6,6 +6,7 @@ import PasswordField from '../components/PasswordField'
 import { supabase, isSupabaseConfigured, SUPABASE_MISSING_MESSAGE } from '../lib/supabase'
 
 const PHONE_PATTERN = /^1\d{10}$/
+const OTP_RESEND_SECONDS = 60
 
 const COPY = {
   login: {
@@ -26,6 +27,14 @@ const COPY = {
     submit: 'Send reset link',
     submitting: 'Sending…',
   },
+  otp: {
+    title: 'Code sign-in · 验证码登录',
+    summary: 'Sign in to an existing account with a one-time code emailed to you.',
+    submit: 'Send code · 发送验证码',
+    submitting: 'Sending… · 发送中…',
+    verify: 'Verify & sign in · 验证并登录',
+    verifying: 'Verifying… · 验证中…',
+  },
 }
 
 const ERRORS = {
@@ -35,6 +44,7 @@ const ERRORS = {
   passwordTooShort: 'Password must be at least 6 characters. · 密码至少需要 6 位字符。',
   passwordMismatch: 'The two passwords do not match. · 两次输入的密码不一致。',
   emailRequired: 'Enter an email address. · 请输入邮箱地址。',
+  otpCodeRequired: 'Enter the 6-digit code from your email. · 请输入邮箱收到的 6 位验证码。',
   generic: 'Operation failed. Please try again later. · 操作失败，请稍后重试。',
 }
 
@@ -50,9 +60,64 @@ export default function Login() {
   const [realName, setRealName] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
+  // OTP (email verification code) flow: otpSent gates the two steps
+  // (request code → verify code); resendCountdown throttles re-requests.
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpCode, setOtpCode] = useState('')
+  const [resendCountdown, setResendCountdown] = useState(0)
 
   const finalEmail = loginMethod === 'phone' ? `${phone}@phone.local` : email
   const copy = COPY[mode]
+
+  // Tick the resend countdown down once per second; the timer is re-scheduled
+  // on each change and cleared on unmount so it never fires detached.
+  useEffect(() => {
+    if (resendCountdown <= 0) {
+      return undefined
+    }
+    const id = setTimeout(() => setResendCountdown((seconds) => seconds - 1), 1000)
+    return () => clearTimeout(id)
+  }, [resendCountdown])
+
+  // Switch tab and clear transient OTP state so a half-finished code flow
+  // never leaks into another mode.
+  const switchMode = (next) => {
+    setMode(next)
+    setMessage(null)
+    setOtpSent(false)
+    setOtpCode('')
+    setResendCountdown(0)
+  }
+
+  const requestOtp = async () => {
+    if (!email.trim()) {
+      throw new Error(ERRORS.emailRequired)
+    }
+    // shouldCreateUser:false — code sign-in is for existing accounts only;
+    // new accounts must go through signup (which collects real name / nickname).
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { shouldCreateUser: false },
+    })
+    if (error) throw error
+  }
+
+  const handleResendOtp = async () => {
+    if (resendCountdown > 0 || loading) {
+      return
+    }
+    setLoading(true)
+    setMessage(null)
+    try {
+      await requestOtp()
+      setResendCountdown(OTP_RESEND_SECONDS)
+      setMessage({ type: 'success', text: 'Code resent. · 验证码已重发。' })
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message || ERRORS.generic })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -108,6 +173,31 @@ export default function Login() {
         return
       }
 
+      if (mode === 'otp') {
+        if (!otpSent) {
+          await requestOtp()
+          setOtpSent(true)
+          setResendCountdown(OTP_RESEND_SECONDS)
+          setMessage({
+            type: 'success',
+            text: 'Code sent. Check your email and enter it below. · 验证码已发送，请查收邮箱并在下方输入。',
+          })
+          return
+        }
+        if (!otpCode.trim()) {
+          throw new Error(ERRORS.otpCodeRequired)
+        }
+        const { error } = await supabase.auth.verifyOtp({
+          email: email.trim(),
+          token: otpCode.trim(),
+          type: 'email',
+        })
+        if (error) throw error
+        navigate('/')
+        return
+      }
+
+      // mode === 'forgot'
       if (!email.trim()) {
         throw new Error(ERRORS.emailRequired)
       }
@@ -127,6 +217,12 @@ export default function Login() {
     }
   }
 
+  const submitLabel = mode === 'otp'
+    ? (otpSent
+        ? (loading ? copy.verifying : copy.verify)
+        : (loading ? copy.submitting : copy.submit))
+    : (loading ? copy.submitting : copy.submit)
+
   return (
     <article className="page-column">
       <PageHeader
@@ -140,18 +236,21 @@ export default function Login() {
 
       <section className="page-section">
         <div className="editorial-actions tabs">
-          <button type="button" className={`text-button ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>
+          <button type="button" className={`text-button ${mode === 'login' ? 'active' : ''}`} onClick={() => switchMode('login')}>
             Sign in · 登录
           </button>
-          <button type="button" className={`text-button ${mode === 'signup' ? 'active' : ''}`} onClick={() => setMode('signup')}>
+          <button type="button" className={`text-button ${mode === 'signup' ? 'active' : ''}`} onClick={() => switchMode('signup')}>
             Sign up · 注册
           </button>
-          <button type="button" className={`text-button ${mode === 'forgot' ? 'active' : ''}`} onClick={() => setMode('forgot')}>
+          <button type="button" className={`text-button ${mode === 'otp' ? 'active' : ''}`} onClick={() => switchMode('otp')}>
+            Code · 验证码
+          </button>
+          <button type="button" className={`text-button ${mode === 'forgot' ? 'active' : ''}`} onClick={() => switchMode('forgot')}>
             Reset password · 找回密码
           </button>
         </div>
 
-        {mode !== 'forgot' ? (
+        {mode === 'login' || mode === 'signup' ? (
           <div className="editorial-actions tabs">
             <button type="button" className={`text-button ${loginMethod === 'email' ? 'active' : ''}`} onClick={() => setLoginMethod('email')}>
               Email · 邮箱
@@ -176,14 +275,15 @@ export default function Login() {
             </>
           ) : null}
 
-          {mode === 'forgot' || loginMethod === 'email' ? (
+          {mode === 'forgot' || mode === 'otp' || loginMethod === 'email' ? (
             <label>
               <span>Email · 邮箱</span>
               <input
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                required={mode === 'forgot' || loginMethod === 'email'}
+                required={mode === 'forgot' || mode === 'otp' || loginMethod === 'email'}
+                disabled={mode === 'otp' && otpSent}
               />
             </label>
           ) : (
@@ -198,7 +298,7 @@ export default function Login() {
             </label>
           )}
 
-          {mode !== 'forgot' ? (
+          {mode === 'login' || mode === 'signup' ? (
             <PasswordField
               label="Password · 密码"
               value={password}
@@ -218,9 +318,32 @@ export default function Login() {
             />
           ) : null}
 
+          {mode === 'otp' && otpSent ? (
+            <>
+              <label>
+                <span>Verification code · 验证码</span>
+                <input
+                  value={otpCode}
+                  onChange={(event) => setOtpCode(event.target.value)}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="6-digit code · 6 位验证码"
+                  required
+                />
+              </label>
+              <div className="editorial-actions">
+                <button type="button" className="text-button" onClick={handleResendOtp} disabled={loading || resendCountdown > 0}>
+                  {resendCountdown > 0
+                    ? `Resend in ${resendCountdown}s · ${resendCountdown} 秒后可重发`
+                    : 'Resend code · 重新发送'}
+                </button>
+              </div>
+            </>
+          ) : null}
+
           <div className="editorial-actions">
             <button type="submit" className="text-button" disabled={loading}>
-              {loading ? copy.submitting : copy.submit}
+              {submitLabel}
             </button>
             {mode === 'login' ? <Link to="/manage">Open collaboration desk · 进入协作</Link> : null}
           </div>
