@@ -56,6 +56,9 @@ export default function TitlePageNarration() {
       audio.removeEventListener('pause', handlePause)
       audio.removeEventListener('ended', handleEnded)
       audio.removeEventListener('error', handleError)
+      // Stop playback on unmount: a detached <audio> can otherwise keep
+      // playing to the end after the user navigates away from Home.
+      audio.pause()
     }
   }, [])
 

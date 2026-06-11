@@ -106,6 +106,7 @@ export default function Web3StudentProfile() {
     memoFeedStatusLabel,
     collectiveWalletCount,
     refreshMemoFeed,
+    scheduleRefresh,
     resetFeed,
     handleAddWalletToRegistry,
     handleRemoveWalletFromRegistry,
@@ -456,12 +457,10 @@ export default function Web3StudentProfile() {
       // Devnet public RPC indexes a fresh transaction with variable latency
       // (1-15 seconds in practice) and aggressively prunes old history. Try
       // a few times so the just-anchored memo reliably appears in the feed.
+      // scheduleRefresh tracks each timer so they're cancelled if the user
+      // navigates away before they fire.
       const retries = [3000, 7000, 14000]
-      retries.forEach((delay) => {
-        setTimeout(() => {
-          refreshMemoFeed()
-        }, delay)
-      })
+      retries.forEach((delay) => scheduleRefresh(delay))
     } catch (error) {
       setMemoError(error?.message || 'Memo transaction failed.')
       setMemoState('error')

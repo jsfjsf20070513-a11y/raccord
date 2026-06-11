@@ -1,7 +1,7 @@
 // 班级 memo / class_anchor feed 逻辑（§04 统一时间线）。
 // 2026-06-09 从 Web3StudentProfile.jsx 抽出为自定义 hook，逻辑逐字保留。
 // 纯 devnet 只读（collective 视图无需钱包），与钱包/签名核心解耦。
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   buildSolscanUrl,
   createDevnetConnection,
@@ -25,6 +25,22 @@ export function useClassMemoFeed({ walletAddress, isConnected }) {
   const [classRegistry, setClassRegistry] = useState(() => getMergedRegistry())
   const [addWalletInput, setAddWalletInput] = useState('')
   const [addWalletStatus, setAddWalletStatus] = useState('')
+
+  // Race guard: each refreshMemoFeed run takes a monotonic ticket; only the
+  // newest run is allowed to commit results. Without this, switching
+  // feedView (collective↔mine) fast lets a slow earlier RPC land after a
+  // newer one and overwrite the visible feed with stale data.
+  const requestSeqRef = useRef(0)
+  const mountedRef = useRef(true)
+  // One-shot refresh timers (Add/Remove wallet) tracked so an unmount
+  // mid-flight cancels them instead of firing an orphaned RPC.
+  const pendingTimersRef = useRef([])
+
+  useEffect(() => () => {
+    mountedRef.current = false
+    pendingTimersRef.current.forEach(clearTimeout)
+    pendingTimersRef.current = []
+  }, [])
 
   // Unified §04 timeline: SPL Memo writes (transient, RPC-bounded)
   // merged with class_anchor PDAs (permanent on-chain accounts) into
@@ -78,8 +94,19 @@ export function useClassMemoFeed({ walletAddress, isConnected }) {
   const collectiveWalletCount = classRegistry.length
 
   const refreshMemoFeed = useCallback(async () => {
-    setMemoFeedState('loading')
-    setMemoFeedError('')
+    const reqId = ++requestSeqRef.current
+    // Commit a state update only if this run is still the newest and the
+    // component is still mounted.
+    const commit = (apply) => {
+      if (mountedRef.current && reqId === requestSeqRef.current) {
+        apply()
+      }
+    }
+
+    commit(() => {
+      setMemoFeedState('loading')
+      setMemoFeedError('')
+    })
     try {
       const connection = createDevnetConnection()
 
@@ -112,17 +139,21 @@ export function useClassMemoFeed({ walletAddress, isConnected }) {
             return []
           }),
         ])
-        setMemoFeed(memos)
-        setClassAnchorFeed(anchors)
-        setMemoFeedState('loaded')
+        commit(() => {
+          setMemoFeed(memos)
+          setClassAnchorFeed(anchors)
+          setMemoFeedState('loaded')
+        })
         return
       }
 
       // 'mine' view requires a connected wallet
       if (!walletAddress) {
-        setMemoFeed([])
-        setClassAnchorFeed([])
-        setMemoFeedState('idle')
+        commit(() => {
+          setMemoFeed([])
+          setClassAnchorFeed([])
+          setMemoFeedState('idle')
+        })
         return
       }
       const [memos, anchors] = await Promise.all([
@@ -139,14 +170,27 @@ export function useClassMemoFeed({ walletAddress, isConnected }) {
           return []
         }),
       ])
-      setMemoFeed(memos.map((entry) => ({ ...entry, walletAddress })))
-      setClassAnchorFeed(anchors)
-      setMemoFeedState('loaded')
+      commit(() => {
+        setMemoFeed(memos.map((entry) => ({ ...entry, walletAddress })))
+        setClassAnchorFeed(anchors)
+        setMemoFeedState('loaded')
+      })
     } catch (error) {
-      setMemoFeedError(error?.message || 'Failed to read memos from devnet RPC.')
-      setMemoFeedState('error')
+      commit(() => {
+        setMemoFeedError(error?.message || 'Failed to read memos from devnet RPC.')
+        setMemoFeedState('error')
+      })
     }
   }, [walletAddress, feedView, classRegistry])
+
+  // Schedule a one-shot refresh, tracked so it can be cancelled on unmount.
+  const scheduleRefresh = useCallback((delay) => {
+    const id = setTimeout(() => {
+      pendingTimersRef.current = pendingTimersRef.current.filter((t) => t !== id)
+      refreshMemoFeed()
+    }, delay)
+    pendingTimersRef.current.push(id)
+  }, [refreshMemoFeed])
 
   // When the user connects a wallet, register it locally so the
   // 'Class collective' feed can pick it up.
@@ -193,7 +237,7 @@ export function useClassMemoFeed({ walletAddress, isConnected }) {
     // Trigger an immediate refresh so the new wallet's memos (if any)
     // show up in the collective feed without an extra click.
     if (feedView === 'collective') {
-      setTimeout(() => refreshMemoFeed(), 50)
+      scheduleRefresh(50)
     }
   }
 
@@ -212,7 +256,7 @@ export function useClassMemoFeed({ walletAddress, isConnected }) {
     setClassRegistry(getMergedRegistry())
     setAddWalletStatus(`Removed ${address.slice(0, 6)}…${address.slice(-6)} from local registry.`)
     if (feedView === 'collective') {
-      setTimeout(() => refreshMemoFeed(), 50)
+      scheduleRefresh(50)
     }
   }
 
@@ -231,6 +275,7 @@ export function useClassMemoFeed({ walletAddress, isConnected }) {
     memoFeedStatusLabel,
     collectiveWalletCount,
     refreshMemoFeed,
+    scheduleRefresh,
     resetFeed,
     handleAddWalletToRegistry,
     handleRemoveWalletFromRegistry,
