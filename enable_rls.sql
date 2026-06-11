@@ -200,3 +200,25 @@ using (
 revoke select on public.comments from anon;
 grant select (id, album_id, content, user_id, user_nickname, created_at)
   on public.comments to anon;
+
+-- ---------------------------------------------------------------------
+-- 8) INSERT 加固：非管理员不得伪造 moderation 信封（2026-06-11 已在线上应用）
+-- ---------------------------------------------------------------------
+-- 背景：OPS 区（album_id=0）用 content 里的 __mathclass_ops__::{json} 信封承载
+-- gallery/resource 投稿与 moderation 审核回执。线上 INSERT 策略原本只校验
+-- auth.uid()=user_id，任何登录用户都能插入 kind=moderation 的伪造回执，污染
+-- 管理端 ManageHub（admin 可读全部）。此处用 **容忍空格的正则**（不是精确
+-- LIKE，避免 `"kind" : "moderation"` 这类带空格绕过)拦截非管理员的 moderation
+-- 信封；正则作用于 text 不会抛错，且不误伤正常评论与 gallery/resource 投稿。
+-- 注意：线上策略名为 "Users can insert their own comments"（与本文件其它策略名
+-- 不完全一致，因线上 DB 是历史演进的混合体）。
+alter policy "Users can insert their own comments" on public.comments
+with check (
+  (auth.uid() = user_id)
+  and (
+    exists (select 1 from public.profiles
+            where profiles.id = auth.uid()
+              and profiles.role = any(array['admin'::text, 'super_admin'::text]))
+    or content !~ '"kind"[[:space:]]*:[[:space:]]*"moderation"'
+  )
+);
