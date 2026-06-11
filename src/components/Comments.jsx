@@ -76,7 +76,13 @@ export default function Comments({ albumId, title = 'Comments · 留言板' }) {
     let active = true
 
     const loadComments = async (scoped) => {
-      let query = supabase.from('comments').select('*').order('created_at', { ascending: false })
+      // Explicit column list: user_email is excluded from the anon column
+      // grant (enable_rls.sql §7), and a bare select('*') would be rejected
+      // for logged-out visitors once column-level privileges are in place.
+      let query = supabase
+        .from('comments')
+        .select('id, album_id, content, user_id, user_nickname, created_at')
+        .order('created_at', { ascending: false })
 
       if (scoped && albumId) {
         query = query.eq('album_id', Number(albumId))

@@ -188,3 +188,15 @@ using (
   auth.uid() = user_id
   or (album_id = 0 and public.is_admin())
 );
+
+-- ---------------------------------------------------------------------
+-- 7) 列级权限：anon 不得读取 user_email（PII —— 全班学号邮箱）
+-- ---------------------------------------------------------------------
+-- RLS 已对 anon 隐藏 OPS 区行（album_id = 0），但公开留言行若保持默认
+-- 全列授权，任何人可用 anon key 直接 `select=user_email` 批量拉取邮箱。
+-- 注意：列级授权生效后 anon 的裸 select('*') 会报错，前端公开留言查询
+-- 必须显式列出列（见 Comments.jsx）。authenticated 保留默认全列（管理端
+-- ManageHub / OPS 协作区需要 user_email，且这些行已有行级策略保护）。
+revoke select on public.comments from anon;
+grant select (id, album_id, content, user_id, user_nickname, created_at)
+  on public.comments to anon;
