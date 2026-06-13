@@ -42,5 +42,7 @@ npm run build
 
 - **链上是不可逆的**:anchor/memo 写入 devnet 后无法撤回,改 `solanaMemo.js` / `classAnchor.js` 前想清楚。
 - Solana 依赖需要 Buffer/polyfill,动构建配置注意 `solanaPolyfill.js` 与 `vite.config.js`。
-- Supabase 仅 anon + RLS:别引入需要 service-role 的写法到前端。
+- **Supabase RLS 是唯一安全边界**:前端 anon-only,所有 `.from()` 全靠 RLS 兜底——别引入需 service-role 的写法到前端。本仓与原班级站**共用同一 Supabase 项目**,RLS 是共享边界,改表/权限要同步 RLS 策略脚本(权威状态以 `harden_rls.sql` 为准)。
+- 🔴 **审核回执是“文本当协议”,改前必重验**:`comments` 表 `album_id=0` 的 ops 行用 content 里的 `__mathclass_ops__::{...}` JSON 承载审核信封(`src/lib/opsQueue.js`、`src/components/Comments.jsx`);“回执只属于本人”靠 RLS 强制 moderation 信封必须管理员身份才能写入。**任何放松该 insert/update 写入守卫的改动,会静默重开“伪造他人案卷回执”——改这段必重验双守卫。**
+- **PII 列遮蔽**:anon 对 `comments` 不授 `user_email`,前端必须显式列名查询(`Comments.jsx`),别改回 `select=*`。
 - `programs/class-anchor` 改了要重新 `anchor build && deploy`,并更新 program ID。
