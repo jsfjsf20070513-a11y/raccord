@@ -43,8 +43,14 @@ export function base58Encode(input) {
   for (let i = 0; i < leadingZeros; i += 1) {
     encoded += BASE58_ALPHABET[0]
   }
-  for (let i = digits.length - 1; i >= 0; i -= 1) {
-    encoded += BASE58_ALPHABET[digits[i]]
+  // A wholly-zero value is already represented by the leading '1's above; the
+  // residual seed digit ([0]) must not add an extra character, or the output
+  // diverges from the bs58 reference (e.g. [0] -> '1', not '11').
+  const isZeroValue = digits.length === 1 && digits[0] === 0
+  if (!isZeroValue) {
+    for (let i = digits.length - 1; i >= 0; i -= 1) {
+      encoded += BASE58_ALPHABET[digits[i]]
+    }
   }
   return encoded
 }

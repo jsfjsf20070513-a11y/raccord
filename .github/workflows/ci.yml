@@ -1,9 +1,10 @@
 name: CI
 
-# Lint + production build on every push/PR to main. The build runs the
-# prebuild hooks (render-theorems, generate-health) and uses the public-safe
-# placeholder assets — no secrets or private-asset injection required, so this
-# runs cleanly on a fork or a fresh clone.
+# Lint + unit tests + production build on every push/PR to main. Tests cover the
+# pure security-critical helpers (URL sanitizing, ops-queue envelope decoding,
+# base58 signature encoding). The build runs the prebuild hooks (render-theorems,
+# generate-health) and uses the public-safe placeholder assets — no secrets or
+# private-asset injection required, so this runs cleanly on a fork or fresh clone.
 
 on:
   push:
@@ -27,6 +28,9 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Test
+        run: npm test
 
       - name: Build
         run: npm run build
