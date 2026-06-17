@@ -12,6 +12,9 @@ import {
   cleanFrenchWord,
   cleanFrenchDeck,
   buildStudyQueue,
+  computeDeckStats,
+  computeStudyStreak,
+  MASTERED_STAGE,
   FRENCH_GENDERS,
 } from './srsScheduler'
 
@@ -216,6 +219,59 @@ describe('buildStudyQueue', () => {
   it('seeds new cards with a usable initial state', () => {
     const [first] = buildStudyQueue({ deck: [{ id: 'w1' }], stateMap: {}, now: NOW })
     expect(first.state).toMatchObject({ word_id: 'w1', proficiency_level: 0 })
+  })
+})
+
+describe('computeDeckStats', () => {
+  const deck = [{ id: 'w1' }, { id: 'w2' }, { id: 'w3' }, { id: 'w4' }]
+
+  it('classifies new / learning / mastered and counts due', () => {
+    const stateMap = {
+      w2: { proficiency_level: 2, next_review_at: '2026-06-10T00:00:00Z' }, // learning, due
+      w3: { proficiency_level: MASTERED_STAGE, next_review_at: '2026-06-30T00:00:00Z' }, // mastered, not due
+      w4: { proficiency_level: MASTERED_STAGE + 1, next_review_at: '2026-06-01T00:00:00Z' }, // mastered, due
+    }
+    const stats = computeDeckStats({ deck, stateMap, now: NOW })
+    expect(stats).toEqual({ total: 4, newCount: 1, learning: 1, mastered: 2, due: 3 })
+    // due = w1(new) + w2(due) + w4(due) = 3
+  })
+
+  it('counts an all-new deck as all due', () => {
+    expect(computeDeckStats({ deck, stateMap: {}, now: NOW }))
+      .toEqual({ total: 4, newCount: 4, learning: 0, mastered: 0, due: 4 })
+  })
+})
+
+describe('computeStudyStreak', () => {
+  const states = (dates) => dates.map((d) => ({ updated_at: d }))
+
+  it('counts consecutive days ending today', () => {
+    const s = states(['2026-06-17T08:00:00Z', '2026-06-16T20:00:00Z', '2026-06-15T09:00:00Z'])
+    expect(computeStudyStreak(s, NOW)).toBe(3)
+  })
+
+  it('collapses multiple sessions on the same day into one', () => {
+    const s = states(['2026-06-17T01:00:00Z', '2026-06-17T23:00:00Z'])
+    expect(computeStudyStreak(s, NOW)).toBe(1)
+  })
+
+  it('still counts a streak ending yesterday (today not studied yet)', () => {
+    const s = states(['2026-06-16T08:00:00Z', '2026-06-15T08:00:00Z'])
+    expect(computeStudyStreak(s, NOW)).toBe(2)
+  })
+
+  it('returns 0 when the most recent day is older than yesterday', () => {
+    expect(computeStudyStreak(states(['2026-06-14T08:00:00Z']), NOW)).toBe(0)
+  })
+
+  it('breaks the streak on a gap', () => {
+    // today + yesterday, then a gap (skip 06-15), then 06-14 → streak = 2
+    const s = states(['2026-06-17T08:00:00Z', '2026-06-16T08:00:00Z', '2026-06-14T08:00:00Z'])
+    expect(computeStudyStreak(s, NOW)).toBe(2)
+  })
+
+  it('returns 0 for no history', () => {
+    expect(computeStudyStreak([], NOW)).toBe(0)
   })
 })
 

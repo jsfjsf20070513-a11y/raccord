@@ -8,6 +8,8 @@ import {
   REVIEW_RESULT,
   buildStudyQueue,
   cleanFrenchDeck,
+  computeDeckStats,
+  computeStudyStreak,
   gradeReviewState,
 } from '../lib/srsScheduler'
 import { fetchReviewStateMap, saveReviewState } from '../lib/vocabularyBackend'
@@ -36,6 +38,7 @@ export default function Vocabulary() {
   const [index, setIndex] = useState(0)
   const [revealed, setRevealed] = useState(false)
   const [stats, setStats] = useState({ correct: 0, wrong: 0 })
+  const [deckStats, setDeckStats] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
 
   const load = useCallback(async () => {
@@ -53,6 +56,10 @@ export default function Vocabulary() {
         return
       }
       const now = new Date().toISOString()
+      setDeckStats({
+        ...computeDeckStats({ deck: VALID_DECK, stateMap: states, now }),
+        streak: computeStudyStreak(Object.values(states), now),
+      })
       const built = buildStudyQueue({
         deck: VALID_DECK,
         stateMap: states,
@@ -125,6 +132,26 @@ export default function Vocabulary() {
         summary="艾宾浩斯阶梯调度 · 新词与复习词交替 · 进度按你的账号保存。"
         meta={[`词库 ${VALID_DECK.length} 条`, '答对进一阶，答错归零']}
       />
+
+      {user && deckStats ? (
+        <section
+          aria-label="学习进度"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.6rem 1.4rem',
+            justifyContent: 'center',
+            margin: '0.6rem 0 0',
+            fontSize: '0.9rem',
+          }}
+        >
+          <span title="今天可学(新词 + 到期复习)">📅 今日到期 <strong>{deckStats.due}</strong></span>
+          <span title="已掌握(达到 30 天间隔阶)">✅ 已掌握 <strong>{deckStats.mastered}</strong></span>
+          <span title="学习中(已见过但未掌握)">📖 学习中 <strong>{deckStats.learning}</strong></span>
+          <span title="还没开始背的新词">✨ 新词 <strong>{deckStats.newCount}</strong></span>
+          <span title="连续背词天数">🔥 连续 <strong>{deckStats.streak}</strong> 天</span>
+        </section>
+      ) : null}
 
       {!user ? (
         <section style={cardStyle}>
