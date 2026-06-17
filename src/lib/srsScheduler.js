@@ -16,6 +16,10 @@
 
 export const CURVE_DAYS = [1, 2, 4, 7, 15, 30, 60, 120]
 export const MAX_STAGE = CURVE_DAYS.length - 1
+// A word is treated as "mastered" once it reaches this ladder stage (≈30-day
+// interval) — strong enough retention to surface as a progress milestone
+// without requiring the full MAX_STAGE, which is rarely reached.
+export const MASTERED_STAGE = 5
 
 export const REVIEW_RESULT = {
   correct: 'correct',
@@ -148,6 +152,74 @@ export function buildStudyQueue({ deck = [], stateMap = {}, now, maxNew = 10, ma
   )
 
   return interleaveStates(newCards.slice(0, maxNew), reviewCards.slice(0, maxReview))
+}
+
+/**
+ * Progress snapshot over a deck given the user's review states. Pure.
+ *   total     — deck size
+ *   newCount  — words with no state yet (also counted as due)
+ *   learning  — seen but below MASTERED_STAGE
+ *   mastered  — at/above MASTERED_STAGE
+ *   due       — studyable right now (new words + due review states)
+ */
+export function computeDeckStats({ deck = [], stateMap = {}, now, masteredStage = MASTERED_STAGE } = {}) {
+  let newCount = 0
+  let learning = 0
+  let mastered = 0
+  let due = 0
+
+  for (const word of deck) {
+    const state = stateMap[word.id]
+    if (!state) {
+      newCount += 1
+      due += 1
+      continue
+    }
+    if (clampStage(state.proficiency_level) >= masteredStage) {
+      mastered += 1
+    } else {
+      learning += 1
+    }
+    if (isDue(state, now)) due += 1
+  }
+
+  return { total: deck.length, newCount, learning, mastered, due }
+}
+
+/**
+ * Consecutive-day study streak ending today (or yesterday, if today's study is
+ * not in yet). Derived from each state's `updated_at` (one row written per graded
+ * answer), so distinct UTC dates ≈ days studied. Returns 0 if the most recent
+ * studied day is older than yesterday (streak broken). Pure.
+ */
+export function computeStudyStreak(states = [], now) {
+  const days = new Set()
+  for (const state of states) {
+    if (state?.updated_at) {
+      days.add(startOfUtcDay(state.updated_at).toISOString())
+    }
+  }
+  if (!days.size) return 0
+
+  const today = startOfUtcDay(now)
+  const yesterday = startOfUtcDay(now)
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1)
+
+  let cursor
+  if (days.has(today.toISOString())) {
+    cursor = today
+  } else if (days.has(yesterday.toISOString())) {
+    cursor = yesterday
+  } else {
+    return 0
+  }
+
+  let streak = 0
+  while (days.has(cursor.toISOString())) {
+    streak += 1
+    cursor.setUTCDate(cursor.getUTCDate() - 1)
+  }
+  return streak
 }
 
 // ---- French domain validation ----------------------------------------------

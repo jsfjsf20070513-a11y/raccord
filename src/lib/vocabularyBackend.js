@@ -30,7 +30,7 @@ export async function fetchReviewStateMap(userId) {
 
   const { data, error } = await supabase
     .from(REVIEW_STATES_TABLE)
-    .select('user_id, word_id, proficiency_level, next_review_at, streak_count, last_result')
+    .select('user_id, word_id, proficiency_level, next_review_at, streak_count, last_result, updated_at')
     .eq('user_id', userId)
 
   if (error) {
