@@ -20,13 +20,15 @@
 | **ElevenLabs 法语朗读**(multilingual_v2)| `src/components/TitlePageNarration.jsx` |
 | Claude 双语定理证明(24 条,KaTeX)| `Home.jsx` 每日定理展开 |
 | Solana 见证页 | `src/pages/SolanaWitness.jsx` |
+| **SRS 双语背词器**(艾宾浩斯阶梯 + 新旧交替 + 法语领域校验)| 纯核心 `src/lib/srsScheduler.js`(已单测)、持久层 `src/lib/vocabularyBackend.js`、词库 `src/data/frenchVocabulary.js`、页面 `src/pages/Vocabulary.jsx`(路由 `/vocabulary`)、建表 `setup_vocabulary.sql` |
 
 ## 技术栈(在主站基础上)
 
 - React 18 + Vite 5 · **`@solana/web3.js` 1.98 · `@coral-xyz/anchor` 0.29 · bn.js · bs58 · buffer**(polyfill:`src/lib/solanaPolyfill.js`)
 - ElevenLabs `multilingual_v2` · Anthropic Claude(开发辅助 + 双语证明)
 - Supabase **anon-only + RLS** · Cloudflare proxy + Vultr Nginx
-- 安全:`npm audit --omit=dev --audit-level=high` → 0 漏洞
+- 测试:**vitest**(`src/lib/*.test.js`,纯安全逻辑 + SRS 调度器);CI 跑 lint → test → build(node 版本以 `.nvmrc` 为准)
+- 安全:`npm audit --omit=dev --audit-level=high` → 0 漏洞(另有 5 个 moderate 来自 `@solana/web3.js` 传递依赖,上游暂无修复;详见 README)
 
 ## 运行 / 部署
 
@@ -34,9 +36,12 @@
 npm install
 npm run dev
 npm run build
+npm test          # vitest run(单元测试)
+npm run lint
 ```
 - Rust Anchor 程序在 `programs/class-anchor/`,部署说明见 `docs/anchor-program.md`(含 program ID + deploy tx)。
 - 链上为 **devnet**,读历史不需 Phantom。
+- SRS 背词器需在 Supabase 执行 `setup_vocabulary.sql` 建 `review_states` 表(自带 RLS,与 `harden_rls.sql` 同口径:用户只能读写自己的行)。表没建时页面优雅降级提示。
 
 ## 不要乱改 / 风险
 
