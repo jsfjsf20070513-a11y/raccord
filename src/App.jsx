@@ -33,6 +33,7 @@ const Login = lazy(() => import('./pages/Login'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const SolanaWitness = lazy(() => import('./pages/SolanaWitness'))
+const Vocabulary = lazy(() => import('./pages/Vocabulary'))
 
 const LOADING_FADE_DURATION = 180
 const INITIAL_LOADING_DURATION = 760
@@ -175,6 +176,7 @@ function AppRoutes() {
         <Route path="album/:id" element={<DeferredPage><AlbumDetail /></DeferredPage>} />
         <Route path="timeline/*" element={<Navigate to="/" replace />} />
         <Route path="announcements/*" element={<Navigate to="/" replace />} />
+        <Route path="vocabulary" element={<DeferredPage><Vocabulary /></DeferredPage>} />
         <Route path="resources" element={<DeferredPage><Resources /></DeferredPage>} />
         <Route path="resources/curate" element={<DeferredPage><ResourceCurate /></DeferredPage>} />
         <Route path="resources/:id" element={<DeferredPage><ResourceDetail /></DeferredPage>} />

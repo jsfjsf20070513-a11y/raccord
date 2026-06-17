@@ -4,6 +4,7 @@ import { useAuth } from '../context/useAuth'
 const navItems = [
   { to: '/', label: 'Home · 扉页' },
   { to: '/resources', label: 'Resources · 资源' },
+  { to: '/vocabulary', label: 'Vocab · 背词' },
   { to: '/manage', label: 'Collaboration · 协作' },
 ]
 
@@ -25,6 +26,10 @@ export default function Layout() {
       return navItems[1]
     }
 
+    if (pathname.startsWith('/vocabulary')) {
+      return navItems[2]
+    }
+
     if (
       pathname.startsWith('/hackathon')
       || pathname.startsWith('/web3-profile')
@@ -33,7 +38,7 @@ export default function Layout() {
       return { to: '/hackathon', label: 'Showcase · 展示' }
     }
 
-    return navItems[2]
+    return navItems[3]
   }
 
   const primaryNav = resolvePrimaryNav(location.pathname)
