@@ -42,6 +42,7 @@ npm run lint
 - Rust Anchor 程序在 `programs/class-anchor/`,部署说明见 `docs/anchor-program.md`(含 program ID + deploy tx)。
 - 链上为 **devnet**,读历史不需 Phantom。
 - SRS 背词器需在 Supabase 执行 `setup_vocabulary.sql` 建 `review_states` 表(自带 RLS,与 `harden_rls.sql` 同口径:用户只能读写自己的行)。表没建时页面优雅降级提示。
+- 扩词库:`npm run vocab:import <file.csv|.json>`(dry run 出校验报告;加 `--out src/data/frenchVocabulary.js` 才写文件)。纯逻辑在 `src/lib/vocabularyImport.js`(已单测),复用 `cleanFrenchWord` 领域校验。
 
 ## 不要乱改 / 风险
 
