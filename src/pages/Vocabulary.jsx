@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, Check, RotateCcw, Sparkles, X } from 'lucide-react'
+import { BookOpen, Check, Download, RotateCcw, Shuffle, Sparkles, Upload, X } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import { useAuth } from '../context/useAuth'
 import { frenchVocabulary } from '../data/frenchVocabulary'
@@ -12,7 +12,8 @@ import {
   computeStudyStreak,
   gradeReviewState,
 } from '../lib/srsScheduler'
-import { fetchReviewStateMap, saveReviewState } from '../lib/vocabularyBackend'
+import { fetchReviewStateMap, importReviewStates, saveReviewState } from '../lib/vocabularyBackend'
+import { parseProgressImport, serializeProgress } from '../lib/vocabularyProgress'
 
 const MAX_NEW = 8
 const MAX_REVIEW = 40
@@ -21,6 +22,18 @@ const MAX_REVIEW = 40
 // (a noun without gender, a verb without a conjugation) are dropped rather than
 // shown — the same domain rule the trainer enforces conceptually.
 const VALID_DECK = cleanFrenchDeck(frenchVocabulary).valid
+const DECK_TAGS = ['all', ...Array.from(new Set(VALID_DECK.map((w) => w.tag).filter(Boolean)))]
+
+// Fisher–Yates; lives here (not in the pure tested scheduler) because it uses
+// Math.random. Order-only, never mutates the input.
+function shuffled(arr) {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
 
 const cardStyle = {
   border: '1px solid var(--rule, #d8d2c4)',
@@ -40,6 +53,10 @@ export default function Vocabulary() {
   const [stats, setStats] = useState({ correct: 0, wrong: 0 })
   const [deckStats, setDeckStats] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const [tag, setTag] = useState('all')
+  const [shuffle, setShuffle] = useState(false)
+  const [importMsg, setImportMsg] = useState('')
+  const fileInputRef = useRef(null)
 
   const load = useCallback(async () => {
     if (!user) return
@@ -56,17 +73,14 @@ export default function Vocabulary() {
         return
       }
       const now = new Date().toISOString()
+      // Progress stats always reflect the WHOLE deck, not the current filter.
       setDeckStats({
         ...computeDeckStats({ deck: VALID_DECK, stateMap: states, now }),
         streak: computeStudyStreak(Object.values(states), now),
       })
-      const built = buildStudyQueue({
-        deck: VALID_DECK,
-        stateMap: states,
-        now,
-        maxNew: MAX_NEW,
-        maxReview: MAX_REVIEW,
-      })
+      const deck = tag === 'all' ? VALID_DECK : VALID_DECK.filter((w) => w.tag === tag)
+      let built = buildStudyQueue({ deck, stateMap: states, now, maxNew: MAX_NEW, maxReview: MAX_REVIEW })
+      if (shuffle) built = shuffled(built)
       setQueue(built)
       setIndex(0)
       setRevealed(false)
@@ -76,7 +90,7 @@ export default function Vocabulary() {
       setErrorMessage(error?.message || '加载背词数据失败。')
       setStatus('error')
     }
-  }, [user])
+  }, [user, tag, shuffle])
 
   useEffect(() => {
     if (user) {
@@ -119,10 +133,74 @@ export default function Vocabulary() {
     [current, user, index, queue.length],
   )
 
+  // Keyboard shortcuts: Space reveals; once revealed, 1 = 没记住, 2 = 记住了.
+  useEffect(() => {
+    if (status !== 'ready') return undefined
+    const onKey = (event) => {
+      const tagName = event.target?.tagName
+      if (tagName === 'INPUT' || tagName === 'TEXTAREA') return
+      if (event.code === 'Space') {
+        event.preventDefault()
+        if (!revealed) setRevealed(true)
+      } else if (revealed && event.key === '1') {
+        grade(REVIEW_RESULT.wrong)
+      } else if (revealed && event.key === '2') {
+        grade(REVIEW_RESULT.correct)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [status, revealed, grade])
+
+  const handleExport = useCallback(async () => {
+    if (!user) return
+    try {
+      const { states } = await fetchReviewStateMap(user.id)
+      const json = serializeProgress(Object.values(states), { exportedAt: new Date().toISOString() })
+      const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }))
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = `vocab-progress-${new Date().toISOString().slice(0, 10)}.json`
+      anchor.click()
+      URL.revokeObjectURL(url)
+      setImportMsg('已导出进度 JSON。')
+    } catch (error) {
+      setImportMsg(`导出失败:${error?.message || error}`)
+    }
+  }, [user])
+
+  const handleImportFile = useCallback(
+    async (event) => {
+      const file = event.target.files?.[0]
+      if (!file || !user) return
+      setImportMsg('正在导入…')
+      try {
+        const text = await file.text()
+        const { rows, report } = parseProgressImport(text)
+        const { mode, count } = await importReviewStates(rows, user.id)
+        if (mode === 'compat') {
+          setImportMsg('数据表还没建立,无法导入。')
+        } else if (mode === 'disabled') {
+          setImportMsg('Supabase 未配置,无法导入。')
+        } else {
+          setImportMsg(`导入完成:写入 ${count} 条,跳过 ${report.rejected.length} 条无效行。`)
+          await load()
+        }
+      } catch (error) {
+        setImportMsg(`导入失败:${error?.message || error}`)
+      } finally {
+        event.target.value = '' // allow re-selecting the same file
+      }
+    },
+    [user, load],
+  )
+
   const progress = useMemo(
     () => (queue.length ? `${Math.min(index + 1, queue.length)} / ${queue.length}` : '0 / 0'),
     [index, queue.length],
   )
+
+  const showControls = user && (status === 'ready' || status === 'empty' || status === 'done')
 
   return (
     <main className="page page-narrow">
@@ -130,7 +208,7 @@ export default function Vocabulary() {
         kicker="Carnet de vocabulaire · 法语背词"
         title="间隔重复背词器"
         summary="艾宾浩斯阶梯调度 · 新词与复习词交替 · 进度按你的账号保存。"
-        meta={[`词库 ${VALID_DECK.length} 条`, '答对进一阶，答错归零']}
+        meta={[`词库 ${VALID_DECK.length} 条`, '空格翻面 · 1 没记住 · 2 记住了']}
       />
 
       {user && deckStats ? (
@@ -150,6 +228,51 @@ export default function Vocabulary() {
           <span title="学习中(已见过但未掌握)">📖 学习中 <strong>{deckStats.learning}</strong></span>
           <span title="还没开始背的新词">✨ 新词 <strong>{deckStats.newCount}</strong></span>
           <span title="连续背词天数">🔥 连续 <strong>{deckStats.streak}</strong> 天</span>
+        </section>
+      ) : null}
+
+      {showControls ? (
+        <section
+          aria-label="背词设置"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.5rem 0.8rem',
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: '1rem 0 0',
+            fontSize: '0.85rem',
+          }}
+        >
+          <span style={{ opacity: 0.7 }}>标签:</span>
+          {DECK_TAGS.map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTag(t)}
+              aria-pressed={tag === t}
+              style={{ fontWeight: tag === t ? 700 : 400, textDecoration: tag === t ? 'underline' : 'none' }}
+            >
+              {t === 'all' ? '全部' : t}
+            </button>
+          ))}
+          <button type="button" onClick={() => setShuffle((s) => !s)} aria-pressed={shuffle}>
+            <Shuffle size={14} aria-hidden="true" /> 乱序{shuffle ? ':开' : ':关'}
+          </button>
+          <button type="button" onClick={handleExport}>
+            <Download size={14} aria-hidden="true" /> 导出进度
+          </button>
+          <button type="button" onClick={() => fileInputRef.current?.click()}>
+            <Upload size={14} aria-hidden="true" /> 导入进度
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            onChange={handleImportFile}
+            style={{ display: 'none' }}
+          />
+          {importMsg ? <span style={{ width: '100%', textAlign: 'center', opacity: 0.75 }}>{importMsg}</span> : null}
         </section>
       ) : null}
 
@@ -191,7 +314,7 @@ export default function Vocabulary() {
       {user && status === 'empty' ? (
         <section style={cardStyle}>
           <Sparkles size={28} aria-hidden="true" />
-          <p style={{ marginTop: '1rem' }}>今天没有到期要复习的词,也没有新词了。明天再来 👋</p>
+          <p style={{ marginTop: '1rem' }}>这个范围今天没有要背的词了。换个标签或明天再来 👋</p>
         </section>
       ) : null}
 
@@ -232,16 +355,16 @@ export default function Vocabulary() {
 
               <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center', marginTop: '1.6rem' }}>
                 <button type="button" onClick={() => grade(REVIEW_RESULT.wrong)}>
-                  <X size={16} aria-hidden="true" /> 没记住
+                  <X size={16} aria-hidden="true" /> 没记住 <kbd>1</kbd>
                 </button>
                 <button type="button" onClick={() => grade(REVIEW_RESULT.correct)}>
-                  <Check size={16} aria-hidden="true" /> 记住了
+                  <Check size={16} aria-hidden="true" /> 记住了 <kbd>2</kbd>
                 </button>
               </div>
             </div>
           ) : (
             <div style={{ marginTop: '1.6rem' }}>
-              <button type="button" onClick={() => setRevealed(true)}>显示释义</button>
+              <button type="button" onClick={() => setRevealed(true)}>显示释义 <kbd>空格</kbd></button>
             </div>
           )}
         </section>
