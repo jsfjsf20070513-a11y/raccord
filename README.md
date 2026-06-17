@@ -17,8 +17,8 @@
 | **First public anchor_statement call** | [`tx TLYjToQB…m9vX`](https://solscan.io/tx/TLYjToQBbvDioD8NqByiBxhH6UqSgftss29NJ6LAxSZKTENLYdHFtfYrq27pEXRHZnJUY7H6y7PMjub2Qtmm9vX?cluster=devnet) → [`PDA 65RxSkm4…DaC2G8`](https://solscan.io/account/65RxSkm4UtE8tbAknGxRe9LCfDssJtGaAvZAmXDaC2G8?cluster=devnet) (statement: *"2026 春季黑客松 — 第一笔从 production 站点写的 anchor"*) |
 | **First SPL Memo anchor** (path A) | [`tx 5L76cFugq…56gv846`](https://solscan.io/tx/5L76cFugqS8qyt5XozqJr3Brt4sf7ZWhsyrqdiqmJPZ4gpDU4cnFN3Ph9TDWTYgrEEL8qsrPajpJSQwcn56gv846?cluster=devnet) |
 | **Live demo entry** | https://rucmathclass.com/witness (no Phantom required to read history) |
-| **Stack** | React 18 + Vite 5 · `@solana/web3.js` 1.95 · `@coral-xyz/anchor` 0.29 · ElevenLabs `multilingual_v2` · Anthropic `claude-opus-4.7` · Supabase (anon-only, RLS) · Cloudflare proxy + Vultr Nginx |
-| **License / audit** | MIT · `npm audit --omit=dev --audit-level=high` → 0 vulnerabilities |
+| **Stack** | React 18 + Vite 5 · `@solana/web3.js` 1.98 · `@coral-xyz/anchor` 0.29 · ElevenLabs `multilingual_v2` · Anthropic `claude-opus-4.7` · Supabase (anon-only, RLS) · Cloudflare proxy + Vultr Nginx |
+| **License / audit** | MIT · `npm audit --omit=dev --audit-level=high` → 0 vulnerabilities (5 moderate advisories remain in `@solana/web3.js` transitive deps with no upstream fix; audited 2026-06-17) |
 
 ---
 
@@ -178,14 +178,14 @@ This is the **SPL Memo read side** — `class_anchor` PDAs are read separately f
 | Layer | Tooling |
 |---|---|
 | Frontend | React 18, React Router 7, Vite 5 |
-| Solana | `@solana/web3.js` v1.95, `bs58` v6, SPL Memo program v2, Phantom-compatible injected wallet |
+| Solana | `@solana/web3.js` v1.98, `bs58` v6, SPL Memo program v2, Phantom-compatible injected wallet |
 | AI | Anthropic Claude (`claude-opus-4.7`) for bilingual reasoning, ElevenLabs `multilingual_v2` for French TTS |
 | Backend | Supabase (anon key only, RLS enforced) for optional comments / collaboration drafts |
 | Hosting | Vultr LA VPS, Nginx 1.18, Cloudflare proxy (Flexible SSL), `rucmathclass.com` registered through Cloudflare-compatible registrar |
 | Build | npm, ESLint flat config, Mermaid for architecture diagram |
 | AI-assisted dev | Codex (GPT-5.5), Claude (Opus, Sonnet), Gemini |
 
-Production audit: `npm audit --omit=dev --audit-level=high` reports **0 vulnerabilities**.
+Production audit: `npm audit --omit=dev --audit-level=high` reports **0 vulnerabilities** (audited 2026-06-17). Five `moderate` advisories remain in `@solana/web3.js` transitive dependencies (`uuid` → `jayson` → `@coral-xyz/borsh`) for which no upstream fix is yet available; none are reachable from the shipped browser bundle (the affected `ws`/`jayson` Node paths are not used by the wallet code, which relies on the browser's native WebSocket).
 
 ---
 
