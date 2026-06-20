@@ -231,24 +231,25 @@ export default function Vocabulary() {
   const tapMatch = useCallback(
     (side, id) => {
       if (phase !== 'answer' || !current) return
-      setMatch((m) => {
-        if (m.done.includes(id)) return m
-        if (!m.sel) return { ...m, sel: { side, id }, wrong: [] }
-        if (m.sel.side === side) return { ...m, sel: { side, id } }
-        if (m.sel.id === id) {
-          const done = [...m.done, id]
-          if (done.length >= current.exercise.cards.length) {
-            setPhase('feedback')
-            record(true, current)
-          }
-          return { sel: null, done, wrong: [] }
+      const m = match
+      if (m.done.includes(id)) return
+      if (!m.sel) { setMatch({ ...m, sel: { side, id }, wrong: [] }); return }
+      if (m.sel.side === side) { setMatch({ ...m, sel: { side, id } }); return }
+      if (m.sel.id === id) {
+        // correct pair — keep side effects OUT of the state updater
+        const done = [...m.done, id]
+        setMatch({ sel: null, done, wrong: [] })
+        if (done.length >= current.exercise.cards.length) {
+          setPhase('feedback')
+          record(true, current)
         }
-        const wrong = [`${m.sel.side}${m.sel.id}`, `${side}${id}`]
-        setTimeout(() => setMatch((mm) => ({ ...mm, wrong: [] })), 380)
-        return { ...m, sel: null, wrong }
-      })
+        return
+      }
+      // mismatch — flash both, then clear
+      setMatch({ ...m, sel: null, wrong: [`${m.sel.side}${m.sel.id}`, `${side}${id}`] })
+      setTimeout(() => setMatch((mm) => ({ ...mm, wrong: [] })), 380)
     },
-    [phase, current, record],
+    [phase, current, match, record],
   )
 
   const next = useCallback(() => {
@@ -496,8 +497,12 @@ export default function Vocabulary() {
     if (ex.type === EXERCISE_TYPES.match) {
       return <p className="vocab-fb is-ok">配对完成 ✓</p>
     }
-    const correct = ex.type === EXERCISE_TYPES.recognition ? ex.answer : (current.word?.french || ex.answer)
-    const gloss = current.word?.chinese
+    // recognition answer is the Chinese gloss; build answer is the full
+    // sentence; the rest (cloze/listen/spelling) resolve to the French headword.
+    const correct = (ex.type === EXERCISE_TYPES.recognition || ex.type === EXERCISE_TYPES.build)
+      ? ex.answer
+      : (current.word?.french || ex.answer)
+    const gloss = ex.type === EXERCISE_TYPES.build ? null : current.word?.chinese
     return (
       <div className={`vocab-fb ${lastCorrect ? 'is-ok' : 'is-no'}`}>
         <p className="vocab-fb-verdict">{lastCorrect ? '答对 ✓ Juste' : '答错 ✗ Faux'}</p>
