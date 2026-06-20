@@ -18,10 +18,6 @@ export default function Layout() {
       return navItems[0]
     }
 
-    if (pathname === '/gallery' || pathname.startsWith('/album/')) {
-      return null
-    }
-
     if (pathname.startsWith('/resources')) {
       return navItems[1]
     }

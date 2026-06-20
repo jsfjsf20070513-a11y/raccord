@@ -18,17 +18,12 @@ import { useUserRole } from './hooks/useUserRole'
 import Home from './pages/Home'
 import './App.css'
 
-const Gallery = lazy(() => import('./pages/Gallery'))
-const AlbumDetail = lazy(() => import('./pages/AlbumDetail'))
-const HackathonShowcase = lazy(() => import('./pages/HackathonShowcase'))
-const Web3StudentProfile = lazy(() => import('./pages/Web3StudentProfile'))
 const Resources = lazy(() => import('./pages/Resources'))
 const ResourceDetail = lazy(() => import('./pages/ResourceDetail'))
 const ResourceCurate = lazy(() => import('./pages/ResourceCurate'))
 const ManageHub = lazy(() => import('./pages/ManageHub'))
 const MaterialsDesk = lazy(() => import('./pages/MaterialsDesk'))
 const ModerationCenter = lazy(() => import('./pages/ModerationCenter'))
-const GalleryContribute = lazy(() => import('./pages/GalleryContribute'))
 const Login = lazy(() => import('./pages/Login'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const NotFound = lazy(() => import('./pages/NotFound'))
@@ -165,15 +160,17 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<ReadyPage><Home /></ReadyPage>} />
-        <Route path="hackathon" element={<DeferredPage><HackathonShowcase /></DeferredPage>} />
-        <Route path="web3-profile" element={<DeferredPage><Web3StudentProfile /></DeferredPage>} />
         <Route path="witness" element={<DeferredPage><SolanaWitness /></DeferredPage>} />
-        {/* Backwards-compat: I previously shared /web3-student-profile in convo. Redirect so any saved link still works. */}
-        <Route path="web3-student-profile" element={<Navigate to="/web3-profile" replace />} />
+        {/* 已下线页面 → 重定向兜底,旧链接/书签不硬 404。
+            黑客松陈列与 web3 个人页撤除,链上能力保留在「班级寄语墙」/witness;
+            图版(涉及同学人脸)整体下线,回首页。 */}
+        <Route path="hackathon" element={<Navigate to="/witness" replace />} />
+        <Route path="web3-profile" element={<Navigate to="/witness" replace />} />
+        <Route path="web3-student-profile" element={<Navigate to="/witness" replace />} />
+        <Route path="gallery" element={<Navigate to="/" replace />} />
+        <Route path="gallery/contribute" element={<Navigate to="/" replace />} />
+        <Route path="album/*" element={<Navigate to="/" replace />} />
         <Route path="class-info" element={<Navigate to="/" replace />} />
-        <Route path="gallery" element={<DeferredPage><Gallery /></DeferredPage>} />
-        <Route path="gallery/contribute" element={<DeferredPage><GalleryContribute /></DeferredPage>} />
-        <Route path="album/:id" element={<DeferredPage><AlbumDetail /></DeferredPage>} />
         <Route path="timeline/*" element={<Navigate to="/" replace />} />
         <Route path="announcements/*" element={<Navigate to="/" replace />} />
         <Route path="vocabulary" element={<DeferredPage><Vocabulary /></DeferredPage>} />
