@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, Check, Download, RotateCcw, Shuffle, Sparkles, Upload, X } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import { useAuth } from '../context/useAuth'
 import { frenchVocabulary } from '../data/frenchVocabulary'
@@ -35,13 +34,14 @@ function shuffled(arr) {
   return a
 }
 
-const cardStyle = {
-  border: '1px solid var(--rule, #d8d2c4)',
-  borderRadius: '10px',
-  padding: '2.4rem 1.8rem',
-  textAlign: 'center',
-  background: 'var(--surface, #fcfbf7)',
-  marginTop: '1.4rem',
+// Accent the figure inside an otherwise-muted stat label, no emoji — matches the
+// site's editorial palette (--accent / --muted) rather than shouting with icons.
+function Stat({ label, value }) {
+  return (
+    <span>
+      {label} <span style={{ color: 'var(--accent)' }}>{value}</span>
+    </span>
+  )
 }
 
 export default function Vocabulary() {
@@ -73,7 +73,6 @@ export default function Vocabulary() {
         return
       }
       const now = new Date().toISOString()
-      // Progress stats always reflect the WHOLE deck, not the current filter.
       setDeckStats({
         ...computeDeckStats({ deck: VALID_DECK, stateMap: states, now }),
         streak: computeStudyStreak(Object.values(states), now),
@@ -195,15 +194,10 @@ export default function Vocabulary() {
     [user, load],
   )
 
-  const progress = useMemo(
-    () => (queue.length ? `${Math.min(index + 1, queue.length)} / ${queue.length}` : '0 / 0'),
-    [index, queue.length],
-  )
-
   const showControls = user && (status === 'ready' || status === 'empty' || status === 'done')
 
   return (
-    <main className="page page-narrow">
+    <main className="page page-narrow vocab-page">
       <PageHeader
         kicker="Carnet de vocabulaire · 法语背词"
         title="间隔重复背词器"
@@ -211,163 +205,160 @@ export default function Vocabulary() {
         meta={[`词库 ${VALID_DECK.length} 条`, '空格翻面 · 1 没记住 · 2 记住了']}
       />
 
-      {user && deckStats ? (
-        <section
-          aria-label="学习进度"
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.6rem 1.4rem',
-            justifyContent: 'center',
-            margin: '0.6rem 0 0',
-            fontSize: '0.9rem',
-          }}
+      {user && status === 'ready' && current ? (
+        <div
+          className="vocab-progress"
+          role="progressbar"
+          aria-label="本轮进度"
+          aria-valuenow={index + 1}
+          aria-valuemin={1}
+          aria-valuemax={queue.length}
         >
-          <span title="今天可学(新词 + 到期复习)">📅 今日到期 <strong>{deckStats.due}</strong></span>
-          <span title="已掌握(达到 30 天间隔阶)">✅ 已掌握 <strong>{deckStats.mastered}</strong></span>
-          <span title="学习中(已见过但未掌握)">📖 学习中 <strong>{deckStats.learning}</strong></span>
-          <span title="还没开始背的新词">✨ 新词 <strong>{deckStats.newCount}</strong></span>
-          <span title="连续背词天数">🔥 连续 <strong>{deckStats.streak}</strong> 天</span>
-        </section>
-      ) : null}
-
-      {showControls ? (
-        <section
-          aria-label="背词设置"
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.5rem 0.8rem',
-            justifyContent: 'center',
-            alignItems: 'center',
-            margin: '1rem 0 0',
-            fontSize: '0.85rem',
-          }}
-        >
-          <span style={{ opacity: 0.7 }}>标签:</span>
-          {DECK_TAGS.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTag(t)}
-              aria-pressed={tag === t}
-              style={{ fontWeight: tag === t ? 700 : 400, textDecoration: tag === t ? 'underline' : 'none' }}
-            >
-              {t === 'all' ? '全部' : t}
-            </button>
-          ))}
-          <button type="button" onClick={() => setShuffle((s) => !s)} aria-pressed={shuffle}>
-            <Shuffle size={14} aria-hidden="true" /> 乱序{shuffle ? ':开' : ':关'}
-          </button>
-          <button type="button" onClick={handleExport}>
-            <Download size={14} aria-hidden="true" /> 导出进度
-          </button>
-          <button type="button" onClick={() => fileInputRef.current?.click()}>
-            <Upload size={14} aria-hidden="true" /> 导入进度
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/json,.json"
-            onChange={handleImportFile}
-            style={{ display: 'none' }}
-          />
-          {importMsg ? <span style={{ width: '100%', textAlign: 'center', opacity: 0.75 }}>{importMsg}</span> : null}
-        </section>
+          <span className="vocab-progress-label">{current.isNew ? '新词' : '复习'}</span>
+          <span className="vocab-progress-track" aria-hidden="true">
+            <span
+              className="vocab-progress-fill"
+              style={{ width: `${Math.round(((index + 1) / queue.length) * 100)}%` }}
+            />
+          </span>
+          <span className="vocab-progress-count">{index + 1} / {queue.length}</span>
+        </div>
       ) : null}
 
       {!user ? (
-        <section style={cardStyle}>
-          <BookOpen size={28} aria-hidden="true" />
-          <p style={{ marginTop: '1rem' }}>背词进度按账号保存,请先登录。</p>
-          <p style={{ marginTop: '1rem' }}>
-            <Link to="/login">前往登录 · Se connecter</Link>
-          </p>
-        </section>
+        <div className="vocab-card vocab-notice">
+          <p>背词进度按账号保存,请先登录。</p>
+          <p className="editorial-actions"><Link to="/login" className="text-button">前往登录 · Se connecter</Link></p>
+        </div>
       ) : null}
 
       {user && status === 'loading' ? (
-        <section style={cardStyle}><p>正在加载你的背词进度…</p></section>
+        <div className="vocab-card vocab-notice"><p className="daily-entry-meta">正在加载你的背词进度…</p></div>
       ) : null}
 
       {user && status === 'disabled' ? (
-        <section style={cardStyle}>
-          <p>站点尚未配置 Supabase,背词功能暂不可用。</p>
-        </section>
+        <div className="vocab-card vocab-notice"><p>站点尚未配置 Supabase,背词功能暂不可用。</p></div>
       ) : null}
 
       {user && status === 'compat' ? (
-        <section style={cardStyle}>
+        <div className="vocab-card vocab-notice">
           <p>背词数据表还没建立。请在 Supabase 执行 <code>setup_vocabulary.sql</code> 后再来。</p>
-        </section>
+        </div>
       ) : null}
 
       {user && status === 'error' ? (
-        <section style={cardStyle}>
+        <div className="vocab-card vocab-notice">
           <p>出错了:{errorMessage}</p>
-          <p style={{ marginTop: '1rem' }}>
-            <button type="button" onClick={load}>重试</button>
-          </p>
-        </section>
+          <p className="editorial-actions"><button type="button" className="text-button" onClick={load}>重试</button></p>
+        </div>
       ) : null}
 
       {user && status === 'empty' ? (
-        <section style={cardStyle}>
-          <Sparkles size={28} aria-hidden="true" />
-          <p style={{ marginTop: '1rem' }}>这个范围今天没有要背的词了。换个标签或明天再来 👋</p>
-        </section>
+        <div className="vocab-card vocab-notice">
+          <p>这个范围今天没有要背的词了。换个标签或明天再来。</p>
+        </div>
       ) : null}
 
       {user && status === 'done' ? (
-        <section style={cardStyle}>
-          <Sparkles size={28} aria-hidden="true" />
-          <p style={{ marginTop: '1rem' }}>本轮完成!答对 {stats.correct} · 答错 {stats.wrong}</p>
-          <p style={{ marginTop: '1rem' }}>
-            <button type="button" onClick={load}>
-              <RotateCcw size={16} aria-hidden="true" /> 再来一轮
-            </button>
-          </p>
-        </section>
+        <div className="vocab-card vocab-notice">
+          <p>本轮完成 — 答对 <span style={{ color: 'var(--accent)' }}>{stats.correct}</span> · 答错 <span style={{ color: 'var(--accent)' }}>{stats.wrong}</span>。</p>
+          <p className="editorial-actions"><button type="button" className="text-button" onClick={load}>再来一轮</button></p>
+        </div>
       ) : null}
 
       {user && status === 'ready' && current ? (
-        <section style={cardStyle}>
-          <p style={{ fontSize: '0.85rem', opacity: 0.7 }}>
-            {progress} · {current.isNew ? '新词 nouveau' : '复习 révision'} · {current.word.tag || ''}
+        <div className="vocab-card">
+          <p className="daily-entry-kicker vocab-card-kicker">
+            {current.isNew ? '新词 nouveau' : '复习 révision'}{current.word.tag ? ` · ${current.word.tag}` : ''}
           </p>
 
-          <p style={{ fontSize: '2rem', margin: '1.2rem 0 0.4rem' }} lang="fr">
-            {current.word.french}
-          </p>
+          <p className="vocab-word" lang="fr">{current.word.french}</p>
           {current.word.pos === 'noun' && current.word.gender ? (
-            <p style={{ opacity: 0.7 }}>({current.word.gender === 'm' ? 'masculin' : 'féminin'})</p>
+            <p className="daily-entry-meta vocab-gender">{current.word.gender === 'm' ? 'masculin' : 'féminin'}</p>
           ) : null}
 
           {revealed ? (
-            <div style={{ marginTop: '1.2rem' }}>
-              <p style={{ fontSize: '1.4rem' }}>{current.word.chinese}</p>
+            <div className="vocab-reveal">
+              <div className="theorem-explanation-block">
+                <p className="theorem-explanation-lang" aria-hidden="true">中文</p>
+                <p className="vocab-chinese">{current.word.chinese}</p>
+              </div>
               {current.word.conjugation ? (
-                <p style={{ opacity: 0.75, marginTop: '0.4rem' }} lang="fr">变位:{current.word.conjugation}</p>
+                <div className="theorem-explanation-block">
+                  <p className="theorem-explanation-lang" aria-hidden="true">Conjugaison</p>
+                  <p lang="fr">{current.word.conjugation}</p>
+                </div>
               ) : null}
               {current.word.example ? (
-                <p style={{ opacity: 0.75, marginTop: '0.4rem' }} lang="fr">« {current.word.example} »</p>
+                <div className="theorem-explanation-block">
+                  <p className="theorem-explanation-lang" aria-hidden="true">Exemple</p>
+                  <p lang="fr">« {current.word.example} »</p>
+                </div>
               ) : null}
 
-              <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center', marginTop: '1.6rem' }}>
-                <button type="button" onClick={() => grade(REVIEW_RESULT.wrong)}>
-                  <X size={16} aria-hidden="true" /> 没记住 <kbd>1</kbd>
+              <div className="editorial-actions vocab-grade">
+                <button type="button" className="text-button subtle" onClick={() => grade(REVIEW_RESULT.wrong)}>
+                  没记住 <span className="vocab-key">1</span>
                 </button>
-                <button type="button" onClick={() => grade(REVIEW_RESULT.correct)}>
-                  <Check size={16} aria-hidden="true" /> 记住了 <kbd>2</kbd>
+                <button type="button" className="text-button" onClick={() => grade(REVIEW_RESULT.correct)}>
+                  记住了 <span className="vocab-key">2</span>
                 </button>
               </div>
             </div>
           ) : (
-            <div style={{ marginTop: '1.6rem' }}>
-              <button type="button" onClick={() => setRevealed(true)}>显示释义 <kbd>空格</kbd></button>
+            <div className="editorial-actions vocab-grade">
+              <button type="button" className="text-button" onClick={() => setRevealed(true)}>
+                显示释义 <span className="vocab-key">空格</span>
+              </button>
             </div>
           )}
-        </section>
+        </div>
+      ) : null}
+
+      {showControls ? (
+        <footer className="vocab-footer">
+          <div className="editorial-actions tabs vocab-tags">
+            <span className="theorem-explanation-lang" aria-hidden="true">标签</span>
+            {DECK_TAGS.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTag(t)}
+                aria-pressed={tag === t}
+                className={`text-button${tag === t ? '' : ' subtle'}`}
+              >
+                {t === 'all' ? '全部' : t}
+              </button>
+            ))}
+            <span className="vocab-dot" aria-hidden="true">·</span>
+            <button type="button" className="text-button subtle" onClick={() => setShuffle((s) => !s)} aria-pressed={shuffle}>
+              乱序 {shuffle ? '开' : '关'}
+            </button>
+            <button type="button" className="text-button subtle" onClick={handleExport}>导出</button>
+            <button type="button" className="text-button subtle" onClick={() => fileInputRef.current?.click()}>导入</button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/json,.json"
+              onChange={handleImportFile}
+              style={{ display: 'none' }}
+            />
+          </div>
+
+          {deckStats ? (
+            <p className="daily-entry-meta vocab-stats" aria-label="学习进度">
+              <Stat label="已掌握" value={deckStats.mastered} />
+              <span className="vocab-dot" aria-hidden="true">·</span>
+              <Stat label="学习中" value={deckStats.learning} />
+              <span className="vocab-dot" aria-hidden="true">·</span>
+              <Stat label="新词" value={deckStats.newCount} />
+              <span className="vocab-dot" aria-hidden="true">·</span>
+              <Stat label="连续" value={`${deckStats.streak} 天`} />
+            </p>
+          ) : null}
+
+          {importMsg ? <p className="status-line vocab-msg">{importMsg}</p> : null}
+        </footer>
       ) : null}
     </main>
   )
