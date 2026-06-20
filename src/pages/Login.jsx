@@ -11,13 +11,13 @@ const OTP_RESEND_SECONDS = 60
 const COPY = {
   login: {
     title: 'Sign in · 登录',
-    summary: 'Access your collaborative records and class workspace.',
+    summary: '登录以跨设备同步你的背词进度。· Sync your vocabulary progress across devices.',
     submit: 'Sign in',
     submitting: 'Signing in…',
   },
   signup: {
     title: 'Create account · 注册',
-    summary: 'Set up an account scoped to this class website.',
+    summary: '注册一个本班网站的账号,保存背词进度。· Create an account to save your vocabulary progress.',
     submit: 'Create account',
     submitting: 'Creating…',
   },
@@ -136,7 +136,7 @@ export default function Login() {
         }
         const { error } = await supabase.auth.signInWithPassword({ email: finalEmail, password })
         if (error) throw error
-        navigate('/')
+        navigate('/vocabulary')
         return
       }
 
@@ -163,7 +163,7 @@ export default function Login() {
 
         if (error) throw error
         if (data.session) {
-          navigate('/')
+          navigate('/vocabulary')
           return
         }
         setMessage({
@@ -193,7 +193,7 @@ export default function Login() {
           type: 'email',
         })
         if (error) throw error
-        navigate('/')
+        navigate('/vocabulary')
         return
       }
 
@@ -226,13 +226,20 @@ export default function Login() {
   return (
     <article className="page-column">
       <PageHeader
-        kicker="Authentication"
+        kicker="Authentification"
         title={copy.title}
         summary={copy.summary}
         backTo="/"
         backLabel="Back to title page · 返回扉页"
         showRule={false}
       />
+
+      {mode === 'login' ? (
+        <ul className="login-values">
+          <li><span className="login-value-mark" aria-hidden="true">◆</span> 背词进度跨设备同步 —— 手机上背的,电脑上接着背。</li>
+          <li><span className="login-value-mark" aria-hidden="true">◆</span> 班级 AI 助手 —— 双语数学答疑,登录后可用<span className="login-value-soon">(即将开放)</span>。</li>
+        </ul>
+      ) : null}
 
       <section className="page-section">
         <div className="editorial-actions tabs">
