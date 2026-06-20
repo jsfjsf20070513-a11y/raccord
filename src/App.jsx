@@ -180,16 +180,20 @@ function AppRoutes() {
         <Route path="resources" element={<DeferredPage><Resources /></DeferredPage>} />
         <Route path="resources/curate" element={<DeferredPage><ResourceCurate /></DeferredPage>} />
         <Route path="resources/:id" element={<DeferredPage><ResourceDetail /></DeferredPage>} />
-        <Route path="manage" element={<DeferredPage><ManageHub /></DeferredPage>} />
-        <Route path="manage/materials" element={<DeferredPage><MaterialsDesk /></DeferredPage>} />
+        {/* 协作工作台改称 Atelier;旧 /manage/* 链接重定向到新路径保持兼容。 */}
+        <Route path="atelier" element={<DeferredPage><ManageHub /></DeferredPage>} />
+        <Route path="atelier/materials" element={<DeferredPage><MaterialsDesk /></DeferredPage>} />
         <Route
-          path="manage/review"
+          path="atelier/review"
           element={(
             <AdminRoute>
               <DeferredPage><ModerationCenter /></DeferredPage>
             </AdminRoute>
           )}
         />
+        <Route path="manage" element={<Navigate to="/atelier" replace />} />
+        <Route path="manage/materials" element={<Navigate to="/atelier/materials" replace />} />
+        <Route path="manage/review" element={<Navigate to="/atelier/review" replace />} />
         <Route path="login" element={<DeferredPage><Login /></DeferredPage>} />
         <Route path="reset-password" element={<DeferredPage><ResetPassword /></DeferredPage>} />
         <Route path="404" element={<DeferredPage><NotFound /></DeferredPage>} />

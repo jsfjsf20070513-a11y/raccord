@@ -2,10 +2,10 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 
 const navItems = [
-  { to: '/', label: 'Home · 扉页' },
-  { to: '/resources', label: 'Resources · 资源' },
-  { to: '/vocabulary', label: 'Vocab · 背词' },
-  { to: '/manage', label: 'Collaboration · 协作' },
+  { to: '/', label: 'Accueil · 扉页' },
+  { to: '/resources', label: 'Ressources · 资源' },
+  { to: '/vocabulary', label: 'Vocabulaire · 背词' },
+  { to: '/atelier', label: 'Atelier · 协作' },
 ]
 
 export default function Layout() {
@@ -30,12 +30,16 @@ export default function Layout() {
       return navItems[2]
     }
 
+    // 班级寄语墙 / 链上见证迁到「协作」之下,导航不再单独暴露「黑客松/展示」。
+    // hackathon/web3 旧页在删除前仍可达,但导航高亮统一落到 Atelier。
     if (
-      pathname.startsWith('/hackathon')
+      pathname.startsWith('/atelier')
+      || pathname.startsWith('/manage')
+      || pathname.startsWith('/hackathon')
       || pathname.startsWith('/web3-profile')
       || pathname.startsWith('/witness')
     ) {
-      return { to: '/hackathon', label: 'Showcase · 展示' }
+      return navItems[3]
     }
 
     return navItems[3]
