@@ -3996,6 +3996,30 @@
 .reset-state p:last-child { margin-bottom: 0; }
 .reset-ok { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ok); }
 
+/* ── ResourceCurate · 资源增补 (centered masthead + left-aligned form) ── */
+.curate-form { max-width: 32rem; margin: 38px auto 0; }
+.curate-form label { display: block; margin: 0 0 26px; }
+.curate-form label > span { display: block; margin-bottom: 8px; color: var(--muted); font-size: 14px; }
+.curate-form input,
+.curate-form select,
+.curate-form textarea {
+  width: 100%;
+  padding: 9px 0;
+  border: none;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.3);
+  background: transparent;
+  font-family: inherit;
+  font-size: 18px;
+  color: var(--ink);
+}
+.curate-form textarea { line-height: 1.6; resize: vertical; }
+.curate-form select { cursor: pointer; }
+.curate-form input:focus,
+.curate-form select:focus,
+.curate-form textarea:focus { outline: none; border-bottom-color: var(--accent); }
+.curate-actions { margin-top: 8px; gap: 24px; align-items: baseline; }
+.curate-note { margin: 8px 0 0; color: var(--muted); font-size: 13px; font-style: italic; }
+
 /* ── Login · value-prop bullets (login mode) ───────────────────────── */
 .login-values {
   list-style: none;
