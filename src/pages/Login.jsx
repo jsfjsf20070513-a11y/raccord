@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import DailyMeditation from '../components/DailyMeditation'
-import PageHeader from '../components/PageHeader'
 import PasswordField from '../components/PasswordField'
 import { supabase, isSupabaseConfigured, SUPABASE_MISSING_MESSAGE } from '../lib/supabase'
 
@@ -10,46 +9,45 @@ const OTP_RESEND_SECONDS = 60
 
 const COPY = {
   login: {
-    title: 'Sign in · 登录',
-    summary: '登录以跨设备同步你的背词进度。· Sync your vocabulary progress across devices.',
-    submit: 'Sign in',
-    submitting: 'Signing in…',
+    title: '登录 · Connexion',
+    summary: '登录后,背词进度跨设备同步。',
+    submit: '登录 · Connexion',
+    submitting: '登录中…',
   },
   signup: {
-    title: 'Create account · 注册',
-    summary: '注册一个本班网站的账号,保存背词进度。· Create an account to save your vocabulary progress.',
-    submit: 'Create account',
-    submitting: 'Creating…',
+    title: '注册 · Créer un compte',
+    summary: '注册一个账号,保存你的背词进度。',
+    submit: '注册 · Créer un compte',
+    submitting: '注册中…',
   },
   forgot: {
-    title: 'Reset password · 找回密码',
-    summary: 'Receive a password reset link by email.',
-    submit: 'Send reset link',
-    submitting: 'Sending…',
+    title: '找回密码 · Mot de passe oublié',
+    summary: '通过邮箱接收密码重置链接。',
+    submit: '发送重置链接 · Envoyer le lien',
+    submitting: '发送中…',
   },
   otp: {
-    title: 'Code sign-in · 验证码登录',
-    summary: 'Sign in to an existing account with a one-time code emailed to you.',
-    submit: 'Send code · 发送验证码',
-    submitting: 'Sending… · 发送中…',
-    verify: 'Verify & sign in · 验证并登录',
-    verifying: 'Verifying… · 验证中…',
+    title: '验证码登录 · Code',
+    summary: '用邮箱验证码登录已有账号。',
+    submit: '发送验证码 · Envoyer le code',
+    submitting: '发送中…',
+    verify: '验证并登录 · Vérifier',
+    verifying: '验证中…',
   },
 }
 
 const ERRORS = {
-  invalidPhone: 'Enter a valid 11-digit Chinese mobile number. · 请输入有效的 11 位手机号码。',
-  realNameRequired: 'Real name is required. · 请填写真实姓名。',
-  nicknameRequired: 'Nickname is required. · 请填写昵称。',
-  passwordTooShort: 'Password must be at least 6 characters. · 密码至少需要 6 位字符。',
-  passwordMismatch: 'The two passwords do not match. · 两次输入的密码不一致。',
-  emailRequired: 'Enter an email address. · 请输入邮箱地址。',
-  otpCodeRequired: 'Enter the 6-digit code from your email. · 请输入邮箱收到的 6 位验证码。',
-  generic: 'Operation failed. Please try again later. · 操作失败，请稍后重试。',
+  invalidPhone: '请输入有效的 11 位手机号码。',
+  realNameRequired: '请填写真实姓名。',
+  nicknameRequired: '请填写昵称。',
+  passwordTooShort: '密码至少需要 6 位字符。',
+  passwordMismatch: '两次输入的密码不一致。',
+  emailRequired: '请输入邮箱地址。',
+  otpCodeRequired: '请输入邮箱收到的 6 位验证码。',
+  generic: '操作失败,请稍后重试。',
 }
 
 export default function Login() {
-  const navigate = useNavigate()
   const [mode, setMode] = useState('login')
   const [loginMethod, setLoginMethod] = useState('email')
   const [email, setEmail] = useState('')
@@ -60,6 +58,9 @@ export default function Login() {
   const [realName, setRealName] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
+  // After a successful sign-in we don't auto-navigate; we offer a destination
+  // choice (背词 / 寄语墙) so the user lands where they meant to.
+  const [signedIn, setSignedIn] = useState(false)
   // OTP (email verification code) flow: otpSent gates the two steps
   // (request code → verify code); resendCountdown throttles re-requests.
   const [otpSent, setOtpSent] = useState(false)
@@ -111,7 +112,7 @@ export default function Login() {
     try {
       await requestOtp()
       setResendCountdown(OTP_RESEND_SECONDS)
-      setMessage({ type: 'success', text: 'Code resent. · 验证码已重发。' })
+      setMessage({ type: 'success', text: '验证码已重新发送。' })
     } catch (error) {
       setMessage({ type: 'error', text: error.message || ERRORS.generic })
     } finally {
@@ -136,7 +137,7 @@ export default function Login() {
         }
         const { error } = await supabase.auth.signInWithPassword({ email: finalEmail, password })
         if (error) throw error
-        navigate('/vocabulary')
+        setSignedIn(true)
         return
       }
 
@@ -163,12 +164,12 @@ export default function Login() {
 
         if (error) throw error
         if (data.session) {
-          navigate('/vocabulary')
+          setSignedIn(true)
           return
         }
         setMessage({
           type: 'success',
-          text: 'Account created. If email confirmation is enabled, check your inbox to verify. · 注册完成。若启用了邮箱确认，请先前往邮箱验证。',
+          text: '注册完成。若启用了邮箱确认,请先前往邮箱验证。',
         })
         return
       }
@@ -180,7 +181,7 @@ export default function Login() {
           setResendCountdown(OTP_RESEND_SECONDS)
           setMessage({
             type: 'success',
-            text: 'Code sent. Check your email and enter it below. · 验证码已发送，请查收邮箱并在下方输入。',
+            text: '验证码已发送,请查收邮箱并在下方输入。',
           })
           return
         }
@@ -193,7 +194,7 @@ export default function Login() {
           type: 'email',
         })
         if (error) throw error
-        navigate('/vocabulary')
+        setSignedIn(true)
         return
       }
 
@@ -208,7 +209,7 @@ export default function Login() {
       if (error) throw error
       setMessage({
         type: 'success',
-        text: 'Reset link sent. Please check your email. · 重置链接已发送，请检查邮箱。',
+        text: '重置链接已发送,请检查邮箱。',
       })
     } catch (error) {
       setMessage({ type: 'error', text: error.message || ERRORS.generic })
@@ -223,60 +224,70 @@ export default function Login() {
         : (loading ? copy.submitting : copy.submit))
     : (loading ? copy.submitting : copy.submit)
 
+  // ── after a successful sign-in: where to? ──
+  if (signedIn) {
+    return (
+      <article className="page-column login-page">
+        <header className="login-masthead">
+          <p className="login-eyebrow">Connecté · 已登录</p>
+          <h1 className="login-title">欢迎回来</h1>
+          <p className="login-summary">接下来去哪儿?</p>
+        </header>
+        <div className="login-dest">
+          <Link to="/vocabulary" className="vocab-verify">去背词 →</Link>
+          <Link to="/witness" className="vocab-verify">去寄语墙 →</Link>
+        </div>
+        <DailyMeditation offset={7} />
+      </article>
+    )
+  }
+
   return (
-    <article className="page-column">
-      <PageHeader
-        kicker="Authentification"
-        title={copy.title}
-        summary={copy.summary}
-        backTo="/"
-        backLabel="Back to title page · 返回扉页"
-        showRule={false}
-      />
+    <article className="page-column login-page">
+      <header className="login-masthead">
+        <Link to="/" className="login-back">返回扉页 · Retour</Link>
+        <p className="login-eyebrow">Authentification</p>
+        <h1 className="login-title">{copy.title}</h1>
+        <p className="login-summary">{copy.summary}</p>
+      </header>
 
       {mode === 'login' ? (
         <ul className="login-values">
-          <li><span className="login-value-mark" aria-hidden="true">◆</span> 背词进度跨设备同步 —— 手机上背的,电脑上接着背。</li>
-          <li><span className="login-value-mark" aria-hidden="true">◆</span> 班级 AI 助手 —— 双语数学答疑,登录后可用<span className="login-value-soon">(即将开放)</span>。</li>
+          <li>
+            <span className="login-value-mark" aria-hidden="true">◆</span>
+            <span className="login-value-text">背词进度跨设备同步 —— 手机上背的,电脑上接着背。</span>
+          </li>
+          <li>
+            <span className="login-value-mark" aria-hidden="true">◆</span>
+            <span className="login-value-text">班级 AI 助手 —— 双语数学答疑,登录后可用<span className="login-value-soon">(即将开放)</span>。</span>
+          </li>
         </ul>
       ) : null}
 
-      <section className="page-section">
-        <div className="editorial-actions tabs">
-          <button type="button" className={`text-button ${mode === 'login' ? 'active' : ''}`} onClick={() => switchMode('login')}>
-            Sign in · 登录
-          </button>
-          <button type="button" className={`text-button ${mode === 'signup' ? 'active' : ''}`} onClick={() => switchMode('signup')}>
-            Sign up · 注册
-          </button>
-          <button type="button" className={`text-button ${mode === 'otp' ? 'active' : ''}`} onClick={() => switchMode('otp')}>
-            Code · 验证码
-          </button>
-          <button type="button" className={`text-button ${mode === 'forgot' ? 'active' : ''}`} onClick={() => switchMode('forgot')}>
-            Reset password · 找回密码
-          </button>
+      <section className="login-section">
+        <div className="editorial-actions tabs login-tabs">
+          <button type="button" className={`text-button ${mode === 'login' ? 'active' : ''}`} onClick={() => switchMode('login')}>登录</button>
+          <button type="button" className={`text-button ${mode === 'signup' ? 'active' : ''}`} onClick={() => switchMode('signup')}>注册</button>
+          <button type="button" className={`text-button ${mode === 'otp' ? 'active' : ''}`} onClick={() => switchMode('otp')}>验证码</button>
+          <button type="button" className={`text-button ${mode === 'forgot' ? 'active' : ''}`} onClick={() => switchMode('forgot')}>找回密码</button>
         </div>
 
         {mode === 'login' || mode === 'signup' ? (
-          <div className="editorial-actions tabs">
-            <button type="button" className={`text-button ${loginMethod === 'email' ? 'active' : ''}`} onClick={() => setLoginMethod('email')}>
-              Email · 邮箱
-            </button>
-            <button type="button" className={`text-button ${loginMethod === 'phone' ? 'active' : ''}`} onClick={() => setLoginMethod('phone')}>
-              Phone · 手机
-            </button>
+          <div className="editorial-actions tabs login-tabs">
+            <button type="button" className={`text-button ${loginMethod === 'email' ? 'active' : ''}`} onClick={() => setLoginMethod('email')}>邮箱</button>
+            <button type="button" className={`text-button ${loginMethod === 'phone' ? 'active' : ''}`} onClick={() => setLoginMethod('phone')}>手机</button>
           </div>
         ) : null}
 
-        <form className="editorial-form" onSubmit={handleSubmit}>
+        <form className="editorial-form login-form" onSubmit={handleSubmit}>
           {mode === 'signup' ? (
             <>
               <label>
-                <span>Real name · 真实姓名</span>
+                <span>真实姓名 · Nom</span>
                 <input value={realName} onChange={(event) => setRealName(event.target.value)} required />
               </label>
               <label>
-                <span>Nickname · 昵称</span>
+                <span>昵称 · Pseudo</span>
                 <input value={nickname} onChange={(event) => setNickname(event.target.value)} required />
               </label>
             </>
@@ -284,7 +295,7 @@ export default function Login() {
 
           {mode === 'forgot' || mode === 'otp' || loginMethod === 'email' ? (
             <label>
-              <span>Email · 邮箱</span>
+              <span>邮箱 · E-mail</span>
               <input
                 type="email"
                 value={email}
@@ -295,11 +306,11 @@ export default function Login() {
             </label>
           ) : (
             <label>
-              <span>Phone · 手机号</span>
+              <span>手机号 · Téléphone</span>
               <input
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
-                placeholder="11-digit mobile number · 11 位手机号"
+                inputMode="numeric"
                 required
               />
             </label>
@@ -307,7 +318,7 @@ export default function Login() {
 
           {mode === 'login' || mode === 'signup' ? (
             <PasswordField
-              label="Password · 密码"
+              label="密码 · Mot de passe"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
@@ -317,7 +328,7 @@ export default function Login() {
 
           {mode === 'signup' ? (
             <PasswordField
-              label="Confirm password · 确认密码"
+              label="确认密码 · Confirmer"
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
               required
@@ -328,31 +339,29 @@ export default function Login() {
           {mode === 'otp' && otpSent ? (
             <>
               <label>
-                <span>Verification code · 验证码</span>
+                <span>验证码 · Code</span>
                 <input
                   value={otpCode}
                   onChange={(event) => setOtpCode(event.target.value)}
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  placeholder="6-digit code · 6 位验证码"
                   required
                 />
               </label>
               <div className="editorial-actions">
                 <button type="button" className="text-button" onClick={handleResendOtp} disabled={loading || resendCountdown > 0}>
                   {resendCountdown > 0
-                    ? `Resend in ${resendCountdown}s · ${resendCountdown} 秒后可重发`
-                    : 'Resend code · 重新发送'}
+                    ? `${resendCountdown} 秒后可重新发送`
+                    : '重新发送 · Renvoyer'}
                 </button>
               </div>
             </>
           ) : null}
 
-          <div className="editorial-actions">
-            <button type="submit" className="text-button" disabled={loading}>
+          <div className="editorial-actions login-submit">
+            <button type="submit" className="vocab-verify" disabled={loading}>
               {submitLabel}
             </button>
-            {mode === 'login' ? <Link to="/manage">Open collaboration desk · 进入协作</Link> : null}
           </div>
           {message ? <p className={`status-line ${message.type === 'error' ? 'is-error' : 'is-success'}`}>{message.text}</p> : null}
         </form>

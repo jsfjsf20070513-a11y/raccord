@@ -3892,6 +3892,58 @@
 }
 .atelier-teaser-desc { margin: 8px 0 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
 
+/* ── Login · 登录 (centered masthead + underline form) ──────────────── */
+.login-masthead { text-align: center; }
+.login-back,
+.login-back:visited { display: inline-block; margin-bottom: 18px; border-bottom: 1px solid var(--rule); color: var(--muted); font-size: 14px; }
+.login-back:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.login-eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.login-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 30px;
+  font-weight: 500;
+}
+.login-summary { margin: 14px auto 0; max-width: 30rem; color: var(--muted); font-size: 15px; }
+
+.login-section { margin-top: 36px; }
+.login-tabs { justify-content: center; }
+.login-form { max-width: 22rem; margin: 28px auto 0; text-align: center; }
+.login-form label { display: block; margin: 0 0 20px; }
+.login-form label > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.login-form input {
+  width: 100%;
+  padding: 8px 0;
+  border: none;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.3);
+  background: transparent;
+  font-size: 20px;
+  text-align: center;
+  color: var(--ink);
+}
+.login-form input:focus { outline: none; border-bottom-color: var(--accent); }
+.login-submit { justify-content: center; margin-top: 8px; }
+.login-form .status-line { margin-top: 18px; text-align: center; }
+
+.login-dest {
+  margin: 32px auto 0;
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
 /* ── Login · value-prop bullets (login mode) ───────────────────────── */
 .login-values {
   list-style: none;
