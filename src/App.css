@@ -126,6 +126,13 @@
   padding-top: 72px;
 }
 
+/* Per-page column widths from the design contract (.dc.html <main> max-width).
+   All stay centered via .page-column's margin:0 auto; only the cap changes. */
+.login-page { max-width: 480px; }      /* Login / ResetPassword */
+.curate-page { max-width: 560px; }     /* ResourceCurate */
+.notfound-page { max-width: 520px; }   /* 404 */
+/* .vocab-page (600px) is defined in the vocabulary block below. */
+
 .page-loading-overlay {
   position: fixed;
   inset: 0;
