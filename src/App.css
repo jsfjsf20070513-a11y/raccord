@@ -10,84 +10,77 @@
   border-bottom: 1px solid var(--rule);
 }
 
+/* Design header: « Carnet de classe » wordmark + auth on one row,
+   four nav items inline below. Naturally responsive via flex-wrap. */
 .site-header-inner {
   max-width: var(--header-width);
   margin: 0 auto;
-  padding: 20px 0 18px;
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
-  align-items: end;
+  padding: 20px 24px 0;
+}
+
+.site-head-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
   gap: 24px;
+  flex-wrap: wrap;
 }
 
-.site-branding {
-  flex-shrink: 0;
-}
-
-.site-branding-kicker {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 14px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.site-title,
-.site-title:visited {
-  display: inline-block;
+.site-wordmark,
+.site-wordmark:visited {
   border-bottom: none;
   color: var(--ink);
-  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
-  font-size: 28px;
-  font-weight: 500;
+  font-family: "EB Garamond", serif;
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
-
-.site-header-focus {
-  justify-self: center;
-  text-align: center;
-}
-
-.site-header-focus a,
-.site-header-focus a:visited {
-  border-bottom: none;
-  color: var(--accent);
-  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
-  font-size: 18px;
-}
-
-.site-header-tools {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-self: end;
-}
-
-.site-nav-secondary {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.site-nav-secondary a,
-.site-nav-secondary a:visited {
-  border-bottom: none;
-  color: var(--muted);
-  font-size: 17px;
-}
+.site-wordmark:hover { color: var(--accent); }
 
 .site-auth {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: flex-end;
+  align-items: baseline;
+  gap: 10px;
   flex-wrap: wrap;
-}
-
-.site-auth-note {
+  font-size: 14px;
   color: var(--muted);
-  font-size: 15px;
+}
+.site-auth-note { color: var(--muted); font-size: 14px; }
+.site-auth-link,
+.site-auth-link:visited {
+  border: none;
+  border-bottom: 1px solid currentColor;
+  background: none;
+  padding: 0;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.site-auth-link:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+.site-nav {
+  display: flex;
+  align-items: baseline;
+  gap: 6px 26px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-bottom: 14px;
+  font-size: 16px;
+}
+.site-nav a,
+.site-nav a:visited {
+  border-bottom: none;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.site-nav a:hover { color: var(--ink); }
+.site-nav a.is-active {
+  color: var(--accent);
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
 }
 
 .site-main {
@@ -97,7 +90,7 @@
 .site-footer {
   max-width: var(--page-width);
   margin: 0 auto;
-  padding: 24px 0 72px;
+  padding: 24px 24px 72px;
   text-align: center;
 }
 
@@ -108,7 +101,6 @@
 }
 
 .site-footer-secondary {
-  margin-top: 8px !important;
   font-style: italic;
 }
 
@@ -116,6 +108,17 @@
   margin-bottom: 16px !important;
   letter-spacing: 0.16em;
 }
+
+.site-footer-link {
+  margin-top: 12px !important;
+  font-size: 13px;
+}
+.site-footer-link a,
+.site-footer-link a:visited {
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+}
+.site-footer-link a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 
 .page-column {
   max-width: var(--page-width);
