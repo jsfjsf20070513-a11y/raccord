@@ -3668,6 +3668,103 @@
   font-size: 15px;
 }
 
+/* ── Witness · 班级寄语墙 (memorial wall, fully centered) ────────────── */
+.witness-page { text-align: center; }
+.witness-masthead { text-align: center; }
+.witness-kicker {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.witness-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 38px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+.witness-lead { margin: 18px auto 0; max-width: 34rem; color: var(--muted); font-size: 16px; line-height: 1.8; }
+
+.witness-traits {
+  margin-top: 48px;
+  padding: 22px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px 48px;
+}
+.witness-trait { display: flex; flex-direction: column; gap: 4px; }
+.witness-trait-fr { color: var(--muted); font-style: italic; font-size: 14px; }
+.witness-trait-zh { font-family: "Noto Serif SC", "Source Han Serif SC", serif; font-size: 19px; }
+.witness-footnote {
+  margin: 14px auto 0;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.witness-footnote a, .witness-footnote a:visited { color: var(--muted); border-bottom: 1px solid var(--rule); }
+.witness-footnote a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+.witness-step { margin-top: 56px; }
+.witness-step-num { margin: 0 0 8px; color: var(--accent); font-size: 13px; font-style: italic; }
+.witness-step-lead { margin: 0 auto; max-width: 30rem; color: var(--muted); font-size: 15px; line-height: 1.7; }
+.witness-note { margin: 12px auto 0; max-width: 32rem; color: var(--muted); font-size: 14px; }
+.witness-actions { margin-top: 20px; display: flex; justify-content: center; }
+.witness-connected { color: var(--ok); font-size: 16px; }
+.witness-error { margin: 16px auto 0; max-width: 30rem; color: var(--accent); font-size: 14px; }
+
+.witness-form { margin-top: 22px; }
+.witness-textarea {
+  display: block;
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: transparent;
+  font-family: "EB Garamond", "Noto Serif SC", serif;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--ink);
+  text-align: center;
+  resize: vertical;
+}
+.witness-textarea:focus { outline: none; border-color: var(--accent); }
+.witness-count { margin: 12px 0 0; color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+
+.witness-receipt {
+  margin: 28px auto 0;
+  max-width: 30rem;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+.witness-receipt p { margin: 0 0 8px; font-size: 15px; }
+.witness-receipt p:last-child { margin-bottom: 0; }
+.witness-receipt-label {
+  display: inline-block;
+  min-width: 3.5em;
+  margin-right: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.witness-receipt-hash { color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+
+.witness-wall { list-style: none; margin: 24px 0 0; padding: 0; }
+.witness-message { padding: 20px 0; border-top: 1px solid var(--rule); }
+.witness-message-text {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 19px;
+  line-height: 1.6;
+}
+.witness-message-meta { margin: 8px 0 0; color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.04em; }
+
 /* ── Resources · 资源与书目 (BIBLIOTHÈQUE → 书架索引 → 编号书架) ──────── */
 .biblio-masthead { text-align: center; }
 .biblio-kicker {
