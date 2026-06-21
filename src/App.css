@@ -128,10 +128,10 @@
 
 /* Per-page column widths from the design contract (.dc.html <main> max-width).
    All stay centered via .page-column's margin:0 auto; only the cap changes. */
-.login-page { max-width: 480px; }      /* Login / ResetPassword */
-.curate-page { max-width: 560px; }     /* ResourceCurate */
-.notfound-page { max-width: 520px; }   /* 404 */
-/* .vocab-page (600px) is defined in the vocabulary block below. */
+.login-page { max-width: 600px; }      /* Login / ResetPassword */
+.curate-page { max-width: 720px; }     /* ResourceCurate */
+.notfound-page { max-width: 680px; }   /* 404 */
+/* .vocab-page width is set wider in the vocabulary block below. */
 
 .page-loading-overlay {
   position: fixed;
@@ -3154,7 +3154,7 @@
    a small italic French prompt → stimulus → answer area → tinted verdict
    banner. Controls (tags / import-export / stats) live only on the idle
    and done screens, never during an active lesson. */
-.vocab-page { max-width: 600px; }
+.vocab-page { max-width: 820px; }
 
 /* Session progress: thin accent track + a right-aligned combo / fraction. */
 .vocab-progress {
@@ -3841,9 +3841,9 @@
 .biblio-index { margin-top: 56px; }
 .biblio-index-row,
 .biblio-index-row:visited {
-  display: grid;
-  grid-template-columns: 40px 1fr auto;
-  gap: 0 16px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
   align-items: baseline;
   padding: 13px 0;
   border-top: 1px solid var(--rule);
@@ -3857,8 +3857,8 @@
 
 .biblio-roman { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--accent); }
 
-.biblio-shelf { margin-top: 72px; scroll-margin-top: 24px; }
-.biblio-shelf-head { display: flex; align-items: baseline; gap: 12px; }
+.biblio-shelf { margin-top: 72px; scroll-margin-top: 24px; text-align: center; }
+.biblio-shelf-head { display: flex; align-items: baseline; gap: 12px; justify-content: center; }
 .biblio-shelf-title {
   margin: 0;
   font-family: "Noto Serif SC", "Source Han Serif SC", serif;
@@ -3867,7 +3867,7 @@
 }
 .biblio-entries { list-style: none; margin: 18px 0 0; padding: 0; }
 .biblio-entry { padding: 15px 0; border-top: 1px solid var(--rule); }
-.biblio-entry-row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+.biblio-entry-row { display: flex; align-items: baseline; justify-content: center; gap: 14px; flex-wrap: wrap; }
 .biblio-entry-title,
 .biblio-entry-title:visited {
   font-size: 18px;
@@ -3909,27 +3909,25 @@
 .atelier-doorways { margin-top: 56px; }
 .atelier-doorway,
 .atelier-doorway:visited {
-  display: grid;
-  grid-template-columns: 40px 1fr auto;
-  gap: 0 16px;
-  align-items: baseline;
-  padding: 20px 0;
+  display: block;
+  padding: 22px 0;
   border-top: 1px solid var(--rule);
   border-bottom: none;
   color: var(--ink);
   text-decoration: none;
+  text-align: center;
 }
 .atelier-doorways .atelier-doorway:last-child { border-bottom: 1px solid var(--rule); }
 .atelier-doorway:hover { color: var(--accent); }
-.atelier-doorway-num { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--accent); }
+.atelier-doorway-num { display: block; margin-bottom: 8px; font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--accent); }
 .atelier-doorway-title { font-size: 20px; }
 .atelier-doorway-sub { color: var(--muted); }
-.atelier-doorway-desc { display: block; margin-top: 4px; color: var(--muted); font-size: 15px; line-height: 1.65; }
-.atelier-doorway-arrow { color: var(--accent); }
+.atelier-doorway-desc { display: block; margin-top: 6px; color: var(--muted); font-size: 15px; line-height: 1.65; }
+.atelier-doorway-arrow { display: none; }
 
-.atelier-teaser { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule); }
+.atelier-teaser { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule); text-align: center; }
 .atelier-teaser-kicker { margin: 0 0 4px; color: var(--accent); font-size: 14px; font-style: italic; }
-.atelier-teaser-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+.atelier-teaser-head { display: flex; align-items: baseline; justify-content: center; gap: 14px; }
 .atelier-teaser-title {
   margin: 0;
   font-family: "Noto Serif SC", "Source Han Serif SC", serif;
@@ -4003,8 +4001,8 @@
 .reset-state p:last-child { margin-bottom: 0; }
 .reset-ok { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ok); }
 
-/* ── ResourceCurate · 资源增补 (centered masthead + left-aligned form) ── */
-.curate-form { max-width: 32rem; margin: 38px auto 0; }
+/* ── ResourceCurate · 资源增补 (centered masthead + centered form) ── */
+.curate-form { max-width: 30rem; margin: 38px auto 0; text-align: center; }
 .curate-form label { display: block; margin: 0 0 26px; }
 .curate-form label > span { display: block; margin-bottom: 8px; color: var(--muted); font-size: 14px; }
 .curate-form input,
@@ -4018,13 +4016,14 @@
   font-family: inherit;
   font-size: 18px;
   color: var(--ink);
+  text-align: center;
 }
-.curate-form textarea { line-height: 1.6; resize: vertical; }
-.curate-form select { cursor: pointer; }
+.curate-form textarea { line-height: 1.6; resize: vertical; text-align: center; }
+.curate-form select { cursor: pointer; text-align: center; text-align-last: center; }
 .curate-form input:focus,
 .curate-form select:focus,
 .curate-form textarea:focus { outline: none; border-bottom-color: var(--accent); }
-.curate-actions { margin-top: 8px; gap: 24px; align-items: baseline; }
+.curate-actions { margin-top: 8px; gap: 24px; align-items: baseline; justify-content: center; }
 .curate-note { margin: 8px 0 0; color: var(--muted); font-size: 13px; font-style: italic; }
 
 /* ── Login · value-prop bullets (login mode) ───────────────────────── */
