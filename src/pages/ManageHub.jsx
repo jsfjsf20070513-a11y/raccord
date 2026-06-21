@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import DailyMeditation from '../components/DailyMeditation'
 
 // 协作 Atelier — design contract: 报头 → 两个编号细线入口(I 班级寄语墙 / II 资源增补)
 // → 班级 AI 助手「即将 · 登录可用」预告 → 细页脚。旧的草稿/审核/案头/图版补录工作台已收敛掉。
@@ -55,6 +56,8 @@ export default function ManageHub() {
           <Link to="/login">登录 →</Link>
         </p>
       </section>
+
+      <section className="home-meditation"><DailyMeditation /></section>
     </article>
   )
 }

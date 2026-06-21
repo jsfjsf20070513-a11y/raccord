@@ -3653,7 +3653,7 @@
   padding-top: 18px;
   border-top: 1px solid var(--rule);
 }
-.home-meditation .section-coda { text-align: center; border: none; padding: 0; margin: 0; }
+.home-meditation .section-coda { text-align: center; border: none; padding: 0; margin: 0; max-width: none; }
 .home-meditation .section-coda-kicker {
   margin: 0 0 12px;
   color: var(--muted);
