@@ -40,13 +40,21 @@ await mkdir(dirname(targetPath), { recursive: true })
 await writeFile(targetPath, fileContents)
 
 // Pre-render bilingual proof sketches (inline prose + $...$ math) to HTML so
-// the browser never loads KaTeX. Keys/credit mirror the source module.
+// the browser never loads KaTeX. Each language is an array of step strings
+// (a legacy single string is normalized to a one-step array); every step is
+// rendered to HTML independently and shipped as an array, so the home page can
+// lay the proof out as ①②③④. Keys/credit mirror the source module.
+const renderSteps = (value) =>
+  (Array.isArray(value) ? value : [value])
+    .filter((step) => step != null && `${step}`.trim() !== '')
+    .map((step) => renderMathTextToHtmlWith(katex, step))
+
 const renderedExplanations = Object.fromEntries(
   Object.entries(theoremExplanations).map(([title, entry]) => [
     title,
     {
-      zh: renderMathTextToHtmlWith(katex, entry.zh),
-      fr: renderMathTextToHtmlWith(katex, entry.fr),
+      zh: renderSteps(entry.zh),
+      fr: renderSteps(entry.fr),
     },
   ]),
 )

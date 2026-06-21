@@ -32,6 +32,16 @@ const TYPE_ROTATION = [
 
 const VALID_DECK = cleanFrenchDeck(frenchVocabulary).valid
 const DECK_TAGS = ['all', ...Array.from(new Set(VALID_DECK.map((w) => w.tag).filter(Boolean)))]
+// CEFR ladder A1→C2; only the levels actually present in the deck are offered.
+const LEVEL_ORDER = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+const DECK_LEVELS = ['all', ...LEVEL_ORDER.filter((l) => VALID_DECK.some((w) => w.level === l))]
+
+// Filter the deck on both axes the learner controls: CEFR level and theme tag.
+function selectDeck(level, tag) {
+  return VALID_DECK.filter(
+    (w) => (level === 'all' || w.level === level) && (tag === 'all' || w.tag === tag),
+  )
+}
 
 function shuffled(arr) {
   const a = [...arr]
@@ -95,6 +105,7 @@ export default function Vocabulary() {
   const [deckStats, setDeckStats] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [tag, setTag] = useState('all')
+  const [level, setLevel] = useState('all')
   const [shuffle, setShuffle] = useState(false)
   const [importMsg, setImportMsg] = useState('')
   const fileInputRef = useRef(null)
@@ -157,11 +168,11 @@ export default function Vocabulary() {
       if (mode === 'disabled') return setStatus('disabled')
       if (mode === 'compat') return setStatus('compat')
       const now = new Date().toISOString()
+      const deck = selectDeck(level, tag)
       setDeckStats({
-        ...computeDeckStats({ deck: VALID_DECK, stateMap: states, now }),
+        ...computeDeckStats({ deck, stateMap: states, now }),
         streak: computeStudyStreak(Object.values(states), now),
       })
-      const deck = tag === 'all' ? VALID_DECK : VALID_DECK.filter((w) => w.tag === tag)
       let queue = buildStudyQueue({ deck, stateMap: states, now, maxNew: MAX_NEW, maxReview: MAX_REVIEW })
       if (shuffle) queue = shuffled(queue)
       const built = buildSession(queue, deck)
@@ -184,7 +195,7 @@ export default function Vocabulary() {
       setStatus('error')
     }
     return undefined
-  }, [user, tag, shuffle])
+  }, [user, tag, level, shuffle])
 
   useEffect(() => {
     if (user) load()
@@ -290,7 +301,7 @@ export default function Vocabulary() {
   // Re-drill only the words missed this session (design: « 只练错词 »).
   const retryWrong = useCallback(() => {
     if (!wrong.length) return
-    const deck = tag === 'all' ? VALID_DECK : VALID_DECK.filter((w) => w.tag === tag)
+    const deck = selectDeck(level, tag)
     const built = buildSession(wrong.map((x) => ({ word: x.word, state: x.state })), deck)
     setSteps(built)
     setI(0)
@@ -303,7 +314,7 @@ export default function Vocabulary() {
     setWrong([])
     spokenRef.current = -1
     setStatus('ready')
-  }, [wrong, tag])
+  }, [wrong, tag, level])
 
   // Study (preview) navigation: step through the deck, then begin the test.
   const studyNext = useCallback(() => {
@@ -587,9 +598,31 @@ export default function Vocabulary() {
     )
   }
 
+  // CEFR level chips (A1→C2). Selecting a level just flips `level`; the load
+  // effect (which depends on `level`) rebuilds the deck — same wiring as tags.
+  function renderLevelRow() {
+    return (
+      <div className="vocab-control-row">
+        <span className="vocab-control-label" aria-hidden="true">级别</span>
+        {DECK_LEVELS.map((l) => (
+          <button
+            key={l}
+            type="button"
+            onClick={() => setLevel(l)}
+            aria-pressed={level === l}
+            className={`vocab-link-btn${level === l ? ' is-active' : ''}`}
+          >
+            {l === 'all' ? '全部 A1–C2' : l}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
   function renderControls() {
     return (
       <div className="vocab-controls">
+        {renderLevelRow()}
         <div className="vocab-control-row">
           <span className="vocab-control-label" aria-hidden="true">标签</span>
           {DECK_TAGS.map((t) => (
@@ -672,6 +705,7 @@ export default function Vocabulary() {
         const last = studyIdx + 1 >= studyList.length
         return (
           <div className="vocab-study">
+            {renderLevelRow()}
             <div className="vocab-study-head">
               <p className="vocab-prompt">Aperçu · 先学一遍</p>
               <span className="vocab-study-count">{studyIdx + 1} / {studyList.length}</span>
@@ -680,6 +714,7 @@ export default function Vocabulary() {
               <div className="vocab-study-title">
                 <h2 lang="fr">{sw.french}</h2>
                 {posLong(sw) ? <span className="vocab-study-pos">{posLong(sw)}</span> : null}
+                {sw.level ? <span className="vocab-study-tag">{sw.level}</span> : null}
                 {sw.tag ? <span className="vocab-study-tag">{sw.tag}</span> : null}
               </div>
               <div className="vocab-study-rule" aria-hidden="true" />
