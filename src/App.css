@@ -10,84 +10,77 @@
   border-bottom: 1px solid var(--rule);
 }
 
+/* Design header: « Carnet de classe » wordmark + auth on one row,
+   four nav items inline below. Naturally responsive via flex-wrap. */
 .site-header-inner {
   max-width: var(--header-width);
   margin: 0 auto;
-  padding: 20px 0 18px;
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
-  align-items: end;
+  padding: 20px 24px 0;
+}
+
+.site-head-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
   gap: 24px;
+  flex-wrap: wrap;
 }
 
-.site-branding {
-  flex-shrink: 0;
-}
-
-.site-branding-kicker {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 14px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.site-title,
-.site-title:visited {
-  display: inline-block;
+.site-wordmark,
+.site-wordmark:visited {
   border-bottom: none;
   color: var(--ink);
-  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
-  font-size: 28px;
-  font-weight: 500;
+  font-family: "EB Garamond", serif;
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
-
-.site-header-focus {
-  justify-self: center;
-  text-align: center;
-}
-
-.site-header-focus a,
-.site-header-focus a:visited {
-  border-bottom: none;
-  color: var(--accent);
-  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
-  font-size: 18px;
-}
-
-.site-header-tools {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-self: end;
-}
-
-.site-nav-secondary {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.site-nav-secondary a,
-.site-nav-secondary a:visited {
-  border-bottom: none;
-  color: var(--muted);
-  font-size: 17px;
-}
+.site-wordmark:hover { color: var(--accent); }
 
 .site-auth {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: flex-end;
+  align-items: baseline;
+  gap: 10px;
   flex-wrap: wrap;
-}
-
-.site-auth-note {
+  font-size: 14px;
   color: var(--muted);
-  font-size: 15px;
+}
+.site-auth-note { color: var(--muted); font-size: 14px; }
+.site-auth-link,
+.site-auth-link:visited {
+  border: none;
+  border-bottom: 1px solid currentColor;
+  background: none;
+  padding: 0;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.site-auth-link:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+.site-nav {
+  display: flex;
+  align-items: baseline;
+  gap: 6px 26px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-bottom: 14px;
+  font-size: 16px;
+}
+.site-nav a,
+.site-nav a:visited {
+  border-bottom: none;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.site-nav a:hover { color: var(--ink); }
+.site-nav a.is-active {
+  color: var(--accent);
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
 }
 
 .site-main {
@@ -97,7 +90,7 @@
 .site-footer {
   max-width: var(--page-width);
   margin: 0 auto;
-  padding: 24px 0 72px;
+  padding: 24px 24px 72px;
   text-align: center;
 }
 
@@ -108,7 +101,6 @@
 }
 
 .site-footer-secondary {
-  margin-top: 8px !important;
   font-style: italic;
 }
 
@@ -116,6 +108,17 @@
   margin-bottom: 16px !important;
   letter-spacing: 0.16em;
 }
+
+.site-footer-link {
+  margin-top: 12px !important;
+  font-size: 13px;
+}
+.site-footer-link a,
+.site-footer-link a:visited {
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+}
+.site-footer-link a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 
 .page-column {
   max-width: var(--page-width);
@@ -3139,26 +3142,24 @@
 }
 
 /* ── Vocabulary trainer ─────────────────────────────────────────────
-   Editorial styling to match the rest of the carnet: hairline frames
-   (no boxed cards), centered serif word, --accent figures, .text-button
-   actions. Deliberately no emoji / no filled buttons. */
-/* Session progress bar — thin accent fill, label left / fraction right. */
+   Faithful to the Claude-design handoff (Vocabulary.dc.html): a clean,
+   centered single column — no page header, no boxed cards. Each step is
+   a small italic French prompt → stimulus → answer area → tinted verdict
+   banner. Controls (tags / import-export / stats) live only on the idle
+   and done screens, never during an active lesson. */
+.vocab-page { max-width: 600px; }
+
+/* Session progress: thin accent track + a right-aligned combo / fraction. */
 .vocab-progress {
   display: flex;
-  align-items: baseline;
-  gap: 14px;
-  margin-top: 18px;
-  font-size: 14px;
-  color: var(--muted);
-}
-.vocab-progress-label {
-  flex: 0 0 auto;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
 }
 .vocab-progress-track {
   flex: 1 1 auto;
   height: 3px;
-  background: var(--rule);
-  align-self: center;
+  background: rgba(26, 26, 26, 0.1);
 }
 .vocab-progress-fill {
   display: block;
@@ -3166,106 +3167,239 @@
   background: var(--accent);
   transition: width 0.35s ease;
 }
-.vocab-progress-count {
+.vocab-progress-side {
   flex: 0 0 auto;
+  min-width: 64px;
+  text-align: right;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
 
-/* Footer: controls + stats sit below the card, hairline-separated, subtle. */
-.vocab-footer {
-  margin-top: 40px;
-  padding-top: 22px;
-  border-top: 1px solid var(--rule);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-.vocab-footer .editorial-actions {
-  justify-content: center;
-  gap: 16px;
-}
-.vocab-footer .vocab-tags.tabs {
-  margin-bottom: 0;
-}
-.vocab-tags .theorem-explanation-lang {
-  align-self: center;
-  margin: 0 2px 0 0;
-}
-.vocab-stats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: baseline;
-  gap: 4px 0;
-  margin: 0;
-}
-.vocab-stats .vocab-dot,
-.vocab-footer .vocab-tags .vocab-dot {
-  margin: 0 12px;
-  color: var(--rule);
-}
-.vocab-msg {
-  margin: 0;
+/* Idle / notice screens — quiet, centered. */
+.vocab-notice {
+  margin-top: 60px;
+  text-align: center;
   color: var(--muted);
-  font-size: 14px;
+}
+.vocab-notice p { margin: 0 0 14px; }
+.vocab-notice p:last-child { margin-bottom: 0; }
+
+/* Text links / link-buttons used across notices, done screen, controls. */
+.vocab-link,
+.vocab-link-btn {
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.vocab-link-btn.is-active { color: var(--accent); }
+.vocab-link-btn:not(.is-active) { color: var(--muted); border-bottom-color: transparent; }
+.vocab-link:hover,
+.vocab-link-btn:hover { color: var(--ink); border-bottom-color: currentColor; }
+
+/* The active exercise stage — centered, generous top margin. */
+.vocab-stage {
+  margin-top: 48px;
+  text-align: center;
 }
 
-.vocab-card {
-  margin-top: 36px;
-  padding: 44px 24px;
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
-  text-align: center;
+/* Study (preview) card — « Aperçu · 先学一遍 » before the test. */
+.vocab-study { margin-top: 24px; text-align: center; }
+.vocab-study-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 14px;
 }
-.vocab-notice {
+.vocab-study-count {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
   color: var(--muted);
+  white-space: nowrap;
 }
-.vocab-notice p {
-  margin: 0 0 14px;
+.vocab-study-body { margin-top: 40px; }
+.vocab-study-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
-.vocab-notice p:last-child {
-  margin-bottom: 0;
+.vocab-study-title h2 { margin: 0; font-size: 48px; font-weight: 500; line-height: 1; }
+.vocab-study-pos { font-style: italic; font-size: 18px; color: var(--muted); }
+.vocab-study-tag {
+  align-self: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  border: 1px solid rgba(139, 0, 0, 0.3);
+  padding: 2px 7px;
 }
-.vocab-card-kicker {
-  text-align: center;
-  margin-bottom: 18px;
-}
-.vocab-word {
-  margin: 0;
-  font-size: 44px;
-  line-height: 1.1;
-  letter-spacing: 0.01em;
-}
-.vocab-gender {
-  margin: 6px 0 0;
-  font-style: italic;
-}
-.vocab-reveal {
-  max-width: 360px;
-  margin: 26px auto 0;
-}
-.vocab-reveal .theorem-explanation-block {
-  margin-bottom: 16px;
-}
-.vocab-reveal .theorem-explanation-lang {
-  text-align: center;
-}
-.vocab-reveal p {
-  margin: 0;
-}
-.vocab-chinese {
+.vocab-study-rule { width: 54px; height: 3px; background: var(--accent); margin: 18px auto 0; }
+.vocab-study-zh {
+  margin: 24px 0 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
   font-size: 26px;
   color: var(--ink);
 }
-.vocab-grade {
+.vocab-study-example {
+  margin: 16px auto 0;
+  max-width: 30rem;
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.vocab-study-actions {
+  margin-top: 44px;
+  display: flex;
+  align-items: center;
   justify-content: center;
   gap: 28px;
-  margin-top: 30px;
+  flex-wrap: wrap;
 }
+
+/* Small italic accent prompt that heads every step. */
+.vocab-prompt {
+  margin: 0 0 22px;
+  color: var(--accent);
+  font-size: 13px;
+  font-style: italic;
+}
+.vocab-prompt-sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.vocab-prompt-pos {
+  color: var(--muted);
+  font-style: normal;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+
+/* Stimuli. */
+.vocab-word {
+  margin: 0;
+  font-size: 52px;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+.vocab-sentence {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.5;
+}
+.vocab-cue {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 38px;
+  font-weight: 500;
+}
+.vocab-cue-sm { font-size: 26px; line-height: 1.4; }
+
+.vocab-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 32px;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  border-radius: 2px;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 20px;
+  color: var(--ink);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.vocab-replay:hover { border-color: var(--accent); color: var(--accent); }
+.vocab-replay-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* Option rows — full-width, hairline-separated, label left / mark right. */
+.vocab-options {
+  list-style: none;
+  max-width: 420px;
+  margin: 34px auto 0;
+  padding: 0;
+  text-align: left;
+}
+.vocab-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 15px 8px;
+  border: none;
+  border-top: 1px solid var(--rule);
+  background: transparent;
+  color: var(--ink);
+  font-family: "EB Garamond", "Noto Serif SC", serif;
+  font-size: 19px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.vocab-options li:last-child .vocab-option { border-bottom: 1px solid var(--rule); }
+.vocab-option:not(:disabled):hover { background: rgba(26, 26, 26, 0.025); }
+.vocab-option:disabled { cursor: default; }
+.vocab-option.is-ok { background: rgba(63, 122, 78, 0.08); color: var(--ok); }
+.vocab-option.is-no { background: rgba(139, 0, 0, 0.05); color: var(--accent); }
+.vocab-option.is-dim { color: rgba(26, 26, 26, 0.32); }
+.vocab-option-text { flex: 1 1 auto; }
+.vocab-option-mark {
+  flex: 0 0 auto;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+}
+
+.vocab-input {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  margin: 40px auto 0;
+  padding: 10px 0;
+  border: none;
+  border-bottom: 1.5px solid rgba(26, 26, 26, 0.3);
+  background: transparent;
+  font-family: "EB Garamond", serif;
+  font-size: 30px;
+  text-align: center;
+  color: var(--ink);
+}
+.vocab-input::placeholder { color: rgba(26, 26, 26, 0.3); font-style: italic; }
+.vocab-input:focus { outline: none; border-bottom-color: var(--accent); }
+
+.vocab-grade { margin-top: 28px; }
+.vocab-verify {
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 18px;
+  transition: color 0.15s ease;
+}
+.vocab-verify:hover { color: var(--ink); }
+.vocab-verify:disabled { color: var(--muted); border-bottom-color: transparent; cursor: default; }
 .vocab-key {
   margin-left: 6px;
-  padding: 1px 6px;
+  padding: 1px 7px;
   border: 1px solid var(--rule);
   border-radius: 3px;
   font-family: "JetBrains Mono", monospace;
@@ -3274,115 +3408,618 @@
   vertical-align: middle;
 }
 
-/* ── Vocabulary · multi-format exercises ───────────────────────────── */
-.vocab-replay {
-  margin: 8px auto 0;
-  font-size: 16px;
-}
-.vocab-options {
-  list-style: none;
-  margin: 22px 0 0;
-  padding: 0;
-  text-align: left;
-}
-.vocab-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 14px 8px;
-  border: none;
-  border-top: 1px solid var(--rule);
-  background: transparent;
-  font-family: "EB Garamond", "Noto Serif SC", serif;
-  font-size: 19px;
-  cursor: pointer;
-}
-.vocab-options li:last-child .vocab-option {
-  border-bottom: 1px solid var(--rule);
-}
-.vocab-option:disabled { cursor: default; }
-.vocab-option.is-ok { background: rgba(63, 122, 78, 0.08); }
-.vocab-option.is-no { background: rgba(139, 0, 0, 0.05); }
-.vocab-option-key {
-  flex: 0 0 auto;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
-  color: var(--muted);
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  padding: 1px 6px;
-}
-.vocab-option-text { flex: 1 1 auto; }
-.vocab-option-mark { flex: 0 0 auto; font-size: 17px; }
-
-.vocab-input {
-  display: block;
-  width: 100%;
-  max-width: 320px;
-  margin: 22px auto 0;
-  padding: 8px 0;
-  border: none;
-  border-bottom: 1px solid var(--rule);
-  background: transparent;
-  font-family: "EB Garamond", serif;
-  font-size: 26px;
-  text-align: center;
-  color: var(--ink);
-}
-.vocab-input:focus { outline: none; border-bottom-color: var(--accent); }
-
-.vocab-build-line,
-.vocab-build-bank {
-  margin: 18px 0 0;
+/* Word-bank build step. */
+.vocab-build-line {
+  min-height: 56px;
+  max-width: 470px;
+  margin: 28px auto 0;
+  padding: 10px 8px;
+  border-bottom: 1.5px solid rgba(26, 26, 26, 0.25);
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 9px;
   justify-content: center;
-  min-height: 30px;
+  align-items: center;
 }
-.vocab-build-line { border-bottom: 1px solid var(--rule); padding-bottom: 14px; }
+.vocab-build-bank {
+  max-width: 470px;
+  margin: 28px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 11px;
+  justify-content: center;
+}
 .vocab-build-placeholder { color: var(--muted); font-style: italic; }
 .vocab-tile {
-  padding: 8px 12px;
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  background: var(--paper);
+  padding: 8px 16px;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink);
   font-family: "EB Garamond", "Noto Serif SC", serif;
   font-size: 18px;
   cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
-.vocab-tile.is-chosen { border-color: var(--accent); }
+.vocab-tile:not(:disabled):hover { border-color: var(--accent); color: var(--accent); }
+.vocab-tile.is-chosen { border-color: rgba(63, 122, 78, 0.5); background: rgba(63, 122, 78, 0.07); }
 .vocab-tile.is-sel { border-color: var(--accent); color: var(--accent); }
-.vocab-tile.is-done { opacity: 0.32; cursor: default; }
-.vocab-tile.is-wrong { border-color: var(--accent); background: rgba(139, 0, 0, 0.06); }
+.vocab-tile.is-done { opacity: 0.28; border-color: rgba(139, 0, 0, 0.3); color: var(--accent); cursor: default; }
+.vocab-tile.is-wrong { border-color: rgba(26, 26, 26, 0.4); color: var(--muted); }
 
+/* Match step — two columns of tiles. */
 .vocab-match {
   display: flex;
-  gap: 14px;
-  justify-content: center;
-  margin-top: 20px;
+  gap: 16px;
+  max-width: 460px;
+  margin: 32px auto 0;
 }
 .vocab-match-col {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  flex: 0 1 180px;
+  gap: 12px;
 }
-.vocab-match-col .vocab-tile { width: 100%; }
+.vocab-match-col .vocab-tile { width: 100%; padding: 14px 10px; text-align: center; }
 
+/* Verdict banner — tinted, top-rule, with a filled continue button. */
 .vocab-fb {
+  margin-top: 40px;
+  padding: 24px;
+  text-align: center;
+  animation: vocab-fb-in 0.22s ease both;
+}
+.vocab-fb.is-ok { background: rgba(63, 122, 78, 0.08); border-top: 2px solid var(--ok); }
+.vocab-fb.is-no { background: rgba(139, 0, 0, 0.055); border-top: 2px solid var(--accent); }
+@keyframes vocab-fb-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.vocab-fb-verdict {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.vocab-fb.is-ok .vocab-fb-verdict { color: var(--ok); }
+.vocab-fb.is-no .vocab-fb-verdict { color: var(--accent); }
+.vocab-fb-answer { margin: 14px 0 0; font-size: 18px; color: var(--ink); }
+.vocab-fb-answer span[lang="fr"] { color: var(--accent); font-weight: 500; }
+.vocab-fb-gloss { color: var(--muted); font-family: "Noto Serif SC", serif; font-size: 16px; }
+.vocab-fb-actions { margin-top: 22px; }
+.vocab-next {
+  padding: 9px 26px;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--paper);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 17px;
+  transition: opacity 0.15s ease;
+}
+.vocab-fb.is-ok .vocab-next { background: var(--ok); border-color: var(--ok); }
+.vocab-fb.is-no .vocab-next { background: var(--accent); border-color: var(--accent); }
+.vocab-next:hover { opacity: 0.85; }
+.vocab-next-key { margin-left: 6px; font-family: "JetBrains Mono", monospace; font-size: 11px; opacity: 0.8; }
+
+/* Done screen. */
+.vocab-done { margin-top: 48px; text-align: center; }
+.vocab-done-score {
+  margin: 10px 0 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 34px;
+  font-weight: 500;
+}
+.vocab-done-meta {
+  margin: 12px 0 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.vocab-done-rule { height: 1px; width: 54px; background: var(--rule); margin: 32px auto; }
+.vocab-review { max-width: 380px; margin: 0 auto; text-align: left; }
+.vocab-review-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 0;
+  border-top: 1px solid var(--rule);
+}
+.vocab-review-row span[lang="fr"] { font-size: 18px; }
+.vocab-review-zh { color: var(--muted); font-family: "Noto Serif SC", serif; font-size: 16px; }
+.vocab-done-actions {
+  margin-top: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+/* Controls strip (idle + done only). */
+.vocab-controls {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.vocab-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 16px;
+}
+.vocab-control-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.vocab-control-stats {
+  margin: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.vocab-control-stats span { color: var(--accent); }
+.vocab-dot { color: rgba(26, 26, 26, 0.18); }
+.vocab-msg { margin: 0; color: var(--muted); font-size: 14px; }
+/* ── Home · 扉页 (cover → daily theorem → meditation) ───────────────── */
+.home-cover { text-align: center; }
+.home-cover-kicker {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.home-cover-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.18;
+}
+.home-cover-subtitle { margin: 16px 0 0; color: var(--muted); font-size: 21px; font-style: italic; }
+.home-cover-edition {
   margin: 22px 0 0;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.home-theorem {
+  margin-top: var(--section-gap);
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+}
+.home-theorem-kicker { margin: 0 0 8px; color: var(--accent); font-size: 14px; font-style: italic; }
+.home-theorem-title {
+  margin: 0 0 8px;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+.home-theorem-prelude { margin: 0 0 14px; color: var(--ink); }
+.home-theorem-formula { margin: 8px 0 18px; text-align: center; color: var(--ink); overflow-x: auto; }
+.home-theorem-note { margin: 0; color: var(--muted); font-size: 15px; }
+
+.home-proof { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--rule); }
+.home-proof summary {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--accent);
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  list-style: none;
+}
+.home-proof summary::-webkit-details-marker { display: none; }
+.home-proof summary > span:first-child { font-style: normal; }
+.home-proof-body { margin: 14px 0 0; display: grid; gap: 18px; text-align: left; }
+.home-proof-body .theorem-explanation-block { max-width: 34rem; margin: 0 auto; }
+.home-proof-body .theorem-explanation-lang { text-align: center; }
+.home-proof-credit {
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.home-meditation {
+  margin-top: var(--section-gap);
   padding-top: 18px;
   border-top: 1px solid var(--rule);
 }
-.vocab-fb-verdict { margin: 0; font-size: 18px; }
-.vocab-fb.is-ok .vocab-fb-verdict { color: var(--ok); }
-.vocab-fb.is-no .vocab-fb-verdict { color: var(--accent); }
-.vocab-fb.is-ok { color: var(--ok); }
-.vocab-fb-answer { margin: 10px 0 0; font-size: 18px; color: var(--ink); }
-.vocab-fb-answer span[lang="fr"] { color: var(--accent); }
-.vocab-fb-gloss { color: var(--muted); font-family: "Noto Serif SC", serif; font-size: 16px; }
+.home-meditation .section-coda { text-align: center; border: none; padding: 0; margin: 0; }
+.home-meditation .section-coda-kicker {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.home-meditation .section-coda-quote {
+  margin: 0 auto;
+  max-width: 34rem;
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.55;
+}
+.home-meditation .section-coda-translation {
+  margin: 10px auto 0;
+  max-width: 30rem;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* ── 404 NotFound (centered) ────────────────────────────────────────── */
+.notfound-page { text-align: center; }
+.notfound-code { margin: 0; font-family: "JetBrains Mono", monospace; font-size: 13px; letter-spacing: 0.3em; color: var(--accent); }
+.notfound-title { margin: 18px 0 0; font-family: "Noto Serif SC", "Source Han Serif SC", serif; font-size: 36px; font-weight: 500; }
+.notfound-sub { margin: 10px 0 0; color: var(--muted); font-size: 18px; }
+.notfound-quote { margin: 30px auto 0; max-width: 34rem; color: var(--ink); font-style: italic; font-size: 19px; line-height: 1.55; }
+.notfound-quote-zh { margin: 10px auto 0; max-width: 30rem; color: var(--muted); font-size: 15px; }
+.notfound-rule { height: 1px; width: 64px; background: var(--rule); margin: 34px auto; }
+.notfound-lead { margin: 0 auto 18px; max-width: 32rem; color: var(--muted); font-size: 16px; }
+.notfound-exits { display: flex; justify-content: center; gap: 26px; flex-wrap: wrap; }
+.notfound-exits a, .notfound-exits a:visited { color: var(--accent); border-bottom: 1px solid currentColor; font-size: 17px; white-space: nowrap; }
+.notfound-exits a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.notfound-home { margin: 30px 0 0; }
+.notfound-home a, .notfound-home a:visited { color: var(--muted); border-bottom: none; font-size: 16px; }
+.notfound-home a:hover { color: var(--accent); }
+
+/* ── PageLoading (quiet carnet loader) ──────────────────────────────── */
+.pl-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: var(--paper);
+  animation: pl-fade 0.4s ease both;
+}
+.pl-overlay.is-leaving { opacity: 0; transition: opacity 0.35s ease; }
+.pl-inline { display: flex; justify-content: center; padding-top: 96px; }
+.pl-shell { max-width: 440px; width: 100%; text-align: center; }
+.pl-eyebrow { margin: 0; font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); }
+.pl-body { min-height: 128px; display: flex; flex-direction: column; justify-content: center; margin-top: 34px; }
+.pl-fr { margin: 0; font-style: italic; font-size: 19px; line-height: 1.5; color: var(--accent); animation: pl-fade 0.5s ease both; }
+.pl-zh { margin: 12px 0 0; font-family: "Noto Serif SC", "Source Han Serif SC", serif; font-size: 22px; line-height: 1.5; color: var(--ink); animation: pl-fade 0.5s ease both; }
+.pl-note { margin: 14px 0 0; color: var(--muted); font-size: 13px; animation: pl-fade 0.5s ease both; }
+.pl-foot { margin-top: 40px; display: flex; align-items: center; gap: 16px; justify-content: center; }
+.pl-track { position: relative; width: 140px; height: 2px; background: rgba(26, 26, 26, 0.1); overflow: hidden; }
+.pl-sweep { position: absolute; top: 0; left: 0; height: 2px; width: 30%; background: var(--accent); animation: pl-sweep 1.2s ease-in-out infinite; }
+.pl-count { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; }
+@keyframes pl-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pl-sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(320%); } }
+@media (prefers-reduced-motion: reduce) {
+  .pl-overlay, .pl-fr, .pl-zh, .pl-note { animation: none; }
+  .pl-sweep { animation: none; width: 100%; opacity: 0.5; }
+}
+
+/* ── Witness · 班级寄语墙 (memorial wall, fully centered) ────────────── */
+.witness-page { text-align: center; }
+.witness-masthead { text-align: center; }
+.witness-kicker {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.witness-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 38px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+.witness-lead { margin: 18px auto 0; max-width: 34rem; color: var(--muted); font-size: 16px; line-height: 1.8; }
+
+.witness-traits {
+  margin-top: 48px;
+  padding: 22px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px 48px;
+}
+.witness-trait { display: flex; flex-direction: column; gap: 4px; }
+.witness-trait-fr { color: var(--muted); font-style: italic; font-size: 14px; }
+.witness-trait-zh { font-family: "Noto Serif SC", "Source Han Serif SC", serif; font-size: 19px; }
+.witness-footnote {
+  margin: 14px auto 0;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.witness-footnote a, .witness-footnote a:visited { color: var(--muted); border-bottom: 1px solid var(--rule); }
+.witness-footnote a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+.witness-step { margin-top: 56px; }
+.witness-step-num { margin: 0 0 8px; color: var(--accent); font-size: 13px; font-style: italic; }
+.witness-step-lead { margin: 0 auto; max-width: 30rem; color: var(--muted); font-size: 15px; line-height: 1.7; }
+.witness-note { margin: 12px auto 0; max-width: 32rem; color: var(--muted); font-size: 14px; }
+.witness-actions { margin-top: 20px; display: flex; justify-content: center; }
+.witness-connected { color: var(--ok); font-size: 16px; }
+.witness-error { margin: 16px auto 0; max-width: 30rem; color: var(--accent); font-size: 14px; }
+
+.witness-form { margin-top: 22px; }
+.witness-textarea {
+  display: block;
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: transparent;
+  font-family: "EB Garamond", "Noto Serif SC", serif;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--ink);
+  text-align: center;
+  resize: vertical;
+}
+.witness-textarea:focus { outline: none; border-color: var(--accent); }
+.witness-count { margin: 12px 0 0; color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+
+.witness-receipt {
+  margin: 28px auto 0;
+  max-width: 30rem;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+.witness-receipt p { margin: 0 0 8px; font-size: 15px; }
+.witness-receipt p:last-child { margin-bottom: 0; }
+.witness-receipt-label {
+  display: inline-block;
+  min-width: 3.5em;
+  margin-right: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.witness-receipt-hash { color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+
+.witness-wall { list-style: none; margin: 24px 0 0; padding: 0; }
+.witness-message { padding: 20px 0; border-top: 1px solid var(--rule); }
+.witness-message-text {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 19px;
+  line-height: 1.6;
+}
+.witness-message-meta { margin: 8px 0 0; color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.04em; }
+
+/* ── Resources · 资源与书目 (BIBLIOTHÈQUE → 书架索引 → 编号书架) ──────── */
+.biblio-masthead { text-align: center; }
+.biblio-kicker {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.biblio-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.biblio-quote { margin: 16px auto 0; max-width: 34rem; color: var(--muted); font-size: 17px; font-style: italic; }
+.biblio-quote-zh { margin: 6px auto 0; max-width: 30rem; color: var(--muted); font-size: 15px; }
+
+.biblio-index { margin-top: 56px; }
+.biblio-index-row,
+.biblio-index-row:visited {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 0 16px;
+  align-items: baseline;
+  padding: 13px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: none;
+  color: var(--ink);
+  text-decoration: none;
+}
+.biblio-index-row:hover { color: var(--accent); }
+.biblio-index-label { font-size: 18px; }
+.biblio-index-count { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+.biblio-roman { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--accent); }
+
+.biblio-shelf { margin-top: 72px; scroll-margin-top: 24px; }
+.biblio-shelf-head { display: flex; align-items: baseline; gap: 12px; }
+.biblio-shelf-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 26px;
+  font-weight: 500;
+}
+.biblio-entries { list-style: none; margin: 18px 0 0; padding: 0; }
+.biblio-entry { padding: 15px 0; border-top: 1px solid var(--rule); }
+.biblio-entry-row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+.biblio-entry-title,
+.biblio-entry-title:visited {
+  font-size: 18px;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(139, 0, 0, 0.35);
+}
+.biblio-entry-title:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.biblio-entry-tag {
+  flex: none;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+.biblio-entry-desc { margin: 5px 0 0; color: var(--muted); font-size: 15px; }
+
+.biblio-coda { margin-top: 80px; }
+
+/* ── Atelier · 协作 (masthead → doorways → AI teaser) ───────────────── */
+.atelier-masthead { text-align: center; }
+.atelier-kicker {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.atelier-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.atelier-subtitle { margin: 16px auto 0; max-width: 34rem; color: var(--muted); font-size: 17px; font-style: italic; }
+.atelier-subtitle-zh { margin: 6px auto 0; max-width: 30rem; color: var(--muted); font-size: 15px; }
+
+.atelier-doorways { margin-top: 56px; }
+.atelier-doorway,
+.atelier-doorway:visited {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 0 16px;
+  align-items: baseline;
+  padding: 20px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: none;
+  color: var(--ink);
+  text-decoration: none;
+}
+.atelier-doorways .atelier-doorway:last-child { border-bottom: 1px solid var(--rule); }
+.atelier-doorway:hover { color: var(--accent); }
+.atelier-doorway-num { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--accent); }
+.atelier-doorway-title { font-size: 20px; }
+.atelier-doorway-sub { color: var(--muted); }
+.atelier-doorway-desc { display: block; margin-top: 4px; color: var(--muted); font-size: 15px; line-height: 1.65; }
+.atelier-doorway-arrow { color: var(--accent); }
+
+.atelier-teaser { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule); }
+.atelier-teaser-kicker { margin: 0 0 4px; color: var(--accent); font-size: 14px; font-style: italic; }
+.atelier-teaser-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+.atelier-teaser-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 22px;
+  font-weight: 500;
+}
+.atelier-teaser-flag {
+  flex: none;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.atelier-teaser-desc { margin: 8px 0 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
+
+/* ── Login · 登录 (centered masthead + underline form) ──────────────── */
+.login-masthead { text-align: center; }
+.login-back,
+.login-back:visited { display: inline-block; margin-bottom: 18px; border-bottom: 1px solid var(--rule); color: var(--muted); font-size: 14px; }
+.login-back:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.login-eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.login-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 30px;
+  font-weight: 500;
+}
+.login-summary { margin: 14px auto 0; max-width: 30rem; color: var(--muted); font-size: 15px; }
+
+.login-section { margin-top: 36px; }
+.login-tabs { justify-content: center; }
+.login-form { max-width: 22rem; margin: 28px auto 0; text-align: center; }
+.login-form label { display: block; margin: 0 0 20px; }
+.login-form label > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.login-form input {
+  width: 100%;
+  padding: 8px 0;
+  border: none;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.3);
+  background: transparent;
+  font-size: 20px;
+  text-align: center;
+  color: var(--ink);
+}
+.login-form input:focus { outline: none; border-bottom-color: var(--accent); }
+.login-submit { justify-content: center; margin-top: 8px; }
+.login-form .status-line { margin-top: 18px; text-align: center; }
+
+.login-dest {
+  margin: 32px auto 0;
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.reset-state { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--rule); text-align: center; }
+.reset-state p { margin: 0 0 18px; }
+.reset-state p:last-child { margin-bottom: 0; }
+.reset-ok { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ok); }
+
+/* ── ResourceCurate · 资源增补 (centered masthead + left-aligned form) ── */
+.curate-form { max-width: 32rem; margin: 38px auto 0; }
+.curate-form label { display: block; margin: 0 0 26px; }
+.curate-form label > span { display: block; margin-bottom: 8px; color: var(--muted); font-size: 14px; }
+.curate-form input,
+.curate-form select,
+.curate-form textarea {
+  width: 100%;
+  padding: 9px 0;
+  border: none;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.3);
+  background: transparent;
+  font-family: inherit;
+  font-size: 18px;
+  color: var(--ink);
+}
+.curate-form textarea { line-height: 1.6; resize: vertical; }
+.curate-form select { cursor: pointer; }
+.curate-form input:focus,
+.curate-form select:focus,
+.curate-form textarea:focus { outline: none; border-bottom-color: var(--accent); }
+.curate-actions { margin-top: 8px; gap: 24px; align-items: baseline; }
+.curate-note { margin: 8px 0 0; color: var(--muted); font-size: 13px; font-style: italic; }
+
 /* ── Login · value-prop bullets (login mode) ───────────────────────── */
 .login-values {
   list-style: none;

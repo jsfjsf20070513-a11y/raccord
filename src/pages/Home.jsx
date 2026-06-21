@@ -1,15 +1,8 @@
-import { Link } from 'react-router-dom'
 import DailyMeditation from '../components/DailyMeditation'
 import TitlePageNarration from '../components/TitlePageNarration'
-import {
-  classProfile,
-  courseSchedule,
-} from '../data/siteContent'
+import { classProfile } from '../data/siteContent'
 import { dailyTheoremNotes } from '../data/dailyTheoremNotes.generated'
-import { homeReadingPaths } from '../data/homeReadingPaths'
 import { explanationsCredit, theoremExplanations } from '../data/theoremExplanations.generated'
-import { usePublicAlbums } from '../hooks/usePublicAlbums'
-import { formatCourseSchedule } from '../lib/courseSchedule'
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000
 const THEOREM_ROTATION_START_DAY = Math.floor(Date.UTC(2025, 8, 1) / DAY_IN_MS)
@@ -48,135 +41,55 @@ function getEditionDateLabel() {
   }).format(new Date())
 }
 
+// 扉页 Home — design contract: 封面题署 → 每日定理(KaTeX + 折叠证明)→ 一句冥想 → 细页脚。
+// 课表 / 图版 / 阅读线 / 黑客松入口都已按设计移除;每日定理与冥想接真实轮换数据。
 export default function Home() {
-  const { homeAlbums } = usePublicAlbums()
-  const plates = homeAlbums
-  const courseTable = formatCourseSchedule(courseSchedule)
   const dailyTheorem = dailyTheoremNotes[getRotatingTheoremIndex(dailyTheoremNotes.length)]
   const editionDateLabel = getEditionDateLabel()
+  const proof = theoremExplanations[dailyTheorem.title]
 
   return (
     <article className="page-column home-page">
-      <header className="title-page">
-        <div className="title-page-head">
-          <p className="page-header-kicker">{classProfile.campus}</p>
-          <h1>2025 级数学班</h1>
-          <p className="title-page-subtitle">Trente mathématiciens, une classe.</p>
-          <div className="title-page-copy">
-            <p>Fenêtre sur le présent, miroir pour la mémoire.</p>
-          </div>
-          <TitlePageNarration />
-          <p className="title-page-ledger">{`Édition du ${editionDateLabel}`}</p>
-          <p className="title-page-track">
-            Dev3pack 2026 · Solana + AI hackathon entry
-          </p>
-          <nav className="title-page-nav" aria-label="Showcase entry · 作品展示入口">
-            <Link to="/web3-profile">→ Open Web3 Student Profile (Solana devnet)</Link>
-            <Link to="/hackathon">View Hackathon Showcase</Link>
-          </nav>
-        </div>
+      <header className="home-cover">
+        <p className="home-cover-kicker">{classProfile.campus}</p>
+        <h1 className="home-cover-title">2025 级数学班</h1>
+        <p className="home-cover-subtitle" lang="fr">Trente mathématiciens, une classe.</p>
+        <p className="home-cover-edition">{`Édition du ${editionDateLabel}`}</p>
+        <TitlePageNarration />
       </header>
 
-      <section className="home-fragment theorem-fragment" aria-label="Theorem review · 定理回顾">
-        <article className="daily-entry theorem-entry">
-          <p className="daily-entry-kicker">Rappel mathématique</p>
-          <h2>{dailyTheorem.title}</h2>
-          <p className="daily-entry-prelude">{dailyTheorem.prelude}</p>
-          <div
-            className="daily-entry-display"
-            dangerouslySetInnerHTML={{ __html: dailyTheorem.displayHtml || dailyTheorem.fallback }}
-          />
-          <p className="daily-entry-meta">{dailyTheorem.note}</p>
-          {theoremExplanations[dailyTheorem.title] ? (
-            <details className="theorem-explanation">
-              <summary>
-                <span className="theorem-explanation-arrow" aria-hidden="true">→</span>
-                <span>Voir la preuve · 查看证明思路</span>
-              </summary>
-              <div className="theorem-explanation-body">
-                <div className="theorem-explanation-block">
-                  <p className="theorem-explanation-lang" aria-hidden="true">中文</p>
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: theoremExplanations[dailyTheorem.title].zh,
-                    }}
-                  />
-                </div>
-                <div className="theorem-explanation-block">
-                  <p className="theorem-explanation-lang" aria-hidden="true">Français</p>
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: theoremExplanations[dailyTheorem.title].fr,
-                    }}
-                  />
-                </div>
-                <p className="theorem-explanation-credit">
-                  Bilingual reasoning by {explanationsCredit.generator}
-                </p>
+      <section className="home-theorem" aria-label="每日定理">
+        <p className="home-theorem-kicker">Rappel mathématique · 每日定理</p>
+        <h2 className="home-theorem-title">{dailyTheorem.title}</h2>
+        <p className="home-theorem-prelude">{dailyTheorem.prelude}</p>
+        <div
+          className="home-theorem-formula"
+          dangerouslySetInnerHTML={{ __html: dailyTheorem.displayHtml || dailyTheorem.fallback }}
+        />
+        <p className="home-theorem-note">{dailyTheorem.note}</p>
+        {proof ? (
+          <details className="home-proof">
+            <summary>
+              <span aria-hidden="true">→</span>
+              <span>Voir la preuve · 查看证明思路</span>
+            </summary>
+            <div className="home-proof-body">
+              <div className="theorem-explanation-block">
+                <p className="theorem-explanation-lang" aria-hidden="true">中文</p>
+                <p dangerouslySetInnerHTML={{ __html: proof.zh }} />
               </div>
-            </details>
-          ) : null}
-        </article>
+              <div className="theorem-explanation-block">
+                <p className="theorem-explanation-lang" aria-hidden="true">Français</p>
+                <p lang="fr" dangerouslySetInnerHTML={{ __html: proof.fr }} />
+              </div>
+              <p className="home-proof-credit">Bilingual reasoning by {explanationsCredit.generator}</p>
+            </div>
+          </details>
+        ) : null}
       </section>
 
-      <section className="page-section" id="courses">
-        <h2 className="section-title">§1 Schedule · 课程表</h2>
-        <p className="schedule-context">
-          The real Spring 2026 timetable for the class — six teaching days, bilingual
-          mathematics + French foundation tracks, taught at the Renmin University of
-          China Sino-French Institute (Suzhou campus). Course names and classroom
-          codes are kept in their registered Chinese form for fidelity. ·
-          中法学院 2026 春学期真实课表，完整保留课程名与教室编号。
-        </p>
-        <pre className="editorial-pre">{courseTable}</pre>
+      <section className="home-meditation">
         <DailyMeditation offset={0} />
-      </section>
-
-      <section className="page-section" id="plates">
-        <h2 className="section-title">§2 Plates · 图版</h2>
-        <ol className="plate-list">
-          {plates.map((album, index) => (
-            <li key={album.id}>
-              <span className="plate-roman">Plate {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][index] || `${index + 1}`}. </span>
-              <Link to={`/album/${album.id}`}>
-                {album.date}
-                {album.titleEn ? <>，{album.titleEn}<span className="plate-headline-zh"> · {album.title}</span></> : <>，{album.title}</>}。
-              </Link>
-              <span className="muted-copy"> {album.description}</span>
-            </li>
-          ))}
-        </ol>
-        <p className="plate-overview-reference">
-          <Link to="/gallery">→ Open the plate index · 进入图版总览</Link>
-        </p>
-        <DailyMeditation offset={1} />
-      </section>
-
-      <section className="page-section" id="books">
-        <h2 className="section-title">§3 Reading lines · 阅读线</h2>
-        <ol className="record-list compact">
-          {homeReadingPaths.map((path) => (
-            <li key={path.id} className="record-entry reading-line-entry">
-              <div className="record-entry-head">
-                <div>
-                  <h3 className="reading-line-title">{path.title}</h3>
-                </div>
-              </div>
-              <p>{path.summary}</p>
-              <div className="editorial-actions reading-line-links">
-                {path.items.map((item) => (
-                  <Link key={item.id} to={`/resources/${encodeURIComponent(item.id)}`}>
-                    {item.title}
-                  </Link>
-                ))}
-              </div>
-            </li>
-          ))}
-        </ol>
-        <p className="editorial-note">
-          <Link to="/resources">Open the full resource directory · 进入完整资源目录</Link>
-        </p>
-        <DailyMeditation offset={2} />
       </section>
     </article>
   )

@@ -1,11 +1,15 @@
-import { Fragment, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo } from 'react'
 import DailyMeditation from '../components/DailyMeditation'
-import PageHeader from '../components/PageHeader'
 import { externalLinkProps } from '../lib/safeUrl'
-import { resourceArticles, resourceCategories } from '../data/resourceCatalog'
+import { resourceCategories } from '../data/resourceCatalog'
 import { useResourceCatalog } from '../hooks/useResourceCatalog'
 import { getResourceLead } from '../lib/resourceText'
+
+// 资源 Resources — design contract: BIBLIOTHÈQUE 报头 → 书架索引(I–VIII)→
+// 八个编号书架(罗马数字 + 思源宋体架名 + 细线条目:标题外链 / 暗红 mono 标签 / 中文简介)。
+// 数据单一来源 resourceCatalog(经 useResourceCatalog 并入审核通过的增补);Appendix 已删。
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII']
+const toRoman = (n) => ROMAN[n] || `${n + 1}`
 
 function buildShelfOrder(catalogItems) {
   const preferred = resourceCategories.map((category) => category.label)
@@ -43,75 +47,51 @@ export default function Resources() {
   )
 
   return (
-    <article className="page-column">
-      <PageHeader
-        kicker="Bibliothèque"
-        title="Resources &amp; bibliography · 资源与书目"
-        note="Classer n'est pas clore; c'est laisser les chemins demeurer lisibles. 编目不是封存，而是让路径仍可辨认。"
-        backTo="/"
-        backLabel="Back to title page · 返回扉页"
-      />
+    <article className="page-column resources-page">
+      <header className="biblio-masthead">
+        <p className="biblio-kicker">Bibliothèque</p>
+        <h1 className="biblio-title">资源与书目</h1>
+        <p className="biblio-quote" lang="fr">Classer n&apos;est pas clore ; c&apos;est laisser les chemins demeurer lisibles.</p>
+        <p className="biblio-quote-zh">编目不是封存,而是让路径仍可辨认。</p>
+      </header>
 
       {shelves.length ? (
-        <section className="page-section resource-directory-section">
-          <h2 className="section-title">Shelf index · 书架索引</h2>
-          <ol className="resource-directory-list">
-            {shelves.map((shelf) => (
-              <li key={`directory-${shelf.title}`} className="resource-directory-entry">
-                <a href={`#${shelfAnchors[shelf.title]}`}>{shelf.title}</a>
-                <span>{shelf.items.length} {shelf.items.length === 1 ? 'entry' : 'entries'} · {shelf.items.length} 条</span>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <nav className="biblio-index" aria-label="书架索引">
+          {shelves.map((shelf, index) => (
+            <a key={`idx-${shelf.title}`} href={`#${shelfAnchors[shelf.title]}`} className="biblio-index-row">
+              <span className="biblio-roman" aria-hidden="true">{toRoman(index)}</span>
+              <span className="biblio-index-label">{shelf.title}</span>
+              <span className="biblio-index-count">{shelf.items.length} 条</span>
+            </a>
+          ))}
+        </nav>
       ) : null}
 
       {shelves.map((shelf, index) => (
-        <Fragment key={shelf.title}>
-          <section className="page-section" id={shelfAnchors[shelf.title]}>
-            <h2 className="section-title">{shelf.title}</h2>
-            {shelf.intro ? <p className="resource-shelf-intro">{shelf.intro}</p> : null}
-            <ol className="record-list">
-              {shelf.items.map((item) => (
-                <li key={item.id} className="record-entry">
-                  <h3>
-                    <a {...externalLinkProps(item.url)}>{item.title}</a>
-                  </h3>
-                  {item.tag ? <p className="record-meta">{item.tag}</p> : null}
-                  {getResourceLead(item) ? <p className="resource-entry-note">{getResourceLead(item)}</p> : null}
-                  <p className="resource-entry-links">
-                    <a {...externalLinkProps(item.url)}>Open original · 直达原网站</a>
-                    <span> · </span>
-                    <Link to={`/resources/${encodeURIComponent(item.id)}`}>In-site note · 查看站内条目</Link>
-                  </p>
+        <section key={shelf.title} id={shelfAnchors[shelf.title]} className="biblio-shelf">
+          <div className="biblio-shelf-head">
+            <span className="biblio-roman" aria-hidden="true">{toRoman(index)}</span>
+            <h2 className="biblio-shelf-title">{shelf.title}</h2>
+          </div>
+          <ol className="biblio-entries">
+            {shelf.items.map((item) => {
+              const lead = getResourceLead(item)
+              return (
+                <li key={item.id} className="biblio-entry">
+                  <div className="biblio-entry-row">
+                    <a {...externalLinkProps(item.url)} className="biblio-entry-title">{item.title}</a>
+                    {item.tag ? <span className="biblio-entry-tag">{item.tag}</span> : null}
+                  </div>
+                  {lead ? <p className="biblio-entry-desc">{lead}</p> : null}
                 </li>
-              ))}
-            </ol>
-          </section>
-
-          {index < shelves.length - 1 ? (
-            <div className="resource-breath">
-              <DailyMeditation offset={8 + index} className="is-breath" />
-            </div>
-          ) : null}
-        </Fragment>
+              )
+            })}
+          </ol>
+        </section>
       ))}
 
-      <section className="page-section">
-        <h2 className="section-title">Appendix · 附录</h2>
-        <ol className="record-list compact appendix-list">
-          {resourceArticles.map((article) => (
-            <li key={article.title} className="record-entry">
-              <h3>
-                <a {...externalLinkProps(article.url)}>{article.title}</a>
-              </h3>
-              <p className="record-meta">
-                {[article.author, article.date, article.tag].filter(Boolean).join(' · ')}
-              </p>
-            </li>
-          ))}
-        </ol>
-        <DailyMeditation offset={16} className="is-breath" />
+      <section className="home-meditation biblio-coda">
+        <DailyMeditation offset={8} />
       </section>
     </article>
   )

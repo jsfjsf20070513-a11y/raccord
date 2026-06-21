@@ -1,7 +1,4 @@
-import { Anchor, ExternalLink, History, ShieldCheck, Sparkles, Wallet } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useAuth } from '../context/useAuth'
 import { SEED_CLASS_WALLETS } from '../data/classRegistry'
 import {
   PROGRAM_ID,
@@ -21,10 +18,18 @@ import {
 // the production site (tx TLYjToQB…m9vX → PDA 65RxSkm4…DaC2G8).
 const SEED_BROWSE_WALLET = SEED_CLASS_WALLETS[0] || null
 
+// On-chain hard limit is 200 UTF-8 bytes. The friendly counter caps at
+// 60 characters — 60 Chinese chars ≈ 180 bytes < 200, so the byte guard
+// below stays a backstop that should never trip in normal use.
 const MAX_BYTES = 200
+const CHAR_LIMIT = 60
 
 function utf8ByteLength(value) {
   return new TextEncoder().encode(value).length
+}
+
+function charLength(value) {
+  return [...value].length
 }
 
 function formatTimestamp(seconds) {
@@ -35,12 +40,11 @@ function formatTimestamp(seconds) {
 }
 
 export default function SolanaWitness() {
-  const { user } = useAuth()
   const [walletKey, setWalletKey] = useState(null)
   const [statement, setStatement] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [history, setHistory] = useState([])
-  const [historyAuthor, setHistoryAuthor] = useState(null)
+  const [, setHistoryAuthor] = useState(null)
   const [historyLoading, setHistoryLoading] = useState(false)
   const [feedback, setFeedback] = useState(null)
   const [error, setError] = useState(null)
@@ -161,18 +165,22 @@ export default function SolanaWitness() {
       setError(null)
 
       if (!walletKey) {
-        setError('Connect a wallet first. · 请先连接 Phantom 钱包。')
+        setError('先连接钱包,才能留下这句话。')
         return
       }
       if (!statement.trim()) {
-        setError('Write the statement you want to anchor first. · 请先写一段想要 anchor 的内容。')
+        setError('先写下你想留下的话。')
         return
       }
-      const bytes = utf8ByteLength(statement)
-      if (bytes > MAX_BYTES) {
-        setError(
-          `Too long: ${bytes} bytes. The on-chain limit is ${MAX_BYTES} bytes. · 太长了 ${bytes} 字节，上链最多 ${MAX_BYTES} 字节。`,
-        )
+      const chars = charLength(statement)
+      if (chars > CHAR_LIMIT) {
+        setError(`最多 ${CHAR_LIMIT} 字 —— 删去 ${chars - CHAR_LIMIT} 字再试。`)
+        return
+      }
+      // Byte backstop: the char cap keeps us well under MAX_BYTES, but emoji
+      // can be 4 bytes each, so guard the real on-chain limit too.
+      if (utf8ByteLength(statement) > MAX_BYTES) {
+        setError('这句话太长了,精简一下再试。')
         return
       }
 
@@ -197,249 +205,121 @@ export default function SolanaWitness() {
     [statement, walletKey, refreshHistory],
   )
 
-  const remainingBytes = MAX_BYTES - utf8ByteLength(statement)
+  const remainingChars = CHAR_LIMIT - charLength(statement)
   const programId = PROGRAM_ID.toBase58()
+  const programShort = `${programId.slice(0, 7)}…${programId.slice(-5)}`
 
   return (
-    <article className="hackathon-page">
-      <header className="hackathon-hero">
-        <div className="hackathon-hero-copy">
-          <p className="hackathon-eyebrow">Dev3pack Solana track · custom Anchor program · devnet</p>
-          <h1>Solana Witness · 见证墙</h1>
-          <p className="hackathon-hero-summary">
-            A standalone demo of the custom Rust Anchor program written for this hackathon. Every
-            statement on this page is permanently inscribed on Solana devnet via a
-            per-(signer, nonce) PDA. No mainnet, no money — just a quiet, public &ldquo;I was here.&rdquo;
-          </p>
-          <p className="hackathon-hero-context" lang="zh">
-            班级见证墙：用我自己写的 Anchor 程序把同学的留言永久记录在 Solana 测试网。
-            每一条留言都有一个独立的 PDA 账户，写入后没有人能删除它，包括我自己。
-          </p>
-          <div className="hackathon-actions" aria-label="Solana witness links">
-            <a
-              className="hackathon-button"
-              href={programExplorerLink()}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <ExternalLink size={17} aria-hidden="true" />
-              View program on Solscan
-            </a>
-            <Link className="hackathon-button" to="/web3-profile">
-              <Anchor size={17} aria-hidden="true" />
-              Back to Web3 Student Profile
-            </Link>
-          </div>
-        </div>
-        <aside className="hackathon-hero-panel" aria-label="Program snapshot">
-          <div className="hackathon-stat">
-            <span>Program ID</span>
-            <strong className="wallet-address-value">{programId}</strong>
-          </div>
-          <div className="hackathon-stat">
-            <span>Cluster</span>
-            <strong>Solana Devnet</strong>
-          </div>
-          <div className="hackathon-stat">
-            <span>Framework</span>
-            <strong>Anchor 0.29 (Rust)</strong>
-          </div>
-        </aside>
+    <article className="page-column witness-page">
+      <header className="witness-masthead">
+        <p className="witness-kicker">Pour la classe · 班级寄语</p>
+        <h1 className="witness-title">班级寄语墙</h1>
+        <p className="witness-lead">
+          给这个班留下一句话 —— 一句你想被记住的话。写下后它就一直留在这里,谁也改不了、谁也删不掉。
+        </p>
       </header>
 
-      <section className="hackathon-section">
-        <p className="hackathon-kicker">01 · Connect</p>
-        <h2>Connect a Phantom wallet on Devnet</h2>
-        <article className="hackathon-card">
-          <p>
-            This page only writes to <strong>Solana devnet</strong>. Devnet SOL has no monetary value
-            and cannot be exchanged for mainnet SOL. Switch Phantom to Devnet (Settings → Developer
-            Settings → Testnet Mode → Solana Devnet), then come back and click connect.
-          </p>
-          {phantomMissing ? (
-            <p className="status-line is-error">
-              Phantom not detected. ·{' '}
-              <a href="https://phantom.app/download" target="_blank" rel="noreferrer">
-                Install Phantom
-              </a>{' '}
-              and refresh.
-            </p>
-          ) : null}
-          <div className="hackathon-actions" aria-label="Wallet controls">
-            {!walletKey ? (
-              <button type="button" className="hackathon-button is-primary" onClick={connectWallet}>
-                <Wallet size={17} aria-hidden="true" />
-                Connect Phantom · 连接钱包
-              </button>
-            ) : (
-              <span className="hackathon-button is-disabled" aria-disabled="true">
-                <Wallet size={17} aria-hidden="true" />
-                Connected · 已连接 ({walletKey.slice(0, 6)}…{walletKey.slice(-6)})
-              </span>
-            )}
-          </div>
-          {user ? (
-            <p className="hackathon-section-lead">
-              Site account · 站点身份: {user.email ?? user.id}
-            </p>
-          ) : null}
-        </article>
+      <section className="witness-traits" aria-label="三个品质">
+        <div className="witness-trait">
+          <span className="witness-trait-fr">Permanent</span>
+          <span className="witness-trait-zh">永久保存</span>
+        </div>
+        <div className="witness-trait">
+          <span className="witness-trait-fr">Public</span>
+          <span className="witness-trait-zh">公开可见</span>
+        </div>
+        <div className="witness-trait">
+          <span className="witness-trait-fr">Inaltérable</span>
+          <span className="witness-trait-zh">不可篡改</span>
+        </div>
       </section>
+      <p className="witness-footnote">
+        由 Solana 区块链承载 · 程序{' '}
+        <a href={programExplorerLink()} target="_blank" rel="noreferrer">{programShort}</a>
+        {' '}· MIT 开源
+      </p>
 
-      <section className="hackathon-section">
-        <p className="hackathon-kicker">02 · Anchor</p>
-        <h2>Inscribe a statement permanently</h2>
-        <article className="hackathon-card">
-          <form className="editorial-form" onSubmit={handleSubmit}>
-            <label htmlFor="witness-statement">
-              <span>
-                Statement &middot; max {MAX_BYTES} UTF-8 bytes (~66 Chinese chars or 200 ASCII)
-              </span>
-              <textarea
-                id="witness-statement"
-                rows={4}
-                value={statement}
-                onChange={(event) => setStatement(event.target.value)}
-                disabled={submitting}
-                placeholder="Spring 2026, the moment a theorem clicked. · 2026 春季数学课，某个让我开窍的瞬间。"
-              />
-            </label>
-            <p className="hackathon-section-lead" aria-live="polite">
-              {remainingBytes >= 0
-                ? `${remainingBytes} bytes remaining · 剩余 ${remainingBytes} 字节`
-                : `Over by ${Math.abs(remainingBytes)} bytes · 超出 ${Math.abs(remainingBytes)} 字节`}
-            </p>
-            <div className="hackathon-actions" aria-label="Anchor controls">
-              <button
-                type="submit"
-                className="hackathon-button is-primary"
-                disabled={submitting || !walletKey || remainingBytes < 0}
-              >
-                <Anchor size={17} aria-hidden="true" />
-                {submitting ? 'Anchoring on devnet…' : 'Anchor on devnet · 上链记录'}
-              </button>
-            </div>
-          </form>
-          {error ? <p className="status-line is-error">{error}</p> : null}
-          {feedback ? (
-            <div className="contact-panel">
-              <dl>
-                <div>
-                  <dt>Status</dt>
-                  <dd>Confirmed on devnet · 已确认上链</dd>
-                </div>
-                <div>
-                  <dt>Transaction signature</dt>
-                  <dd className="wallet-address-value">{feedback.signature}</dd>
-                </div>
-                <div>
-                  <dt>PDA</dt>
-                  <dd className="wallet-address-value">{feedback.pda}</dd>
-                </div>
-                <div>
-                  <dt>Verify</dt>
-                  <dd>
-                    <a href={feedback.explorerTx} target="_blank" rel="noreferrer">
-                      Transaction on Solscan
-                    </a>
-                    {' · '}
-                    <a href={feedback.explorerAccount} target="_blank" rel="noreferrer">
-                      PDA on Solscan
-                    </a>
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          ) : null}
-          <p className="hackathon-ai-badge">
-            <ShieldCheck size={15} aria-hidden="true" />
-            Devnet only. The program is open-source under MIT — see{' '}
-            <code>programs/class-anchor/src/lib.rs</code>.
+      <section className="witness-step">
+        <p className="witness-step-num">01 · 先连接你的钱包</p>
+        <p className="witness-step-lead">钱包就像你的署名 —— 它证明这句话是你留下的。</p>
+        {phantomMissing ? (
+          <p className="witness-note">
+            还没有钱包?装一个{' '}
+            <a href="https://phantom.app/download" target="_blank" rel="noreferrer">Phantom</a>
+            (免费浏览器插件,两分钟搞定),再刷新页面就好。
           </p>
-        </article>
-      </section>
-
-      <section className="hackathon-section">
-        <p className="hackathon-kicker">03 · History</p>
-        <h2>{walletKey ? 'What this wallet has anchored' : 'What the seed wallet has anchored'}</h2>
-        <article className="hackathon-card">
-          <div className="feature-card-head">
-            <h3>Read straight from the program</h3>
-            <span className="feature-status">
-              <History size={15} aria-hidden="true" />
-              {historyLoading ? 'Reading…' : `${history.length} record${history.length === 1 ? '' : 's'}`}
-            </span>
-          </div>
-          <p>
-            Every entry below is fetched with{' '}
-            <code>program.account.classAnchor.all([memcmp on author])</code> — no third-party
-            indexer, just the deployed Anchor program and devnet RPC.{' '}
-            {walletKey ? (
-              <>Showing the records owned by your connected wallet.</>
-            ) : historyAuthor ? (
-              <>
-                Showing the seed wallet&rsquo;s records (
-                <code className="wallet-address-value">{historyAuthor.slice(0, 6)}…{historyAuthor.slice(-6)}</code>
-                ) so this section is not blank for judges without a Phantom wallet. Connect to see your own.
-              </>
-            ) : null}
-          </p>
-          {history.length === 0 && !historyLoading ? (
-            <p className="hackathon-section-lead">
-              {walletKey
-                ? 'This wallet has not anchored any statement yet. Anchor one above to see it appear here.'
-                : 'No PDAs yet. Reload to retry, or anchor one yourself in §02 above.'}
-            </p>
+        ) : null}
+        <div className="witness-actions">
+          {!walletKey ? (
+            <button type="button" className="vocab-verify" onClick={connectWallet}>连接钱包</button>
           ) : (
-            <ol className="memo-feed-list">
-              {history.map((item) => (
-                <li key={item.pda} className="memo-feed-entry">
-                  <div className="memo-feed-head">
-                    <span className="memo-feed-time">
-                      {formatTimestamp(item.timestamp)} &middot; nonce {item.nonce}
-                    </span>
-                    <a
-                      className="memo-feed-link"
-                      href={`https://solscan.io/account/${item.pda}?cluster=devnet`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <ExternalLink size={13} aria-hidden="true" />
-                      PDA
-                    </a>
-                  </div>
-                  <pre className="signed-statement">{item.statement}</pre>
-                  <p className="memo-feed-sig">
-                    PDA: {item.pda.slice(0, 8)}…{item.pda.slice(-6)}
-                  </p>
-                </li>
-              ))}
-            </ol>
+            <span className="witness-connected">● 已连接 · 尾号 {walletKey.slice(-4)}</span>
           )}
-        </article>
+        </div>
+        {error && !walletKey ? <p className="witness-error">{error}</p> : null}
       </section>
 
-      <section className="hackathon-section">
-        <p className="hackathon-kicker">Coda</p>
-        <h2>Why this exists</h2>
-        <article className="hackathon-card">
-          <p>
-            <em>Anchored, not stored.</em> The class collaboration website at the root URL is a
-            quiet bilingual class notebook. This page is its hard-edged twin — written in Rust,
-            deployed to a public ledger, and verifiable by anyone with a browser.
+      <section className="witness-step">
+        <p className="witness-step-num">02 · 写下你的寄语</p>
+        <form className="witness-form" onSubmit={handleSubmit}>
+          <textarea
+            className="witness-textarea"
+            rows={3}
+            value={statement}
+            onChange={(event) => setStatement(event.target.value)}
+            disabled={submitting}
+            placeholder="想对这个班说的一句话……"
+            aria-label="你的寄语"
+          />
+          <p className="witness-count" aria-live="polite">
+            {remainingChars >= 0 ? `还能写 ${remainingChars} 字` : `超出 ${-remainingChars} 字`}
           </p>
-          <p>
-            Pair with{' '}
-            <Link to="/web3-profile#onchain-feed">/web3-profile §04 — Class collective memo feed</Link>{' '}
-            (live RPC read across the class wallet registry, SPL Memo path) for a complementary
-            view of what the class has written on Solana. The history above is the persistent
-            class_anchor PDA path; §04 is the SPL Memo path with a wider class scope.
+          <div className="witness-actions">
+            <button
+              type="submit"
+              className="vocab-verify"
+              disabled={submitting || !walletKey || remainingChars < 0 || !statement.trim()}
+            >
+              {submitting ? '正在留下…' : '留下这句话'}
+            </button>
+          </div>
+        </form>
+        {error && walletKey ? <p className="witness-error">{error}</p> : null}
+        {feedback ? (
+          <div className="witness-receipt">
+            <p><span className="witness-receipt-label">状态</span>已永久保存</p>
+            <p>
+              <span className="witness-receipt-label">凭证</span>
+              <span className="witness-receipt-hash">{feedback.signature.slice(0, 10)}…{feedback.signature.slice(-8)}</span>
+            </p>
+            <p>
+              <span className="witness-receipt-label">核验</span>
+              <a href={feedback.explorerTx} target="_blank" rel="noreferrer">在 Solscan 上查看 →</a>
+            </p>
+          </div>
+        ) : null}
+      </section>
+
+      <section className="witness-step">
+        <p className="witness-step-num">03 · 已经留下的话</p>
+        {history.length === 0 && !historyLoading ? (
+          <p className="witness-step-lead">
+            {walletKey ? '你还没有留下寄语 —— 在上面写下第一句吧。' : '还没有寄语,来写下第一句。'}
           </p>
-          <p className="hackathon-ai-badge">
-            <Sparkles size={15} aria-hidden="true" />
-            Built solo by Jin Shuopeng for Dev3pack 2026. AI-assisted dev, human-verified, MIT.
-          </p>
-        </article>
+        ) : (
+          <ol className="witness-wall">
+            {history.map((item) => (
+              <li key={item.pda} className="witness-message">
+                <p className="witness-message-text">{item.statement}</p>
+                <p className="witness-message-meta">
+                  {formatTimestamp(item.timestamp)}{' · '}
+                  <a href={`https://solscan.io/account/${item.pda}?cluster=devnet`} target="_blank" rel="noreferrer">核验</a>
+                </p>
+              </li>
+            ))}
+          </ol>
+        )}
+        {historyLoading ? <p className="witness-step-lead">正在读取…</p> : null}
       </section>
     </article>
   )

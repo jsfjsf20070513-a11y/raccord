@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import PageHeader from '../components/PageHeader'
 import { useAuth } from '../context/useAuth'
 import { frenchVocabulary } from '../data/frenchVocabulary'
 import {
@@ -43,12 +42,23 @@ function shuffled(arr) {
   return a
 }
 
-function Stat({ label, value }) {
-  return (
-    <span>
-      {label} <span style={{ color: 'var(--accent)' }}>{value}</span>
-    </span>
-  )
+// Short grammatical label for the prompt line, e.g. « n.f. » / « v. » / « adj. ».
+function posLabel(word) {
+  if (!word) return ''
+  if (word.pos === 'verb') return 'v.'
+  if (word.pos === 'adjective') return 'adj.'
+  if (word.pos === 'noun') return word.gender === 'm' ? 'n.m.' : word.gender === 'f' ? 'n.f.' : 'n.'
+  return ''
+}
+
+// Long italic part-of-speech for the study card, in French.
+function posLong(word) {
+  if (!word) return ''
+  if (word.pos === 'verb') return 'verbe'
+  if (word.pos === 'adjective') return 'adjectif'
+  if (word.pos === 'adverb') return 'adverbe'
+  if (word.pos === 'noun') return word.gender === 'm' ? 'nom masc.' : word.gender === 'f' ? 'nom fém.' : 'nom'
+  return ''
 }
 
 // Turn the SRS study queue into a list of exercise steps. A match warm-up leads
@@ -69,7 +79,9 @@ function buildSession(queue, deck) {
 
 export default function Vocabulary() {
   const { user } = useAuth()
-  const [status, setStatus] = useState('loading') // loading|ready|disabled|compat|empty|error|done
+  const [status, setStatus] = useState('loading') // loading|study|ready|disabled|compat|empty|error|done
+  const [studyList, setStudyList] = useState([]) // {word, state} — preview deck shown before the test
+  const [studyIdx, setStudyIdx] = useState(0)
   const [steps, setSteps] = useState([])
   const [i, setI] = useState(0)
   const [phase, setPhase] = useState('answer') // answer|feedback
@@ -79,6 +91,7 @@ export default function Vocabulary() {
   const [chosen, setChosen] = useState([]) // build: ordered tile ids
   const [match, setMatch] = useState({ sel: null, done: [], wrong: [] })
   const [stats, setStats] = useState({ correct: 0, attempts: 0, combo: 0, maxCombo: 0 })
+  const [wrong, setWrong] = useState([]) // {word, state} missed this session — feeds the review list + 只练错词
   const [deckStats, setDeckStats] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [tag, setTag] = useState('all')
@@ -153,6 +166,8 @@ export default function Vocabulary() {
       if (shuffle) queue = shuffled(queue)
       const built = buildSession(queue, deck)
       setSteps(built)
+      setStudyList(queue.map((q) => ({ word: q.word, state: q.state })))
+      setStudyIdx(0)
       setI(0)
       setPhase('answer')
       setPicked(null)
@@ -160,8 +175,10 @@ export default function Vocabulary() {
       setChosen([])
       setMatch({ sel: null, done: [], wrong: [] })
       setStats({ correct: 0, attempts: 0, combo: 0, maxCombo: 0 })
+      setWrong([])
       spokenRef.current = -1
-      setStatus(built.length ? 'ready' : 'empty')
+      // Preview new words first (先学一遍); the test begins after study or skip.
+      setStatus(built.length ? (queue.length ? 'study' : 'ready') : 'empty')
     } catch (error) {
       setErrorMessage(error?.message || '加载背词数据失败。')
       setStatus('error')
@@ -187,6 +204,9 @@ export default function Vocabulary() {
           maxCombo: Math.max(s.maxCombo, combo),
         }
       })
+      if (!ok && step?.kind === 'card' && step.word) {
+        setWrong((w) => (w.some((x) => x.word.id === step.word.id) ? w : [...w, { word: step.word, state: step.state }]))
+      }
       if (step?.kind === 'card' && user) {
         const now = new Date().toISOString()
         const next = gradeReviewState(
@@ -267,6 +287,33 @@ export default function Vocabulary() {
     setMatch({ sel: null, done: [], wrong: [] })
   }, [i, steps.length])
 
+  // Re-drill only the words missed this session (design: « 只练错词 »).
+  const retryWrong = useCallback(() => {
+    if (!wrong.length) return
+    const deck = tag === 'all' ? VALID_DECK : VALID_DECK.filter((w) => w.tag === tag)
+    const built = buildSession(wrong.map((x) => ({ word: x.word, state: x.state })), deck)
+    setSteps(built)
+    setI(0)
+    setPhase('answer')
+    setPicked(null)
+    setInput('')
+    setChosen([])
+    setMatch({ sel: null, done: [], wrong: [] })
+    setStats({ correct: 0, attempts: 0, combo: 0, maxCombo: 0 })
+    setWrong([])
+    spokenRef.current = -1
+    setStatus('ready')
+  }, [wrong, tag])
+
+  // Study (preview) navigation: step through the deck, then begin the test.
+  const studyNext = useCallback(() => {
+    setStudyIdx((idx) => {
+      if (idx + 1 >= studyList.length) { setStatus('ready'); return idx }
+      return idx + 1
+    })
+  }, [studyList.length])
+  const skipStudy = useCallback(() => setStatus('ready'), [])
+
   // speak the listen prompt when its step appears; autofocus the spelling input
   useEffect(() => {
     if (status !== 'ready' || !current) return
@@ -310,6 +357,19 @@ export default function Vocabulary() {
     return () => window.removeEventListener('keydown', onKey)
   }, [status, phase, current, choose, submitSpelling, next])
 
+  // study preview: Enter / Space advances to the next word (or the test)
+  useEffect(() => {
+    if (status !== 'study') return undefined
+    const onKey = (event) => {
+      if (event.key === 'Enter' || event.code === 'Space') {
+        event.preventDefault()
+        studyNext()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [status, studyNext])
+
   // ── export / import progress ──
   const handleExport = useCallback(async () => {
     if (!user) return
@@ -352,176 +412,209 @@ export default function Vocabulary() {
     [user, load],
   )
 
-  const showControls = user && (status === 'ready' || status === 'empty' || status === 'done')
+  // controls (tags / shuffle / import-export / stats) sit on the idle + done
+  // screens only — never during an active lesson, per the design's clean flow.
+  const showControls = user && (status === 'empty' || status === 'done')
 
   // ── render helpers ──
   const ex = current?.exercise
   const fb = phase === 'feedback'
+  const acc = stats.attempts ? `${Math.round((stats.correct / stats.attempts) * 100)}%` : '—'
 
-  function optionMark(opt) {
-    if (!fb) return { color: 'inherit', mark: '' }
-    if (opt === ex.answer) return { color: 'var(--ok)', mark: '✓', tint: 'ok' }
-    if (opt === picked) return { color: 'var(--accent)', mark: '✗', tint: 'no', strike: true }
-    return { color: 'var(--muted)', mark: '' }
-  }
-
-  function renderChoice() {
-    const prompt = ex.type === EXERCISE_TYPES.cloze
-      ? ex.sentence
-      : ex.type === EXERCISE_TYPES.listen
-        ? null
-        : ex.prompt
+  function renderOptions() {
     return (
-      <>
-        {ex.type === EXERCISE_TYPES.listen ? (
-          <button type="button" className="text-button vocab-replay" onClick={() => speak(ex.audioText)}>
-            ▶ 再听一次 · écouter
-          </button>
-        ) : (
-          <p className="vocab-word" lang={ex.type === EXERCISE_TYPES.cloze ? 'fr' : undefined}>{prompt}</p>
-        )}
-        <ul className="vocab-options">
-          {ex.options.map((opt, idx) => {
-            const m = optionMark(opt)
-            return (
-              <li key={opt}>
-                <button
-                  type="button"
-                  className={`vocab-option${m.tint ? ` is-${m.tint}` : ''}`}
-                  onClick={() => choose(opt)}
-                  disabled={fb}
-                  style={{ color: m.color, textDecoration: m.strike ? 'line-through' : 'none' }}
-                  lang={ex.type === EXERCISE_TYPES.recognition ? undefined : 'fr'}
-                >
-                  <span className="vocab-option-key" aria-hidden="true">{idx + 1}</span>
-                  <span className="vocab-option-text">{opt}</span>
-                  {m.mark ? <span className="vocab-option-mark">{m.mark}</span> : null}
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      </>
-    )
-  }
-
-  function renderSpelling() {
-    return (
-      <>
-        <p className="vocab-word">{ex.prompt}</p>
-        <p className="daily-entry-meta vocab-gender">拼出对应的法语词 · écris en français</p>
-        <input
-          ref={inputRef}
-          className="vocab-input"
-          lang="fr"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') submitSpelling() }}
-          disabled={fb}
-          autoComplete="off"
-          autoCapitalize="off"
-          spellCheck={false}
-          aria-label="法语拼写输入"
-        />
-        {!fb ? (
-          <div className="editorial-actions vocab-grade">
-            <button type="button" className="text-button" onClick={submitSpelling}>提交 <span className="vocab-key">回车</span></button>
-          </div>
-        ) : null}
-      </>
-    )
-  }
-
-  function renderBuild() {
-    const map = Object.fromEntries(ex.bank.map((t) => [t.id, t.w]))
-    return (
-      <>
-        <p className="daily-entry-meta vocab-gender">把词块拼成正确句子 · reconstruis la phrase</p>
-        <p className="vocab-build-line" lang="fr">
-          {chosen.length
-            ? chosen.map((id) => (
-              <button key={id} type="button" className="vocab-tile is-chosen" onClick={() => tapTile(id)} disabled={fb}>{map[id]}</button>
-            ))
-            : <span className="vocab-build-placeholder">点词块组句…</span>}
-        </p>
-        <p className="vocab-build-bank" lang="fr">
-          {ex.bank.filter((t) => !chosen.includes(t.id)).map((t) => (
-            <button key={t.id} type="button" className="vocab-tile" onClick={() => tapTile(t.id)} disabled={fb}>{t.w}</button>
-          ))}
-        </p>
-        {!fb ? (
-          <div className="editorial-actions vocab-grade">
-            <button type="button" className="text-button" onClick={submitBuild} disabled={!chosen.length}>提交</button>
-          </div>
-        ) : null}
-      </>
-    )
-  }
-
-  function renderMatch() {
-    const flash = (side, id) => match.wrong.includes(`${side}${id}`)
-    return (
-      <>
-        <p className="daily-entry-meta vocab-gender">点一对 法语 ↔ 中文 · associe</p>
-        <div className="vocab-match">
-          <div className="vocab-match-col">
-            {ex.left.map((c) => (
+      <ul className="vocab-options">
+        {ex.options.map((opt) => {
+          let mark = ''
+          let tint = ''
+          let strike = false
+          if (fb) {
+            if (opt === ex.answer) { mark = '✓'; tint = 'ok' }
+            else if (opt === picked) { mark = '✗'; tint = 'no'; strike = true }
+            else { tint = 'dim' }
+          }
+          return (
+            <li key={opt}>
               <button
-                key={c.id}
                 type="button"
-                lang="fr"
-                className={`vocab-tile${match.done.includes(c.id) ? ' is-done' : ''}${match.sel?.side === 'L' && match.sel?.id === c.id ? ' is-sel' : ''}${flash('L', c.id) ? ' is-wrong' : ''}`}
-                onClick={() => tapMatch('L', c.id)}
-                disabled={match.done.includes(c.id)}
-              >{c.text}</button>
-            ))}
-          </div>
-          <div className="vocab-match-col">
-            {ex.right.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                className={`vocab-tile${match.done.includes(c.id) ? ' is-done' : ''}${match.sel?.side === 'R' && match.sel?.id === c.id ? ' is-sel' : ''}${flash('R', c.id) ? ' is-wrong' : ''}`}
-                onClick={() => tapMatch('R', c.id)}
-                disabled={match.done.includes(c.id)}
-              >{c.text}</button>
-            ))}
-          </div>
-        </div>
-      </>
+                className={`vocab-option${tint ? ` is-${tint}` : ''}`}
+                onClick={() => choose(opt)}
+                disabled={fb}
+                style={strike ? { textDecoration: 'line-through' } : undefined}
+                lang={ex.type === EXERCISE_TYPES.recognition ? undefined : 'fr'}
+              >
+                <span className="vocab-option-text">{opt}</span>
+                {mark ? <span className="vocab-option-mark">{mark}</span> : null}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
     )
+  }
+
+  function renderStage() {
+    switch (ex.type) {
+      case EXERCISE_TYPES.match: {
+        const flash = (side, id) => match.wrong.includes(`${side}${id}`)
+        const tileClass = (side, c) => `vocab-tile${match.done.includes(c.id) ? ' is-done' : ''}${match.sel?.side === side && match.sel?.id === c.id ? ' is-sel' : ''}${flash(side, c.id) ? ' is-wrong' : ''}`
+        return (
+          <>
+            <p className="vocab-prompt">Associez · 配对</p>
+            <p className="vocab-prompt-sub">点法语,再点对应的中文。</p>
+            <div className="vocab-match">
+              <div className="vocab-match-col">
+                {ex.left.map((c) => (
+                  <button key={c.id} type="button" lang="fr" className={tileClass('L', c)} onClick={() => tapMatch('L', c.id)} disabled={match.done.includes(c.id)}>{c.text}</button>
+                ))}
+              </div>
+              <div className="vocab-match-col">
+                {ex.right.map((c) => (
+                  <button key={c.id} type="button" className={tileClass('R', c)} onClick={() => tapMatch('R', c.id)} disabled={match.done.includes(c.id)}>{c.text}</button>
+                ))}
+              </div>
+            </div>
+          </>
+        )
+      }
+      case EXERCISE_TYPES.recognition:
+        return (
+          <>
+            <p className="vocab-prompt">Quel est le sens ? · 选择词义</p>
+            <p className="vocab-word" lang="fr">{ex.prompt}</p>
+            {renderOptions()}
+          </>
+        )
+      case EXERCISE_TYPES.cloze:
+        return (
+          <>
+            <p className="vocab-prompt">Complétez la phrase · 例句填空</p>
+            <p className="vocab-sentence" lang="fr">{ex.sentence}</p>
+            {renderOptions()}
+          </>
+        )
+      case EXERCISE_TYPES.listen:
+        return (
+          <>
+            <p className="vocab-prompt">Écoutez et choisissez · 听写</p>
+            <button type="button" className="vocab-replay" onClick={() => speak(ex.audioText)}>
+              ▶ <span className="vocab-replay-label">再听 · réécouter</span>
+            </button>
+            {renderOptions()}
+          </>
+        )
+      case EXERCISE_TYPES.spelling:
+        return (
+          <>
+            <p className="vocab-prompt">
+              Écrivez en français · 拼写
+              {posLabel(current.word) ? <span className="vocab-prompt-pos"> · {posLabel(current.word)}</span> : null}
+            </p>
+            <p className="vocab-cue">{ex.prompt}</p>
+            <input
+              ref={inputRef}
+              className="vocab-input"
+              lang="fr"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') submitSpelling() }}
+              disabled={fb}
+              placeholder="tapez le mot…"
+              autoComplete="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              aria-label="法语拼写输入"
+            />
+            {!fb ? (
+              <div className="vocab-grade">
+                <button type="button" className="vocab-verify" onClick={submitSpelling}>Vérifier <span className="vocab-key">↵</span></button>
+              </div>
+            ) : null}
+          </>
+        )
+      case EXERCISE_TYPES.build: {
+        const map = Object.fromEntries(ex.bank.map((t) => [t.id, t.w]))
+        return (
+          <>
+            <p className="vocab-prompt">Traduisez la phrase · 词块拼句</p>
+            <p className="vocab-cue vocab-cue-sm">{current.word?.chinese}</p>
+            <div className="vocab-build-line" lang="fr">
+              {chosen.length
+                ? chosen.map((id) => (
+                  <button key={id} type="button" className="vocab-tile is-chosen" onClick={() => tapTile(id)} disabled={fb}>{map[id]}</button>
+                ))
+                : <span className="vocab-build-placeholder">点词块组句…</span>}
+            </div>
+            <div className="vocab-build-bank" lang="fr">
+              {ex.bank.filter((t) => !chosen.includes(t.id)).map((t) => (
+                <button key={t.id} type="button" className="vocab-tile" onClick={() => tapTile(t.id)} disabled={fb}>{t.w}</button>
+              ))}
+            </div>
+            {!fb ? (
+              <div className="vocab-grade">
+                <button type="button" className="vocab-verify" onClick={submitBuild} disabled={!chosen.length}>Vérifier <span className="vocab-key">↵</span></button>
+              </div>
+            ) : null}
+          </>
+        )
+      }
+      default:
+        return null
+    }
   }
 
   function renderFeedback() {
     if (!fb || !ex) return null
-    if (ex.type === EXERCISE_TYPES.match) {
-      return <p className="vocab-fb is-ok">配对完成 ✓</p>
-    }
-    // recognition answer is the Chinese gloss; build answer is the full
-    // sentence; the rest (cloze/listen/spelling) resolve to the French headword.
+    const isMatch = ex.type === EXERCISE_TYPES.match
+    const ok = isMatch || lastCorrect
+    // recognition + build resolve to the exercise answer; the rest reveal the French headword.
     const correct = (ex.type === EXERCISE_TYPES.recognition || ex.type === EXERCISE_TYPES.build)
       ? ex.answer
       : (current.word?.french || ex.answer)
     const gloss = ex.type === EXERCISE_TYPES.build ? null : current.word?.chinese
     return (
-      <div className={`vocab-fb ${lastCorrect ? 'is-ok' : 'is-no'}`}>
-        <p className="vocab-fb-verdict">{lastCorrect ? '答对 ✓ Juste' : '答错 ✗ Faux'}</p>
-        {!lastCorrect ? (
+      <div className={`vocab-fb ${ok ? 'is-ok' : 'is-no'}`}>
+        <p className="vocab-fb-verdict">{isMatch ? '配对完成 ✓' : ok ? '答对 ✓ Juste' : '答错 ✗ Faux'}</p>
+        {!ok ? (
           <p className="vocab-fb-answer">正确答案 <span lang="fr">{correct}</span>{gloss ? <span className="vocab-fb-gloss"> · {gloss}</span> : null}</p>
         ) : null}
+        <div className="vocab-fb-actions">
+          <button type="button" className="vocab-next" onClick={next}>
+            {i + 1 >= steps.length ? 'Terminer · 结束' : 'Continuer · 继续'} <span className="vocab-next-key">↵</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  function renderControls() {
+    return (
+      <div className="vocab-controls">
+        <div className="vocab-control-row">
+          <span className="vocab-control-label" aria-hidden="true">标签</span>
+          {DECK_TAGS.map((t) => (
+            <button key={t} type="button" onClick={() => setTag(t)} aria-pressed={tag === t} className={`vocab-link-btn${tag === t ? ' is-active' : ''}`}>
+              {t === 'all' ? '全部' : t}
+            </button>
+          ))}
+          <span className="vocab-dot" aria-hidden="true">·</span>
+          <button type="button" className={`vocab-link-btn${shuffle ? ' is-active' : ''}`} onClick={() => setShuffle((s) => !s)} aria-pressed={shuffle}>乱序 {shuffle ? '开' : '关'}</button>
+          <button type="button" className="vocab-link-btn" onClick={handleExport}>导出</button>
+          <button type="button" className="vocab-link-btn" onClick={() => fileInputRef.current?.click()}>导入</button>
+          <input ref={fileInputRef} type="file" accept="application/json,.json" onChange={handleImportFile} style={{ display: 'none' }} />
+        </div>
+        {deckStats ? (
+          <p className="vocab-control-stats" aria-label="学习进度">
+            已掌握 <span>{deckStats.mastered}</span> · 学习中 <span>{deckStats.learning}</span> · 新词 <span>{deckStats.newCount}</span> · 连续 <span>{deckStats.streak}</span> 天
+          </p>
+        ) : null}
+        {importMsg ? <p className="vocab-msg">{importMsg}</p> : null}
       </div>
     )
   }
 
   return (
     <main className="page page-narrow vocab-page">
-      <PageHeader
-        kicker="Carnet de vocabulaire · 法语背词"
-        title="间隔重复背词器"
-        summary="多题型轮换 · 艾宾浩斯阶梯调度 · 进度按你的账号保存。"
-        meta={[`词库 ${VALID_DECK.length} 条`, '1–4 选项 · 回车提交']}
-      />
-
       {user && status === 'ready' && current ? (
         <div
           className="vocab-progress"
@@ -531,114 +624,114 @@ export default function Vocabulary() {
           aria-valuemin={1}
           aria-valuemax={steps.length}
         >
-          <span className="vocab-progress-label">{stats.combo >= 2 ? `连击 ${stats.combo}` : '本轮'}</span>
           <span className="vocab-progress-track" aria-hidden="true">
             <span className="vocab-progress-fill" style={{ width: `${Math.round(((i + 1) / steps.length) * 100)}%` }} />
           </span>
-          <span className="vocab-progress-count">{i + 1} / {steps.length}</span>
+          <span className="vocab-progress-side">
+            {stats.combo >= 2 ? `连击 ×${stats.combo}` : `${i + 1} / ${steps.length}`}
+          </span>
         </div>
       ) : null}
 
       {!user ? (
-        <div className="vocab-card vocab-notice">
+        <div className="vocab-notice">
           <p>背词进度按账号保存,请先登录。</p>
-          <p className="editorial-actions"><Link to="/login" className="text-button">前往登录 · Se connecter</Link></p>
+          <p><Link to="/login" className="vocab-link">前往登录 →</Link></p>
         </div>
       ) : null}
 
       {user && status === 'loading' ? (
-        <div className="vocab-card vocab-notice"><p className="daily-entry-meta">正在加载你的背词进度…</p></div>
+        <div className="vocab-notice"><p>正在加载你的背词进度…</p></div>
       ) : null}
 
       {user && status === 'disabled' ? (
-        <div className="vocab-card vocab-notice"><p>站点尚未配置 Supabase,背词功能暂不可用。</p></div>
+        <div className="vocab-notice"><p>站点尚未配置 Supabase,背词功能暂不可用。</p></div>
       ) : null}
 
       {user && status === 'compat' ? (
-        <div className="vocab-card vocab-notice">
+        <div className="vocab-notice">
           <p>背词数据表还没建立。请在 Supabase 执行 <code>setup_vocabulary.sql</code> 后再来。</p>
         </div>
       ) : null}
 
       {user && status === 'error' ? (
-        <div className="vocab-card vocab-notice">
+        <div className="vocab-notice">
           <p>出错了:{errorMessage}</p>
-          <p className="editorial-actions"><button type="button" className="text-button" onClick={load}>重试</button></p>
+          <p><button type="button" className="vocab-link-btn" onClick={load}>重试</button></p>
         </div>
       ) : null}
 
       {user && status === 'empty' ? (
-        <div className="vocab-card vocab-notice">
+        <div className="vocab-notice">
           <p>这个范围今天没有要背的词了。换个标签或明天再来。</p>
         </div>
       ) : null}
 
-      {user && status === 'done' ? (
-        <div className="vocab-card vocab-notice">
-          <p>本轮完成 — 答对 <span style={{ color: 'var(--ok)' }}>{stats.correct}</span> / {stats.attempts}，最高连击 <span style={{ color: 'var(--accent)' }}>{stats.maxCombo}</span>。</p>
-          <p className="editorial-actions"><button type="button" className="text-button" onClick={load}>再来一轮</button></p>
-        </div>
-      ) : null}
+      {user && status === 'study' && studyList[studyIdx] ? (() => {
+        const sw = studyList[studyIdx].word
+        const last = studyIdx + 1 >= studyList.length
+        return (
+          <div className="vocab-study">
+            <div className="vocab-study-head">
+              <p className="vocab-prompt">Aperçu · 先学一遍</p>
+              <span className="vocab-study-count">{studyIdx + 1} / {studyList.length}</span>
+            </div>
+            <div className="vocab-study-body">
+              <div className="vocab-study-title">
+                <h2 lang="fr">{sw.french}</h2>
+                {posLong(sw) ? <span className="vocab-study-pos">{posLong(sw)}</span> : null}
+                {sw.tag ? <span className="vocab-study-tag">{sw.tag}</span> : null}
+              </div>
+              <div className="vocab-study-rule" aria-hidden="true" />
+              <p className="vocab-study-zh">{sw.chinese}</p>
+              {sw.example ? <p className="vocab-study-example" lang="fr">{sw.example}</p> : null}
+            </div>
+            <div className="vocab-study-actions">
+              <button type="button" className="vocab-verify" onClick={studyNext}>
+                {last ? '开始测试 · Commencer' : '下一个 · Suivant'} <span className="vocab-key">↵</span>
+              </button>
+              <button type="button" className="vocab-link-btn" onClick={skipStudy}>跳过预习,直接测试</button>
+            </div>
+          </div>
+        )
+      })() : null}
 
       {user && status === 'ready' && current ? (
-        <div className="vocab-card">
-          {current.kind !== 'match' ? (
-            <p className="daily-entry-kicker vocab-card-kicker">
-              {ex.type === EXERCISE_TYPES.recognition ? '认词 · reconnaître'
-                : ex.type === EXERCISE_TYPES.cloze ? '填空 · compléter'
-                  : ex.type === EXERCISE_TYPES.listen ? '听写 · écouter'
-                    : ex.type === EXERCISE_TYPES.spelling ? '拼写 · épeler'
-                      : ex.type === EXERCISE_TYPES.build ? '拼句 · reconstruire'
-                        : ''}{current.word?.tag ? ` · ${current.word.tag}` : ''}
-            </p>
-          ) : (
-            <p className="daily-entry-kicker vocab-card-kicker">配对 · associer</p>
-          )}
-
-          {ex.type === EXERCISE_TYPES.match ? renderMatch()
-            : ex.type === EXERCISE_TYPES.spelling ? renderSpelling()
-              : ex.type === EXERCISE_TYPES.build ? renderBuild()
-                : renderChoice()}
-
+        <div className="vocab-stage">
+          {renderStage()}
           {renderFeedback()}
-
-          {fb ? (
-            <div className="editorial-actions vocab-grade">
-              <button type="button" className="text-button" onClick={next}>继续 <span className="vocab-key">回车</span></button>
-            </div>
-          ) : null}
         </div>
       ) : null}
 
-      {showControls ? (
-        <footer className="vocab-footer">
-          <div className="editorial-actions tabs vocab-tags">
-            <span className="theorem-explanation-lang" aria-hidden="true">标签</span>
-            {DECK_TAGS.map((t) => (
-              <button key={t} type="button" onClick={() => setTag(t)} aria-pressed={tag === t} className={`text-button${tag === t ? '' : ' subtle'}`}>
-                {t === 'all' ? '全部' : t}
-              </button>
-            ))}
-            <span className="vocab-dot" aria-hidden="true">·</span>
-            <button type="button" className="text-button subtle" onClick={() => setShuffle((s) => !s)} aria-pressed={shuffle}>乱序 {shuffle ? '开' : '关'}</button>
-            <button type="button" className="text-button subtle" onClick={handleExport}>导出</button>
-            <button type="button" className="text-button subtle" onClick={() => fileInputRef.current?.click()}>导入</button>
-            <input ref={fileInputRef} type="file" accept="application/json,.json" onChange={handleImportFile} style={{ display: 'none' }} />
+      {user && status === 'done' ? (
+        <div className="vocab-done">
+          <p className="vocab-prompt">Leçon terminée · 本节完成</p>
+          <p className="vocab-done-score">答对 {stats.correct} / {stats.attempts} 题</p>
+          <p className="vocab-done-meta">正确率 {acc} · 最高连击 ×{stats.maxCombo}</p>
+          <div className="vocab-done-rule" aria-hidden="true" />
+          {wrong.length ? (
+            <>
+              <p className="vocab-prompt-sub">需要复习 · à revoir</p>
+              <div className="vocab-review">
+                {wrong.map(({ word }) => (
+                  <div className="vocab-review-row" key={word.id}>
+                    <span lang="fr">{word.french}</span>
+                    <span className="vocab-review-zh">{word.chinese}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="vocab-prompt-sub">全部答对 —— 漂亮。</p>
+          )}
+          <div className="vocab-done-actions">
+            {wrong.length ? <button type="button" className="vocab-link-btn" onClick={retryWrong}>只练错词</button> : null}
+            <button type="button" className="vocab-link-btn" onClick={load}>再来一轮</button>
           </div>
-          {deckStats ? (
-            <p className="daily-entry-meta vocab-stats" aria-label="学习进度">
-              <Stat label="已掌握" value={deckStats.mastered} />
-              <span className="vocab-dot" aria-hidden="true">·</span>
-              <Stat label="学习中" value={deckStats.learning} />
-              <span className="vocab-dot" aria-hidden="true">·</span>
-              <Stat label="新词" value={deckStats.newCount} />
-              <span className="vocab-dot" aria-hidden="true">·</span>
-              <Stat label="连续" value={`${deckStats.streak} 天`} />
-            </p>
-          ) : null}
-          {importMsg ? <p className="status-line vocab-msg">{importMsg}</p> : null}
-        </footer>
+        </div>
       ) : null}
+
+      {showControls ? renderControls() : null}
     </main>
   )
 }
