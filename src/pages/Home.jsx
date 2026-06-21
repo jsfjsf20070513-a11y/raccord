@@ -76,11 +76,19 @@ export default function Home() {
             <div className="home-proof-body">
               <div className="theorem-explanation-block">
                 <p className="theorem-explanation-lang" aria-hidden="true">中文</p>
-                <p dangerouslySetInnerHTML={{ __html: proof.zh }} />
+                <ol className="home-proof-steps">
+                  {(Array.isArray(proof.zh) ? proof.zh : [proof.zh]).map((step, idx) => (
+                    <li key={idx} dangerouslySetInnerHTML={{ __html: step }} />
+                  ))}
+                </ol>
               </div>
               <div className="theorem-explanation-block">
                 <p className="theorem-explanation-lang" aria-hidden="true">Français</p>
-                <p lang="fr" dangerouslySetInnerHTML={{ __html: proof.fr }} />
+                <ol className="home-proof-steps" lang="fr">
+                  {(Array.isArray(proof.fr) ? proof.fr : [proof.fr]).map((step, idx) => (
+                    <li key={idx} dangerouslySetInnerHTML={{ __html: step }} />
+                  ))}
+                </ol>
               </div>
               <p className="home-proof-credit">Bilingual reasoning by {explanationsCredit.generator}</p>
             </div>

@@ -3639,6 +3639,40 @@
 .home-proof-body { margin: 14px 0 0; display: grid; gap: 18px; text-align: left; }
 .home-proof-body .theorem-explanation-block { max-width: 34rem; margin: 0 auto; }
 .home-proof-body .theorem-explanation-lang { text-align: center; }
+
+/* Numbered proof steps — one move per line, ①②③④ in the margin. */
+.home-proof-steps {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  counter-reset: proof-step;
+  text-align: left;
+}
+.home-proof-steps > li {
+  counter-increment: proof-step;
+  position: relative;
+  margin: 0 0 12px;
+  padding-left: 2.1rem;
+  line-height: 1.6;
+}
+.home-proof-steps > li:last-child { margin-bottom: 0; }
+.home-proof-steps > li::before {
+  content: counter(proof-step);
+  position: absolute;
+  left: 0;
+  top: 0.12em;
+  width: 1.45rem;
+  height: 1.45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  color: var(--accent);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  line-height: 1;
+}
 .home-proof-credit {
   margin: 0;
   text-align: center;
