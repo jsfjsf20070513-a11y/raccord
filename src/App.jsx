@@ -13,17 +13,12 @@ import {
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
 import PageLoading from './components/PageLoading'
-import { useAuth } from './context/useAuth'
-import { useUserRole } from './hooks/useUserRole'
 import Home from './pages/Home'
 import './App.css'
 
 const Resources = lazy(() => import('./pages/Resources'))
-const ResourceDetail = lazy(() => import('./pages/ResourceDetail'))
 const ResourceCurate = lazy(() => import('./pages/ResourceCurate'))
 const ManageHub = lazy(() => import('./pages/ManageHub'))
-const MaterialsDesk = lazy(() => import('./pages/MaterialsDesk'))
-const ModerationCenter = lazy(() => import('./pages/ModerationCenter'))
 const Login = lazy(() => import('./pages/Login'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const NotFound = lazy(() => import('./pages/NotFound'))
@@ -123,38 +118,6 @@ function DeferredPage({ children }) {
   )
 }
 
-function AdminRoute({ children }) {
-  const location = useLocation()
-  const { user } = useAuth()
-  const { isAdmin, loading: roleLoading } = useUserRole()
-
-  if (roleLoading) {
-    return (
-      <ReadyPage>
-        <PageLoading pathname={location.pathname} />
-      </ReadyPage>
-    )
-  }
-
-  if (!user) {
-    return (
-      <ReadyPage>
-        <Navigate to="/login" replace />
-      </ReadyPage>
-    )
-  }
-
-  if (!isAdmin) {
-    return (
-      <ReadyPage>
-        <Navigate to="/manage" replace />
-      </ReadyPage>
-    )
-  }
-
-  return children
-}
-
 function AppRoutes() {
   return (
     <Routes>
@@ -176,21 +139,15 @@ function AppRoutes() {
         <Route path="vocabulary" element={<DeferredPage><Vocabulary /></DeferredPage>} />
         <Route path="resources" element={<DeferredPage><Resources /></DeferredPage>} />
         <Route path="resources/curate" element={<DeferredPage><ResourceCurate /></DeferredPage>} />
-        <Route path="resources/:id" element={<DeferredPage><ResourceDetail /></DeferredPage>} />
-        {/* 协作工作台改称 Atelier;旧 /manage/* 链接重定向到新路径保持兼容。 */}
+        {/* 资源详情页已下线(资源直接外链);旧 /resources/:id 链接回资源目录。 */}
+        <Route path="resources/:id" element={<Navigate to="/resources" replace />} />
+        {/* 协作收敛为「寄语墙 + 资源增补」;材料桌 / 审核中心已下线,旧 /atelier/* 与 /manage/* 链接回协作页。 */}
         <Route path="atelier" element={<DeferredPage><ManageHub /></DeferredPage>} />
-        <Route path="atelier/materials" element={<DeferredPage><MaterialsDesk /></DeferredPage>} />
-        <Route
-          path="atelier/review"
-          element={(
-            <AdminRoute>
-              <DeferredPage><ModerationCenter /></DeferredPage>
-            </AdminRoute>
-          )}
-        />
+        <Route path="atelier/materials" element={<Navigate to="/atelier" replace />} />
+        <Route path="atelier/review" element={<Navigate to="/atelier" replace />} />
         <Route path="manage" element={<Navigate to="/atelier" replace />} />
-        <Route path="manage/materials" element={<Navigate to="/atelier/materials" replace />} />
-        <Route path="manage/review" element={<Navigate to="/atelier/review" replace />} />
+        <Route path="manage/materials" element={<Navigate to="/atelier" replace />} />
+        <Route path="manage/review" element={<Navigate to="/atelier" replace />} />
         <Route path="login" element={<DeferredPage><Login /></DeferredPage>} />
         <Route path="reset-password" element={<DeferredPage><ResetPassword /></DeferredPage>} />
         <Route path="404" element={<DeferredPage><NotFound /></DeferredPage>} />
