@@ -614,7 +614,7 @@ export default function Vocabulary() {
   }
 
   return (
-    <main className="page page-narrow vocab-page">
+    <main className="page-column vocab-page">
       {user && status === 'ready' && current ? (
         <div
           className="vocab-progress"
