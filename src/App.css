@@ -3139,26 +3139,24 @@
 }
 
 /* ── Vocabulary trainer ─────────────────────────────────────────────
-   Editorial styling to match the rest of the carnet: hairline frames
-   (no boxed cards), centered serif word, --accent figures, .text-button
-   actions. Deliberately no emoji / no filled buttons. */
-/* Session progress bar — thin accent fill, label left / fraction right. */
+   Faithful to the Claude-design handoff (Vocabulary.dc.html): a clean,
+   centered single column — no page header, no boxed cards. Each step is
+   a small italic French prompt → stimulus → answer area → tinted verdict
+   banner. Controls (tags / import-export / stats) live only on the idle
+   and done screens, never during an active lesson. */
+.vocab-page { max-width: 600px; }
+
+/* Session progress: thin accent track + a right-aligned combo / fraction. */
 .vocab-progress {
   display: flex;
-  align-items: baseline;
-  gap: 14px;
-  margin-top: 18px;
-  font-size: 14px;
-  color: var(--muted);
-}
-.vocab-progress-label {
-  flex: 0 0 auto;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
 }
 .vocab-progress-track {
   flex: 1 1 auto;
   height: 3px;
-  background: var(--rule);
-  align-self: center;
+  background: rgba(26, 26, 26, 0.1);
 }
 .vocab-progress-fill {
   display: block;
@@ -3166,106 +3164,239 @@
   background: var(--accent);
   transition: width 0.35s ease;
 }
-.vocab-progress-count {
+.vocab-progress-side {
   flex: 0 0 auto;
+  min-width: 64px;
+  text-align: right;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
 
-/* Footer: controls + stats sit below the card, hairline-separated, subtle. */
-.vocab-footer {
-  margin-top: 40px;
-  padding-top: 22px;
-  border-top: 1px solid var(--rule);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-.vocab-footer .editorial-actions {
-  justify-content: center;
-  gap: 16px;
-}
-.vocab-footer .vocab-tags.tabs {
-  margin-bottom: 0;
-}
-.vocab-tags .theorem-explanation-lang {
-  align-self: center;
-  margin: 0 2px 0 0;
-}
-.vocab-stats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: baseline;
-  gap: 4px 0;
-  margin: 0;
-}
-.vocab-stats .vocab-dot,
-.vocab-footer .vocab-tags .vocab-dot {
-  margin: 0 12px;
-  color: var(--rule);
-}
-.vocab-msg {
-  margin: 0;
+/* Idle / notice screens — quiet, centered. */
+.vocab-notice {
+  margin-top: 60px;
+  text-align: center;
   color: var(--muted);
-  font-size: 14px;
+}
+.vocab-notice p { margin: 0 0 14px; }
+.vocab-notice p:last-child { margin-bottom: 0; }
+
+/* Text links / link-buttons used across notices, done screen, controls. */
+.vocab-link,
+.vocab-link-btn {
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.vocab-link-btn.is-active { color: var(--accent); }
+.vocab-link-btn:not(.is-active) { color: var(--muted); border-bottom-color: transparent; }
+.vocab-link:hover,
+.vocab-link-btn:hover { color: var(--ink); border-bottom-color: currentColor; }
+
+/* The active exercise stage — centered, generous top margin. */
+.vocab-stage {
+  margin-top: 48px;
+  text-align: center;
 }
 
-.vocab-card {
-  margin-top: 36px;
-  padding: 44px 24px;
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
-  text-align: center;
+/* Study (preview) card — « Aperçu · 先学一遍 » before the test. */
+.vocab-study { margin-top: 24px; text-align: center; }
+.vocab-study-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 14px;
 }
-.vocab-notice {
+.vocab-study-count {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
   color: var(--muted);
+  white-space: nowrap;
 }
-.vocab-notice p {
-  margin: 0 0 14px;
+.vocab-study-body { margin-top: 40px; }
+.vocab-study-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
-.vocab-notice p:last-child {
-  margin-bottom: 0;
+.vocab-study-title h2 { margin: 0; font-size: 48px; font-weight: 500; line-height: 1; }
+.vocab-study-pos { font-style: italic; font-size: 18px; color: var(--muted); }
+.vocab-study-tag {
+  align-self: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  border: 1px solid rgba(139, 0, 0, 0.3);
+  padding: 2px 7px;
 }
-.vocab-card-kicker {
-  text-align: center;
-  margin-bottom: 18px;
-}
-.vocab-word {
-  margin: 0;
-  font-size: 44px;
-  line-height: 1.1;
-  letter-spacing: 0.01em;
-}
-.vocab-gender {
-  margin: 6px 0 0;
-  font-style: italic;
-}
-.vocab-reveal {
-  max-width: 360px;
-  margin: 26px auto 0;
-}
-.vocab-reveal .theorem-explanation-block {
-  margin-bottom: 16px;
-}
-.vocab-reveal .theorem-explanation-lang {
-  text-align: center;
-}
-.vocab-reveal p {
-  margin: 0;
-}
-.vocab-chinese {
+.vocab-study-rule { width: 54px; height: 3px; background: var(--accent); margin: 18px auto 0; }
+.vocab-study-zh {
+  margin: 24px 0 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
   font-size: 26px;
   color: var(--ink);
 }
-.vocab-grade {
+.vocab-study-example {
+  margin: 16px auto 0;
+  max-width: 30rem;
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.vocab-study-actions {
+  margin-top: 44px;
+  display: flex;
+  align-items: center;
   justify-content: center;
   gap: 28px;
-  margin-top: 30px;
+  flex-wrap: wrap;
 }
+
+/* Small italic accent prompt that heads every step. */
+.vocab-prompt {
+  margin: 0 0 22px;
+  color: var(--accent);
+  font-size: 13px;
+  font-style: italic;
+}
+.vocab-prompt-sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.vocab-prompt-pos {
+  color: var(--muted);
+  font-style: normal;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+}
+
+/* Stimuli. */
+.vocab-word {
+  margin: 0;
+  font-size: 52px;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+.vocab-sentence {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.5;
+}
+.vocab-cue {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 38px;
+  font-weight: 500;
+}
+.vocab-cue-sm { font-size: 26px; line-height: 1.4; }
+
+.vocab-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 32px;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  border-radius: 2px;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 20px;
+  color: var(--ink);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.vocab-replay:hover { border-color: var(--accent); color: var(--accent); }
+.vocab-replay-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* Option rows — full-width, hairline-separated, label left / mark right. */
+.vocab-options {
+  list-style: none;
+  max-width: 420px;
+  margin: 34px auto 0;
+  padding: 0;
+  text-align: left;
+}
+.vocab-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 15px 8px;
+  border: none;
+  border-top: 1px solid var(--rule);
+  background: transparent;
+  color: var(--ink);
+  font-family: "EB Garamond", "Noto Serif SC", serif;
+  font-size: 19px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.vocab-options li:last-child .vocab-option { border-bottom: 1px solid var(--rule); }
+.vocab-option:not(:disabled):hover { background: rgba(26, 26, 26, 0.025); }
+.vocab-option:disabled { cursor: default; }
+.vocab-option.is-ok { background: rgba(63, 122, 78, 0.08); color: var(--ok); }
+.vocab-option.is-no { background: rgba(139, 0, 0, 0.05); color: var(--accent); }
+.vocab-option.is-dim { color: rgba(26, 26, 26, 0.32); }
+.vocab-option-text { flex: 1 1 auto; }
+.vocab-option-mark {
+  flex: 0 0 auto;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+}
+
+.vocab-input {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  margin: 40px auto 0;
+  padding: 10px 0;
+  border: none;
+  border-bottom: 1.5px solid rgba(26, 26, 26, 0.3);
+  background: transparent;
+  font-family: "EB Garamond", serif;
+  font-size: 30px;
+  text-align: center;
+  color: var(--ink);
+}
+.vocab-input::placeholder { color: rgba(26, 26, 26, 0.3); font-style: italic; }
+.vocab-input:focus { outline: none; border-bottom-color: var(--accent); }
+
+.vocab-grade { margin-top: 28px; }
+.vocab-verify {
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 18px;
+  transition: color 0.15s ease;
+}
+.vocab-verify:hover { color: var(--ink); }
+.vocab-verify:disabled { color: var(--muted); border-bottom-color: transparent; cursor: default; }
 .vocab-key {
   margin-left: 6px;
-  padding: 1px 6px;
+  padding: 1px 7px;
   border: 1px solid var(--rule);
   border-radius: 3px;
   font-family: "JetBrains Mono", monospace;
@@ -3274,115 +3405,171 @@
   vertical-align: middle;
 }
 
-/* ── Vocabulary · multi-format exercises ───────────────────────────── */
-.vocab-replay {
-  margin: 8px auto 0;
-  font-size: 16px;
-}
-.vocab-options {
-  list-style: none;
-  margin: 22px 0 0;
-  padding: 0;
-  text-align: left;
-}
-.vocab-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 14px 8px;
-  border: none;
-  border-top: 1px solid var(--rule);
-  background: transparent;
-  font-family: "EB Garamond", "Noto Serif SC", serif;
-  font-size: 19px;
-  cursor: pointer;
-}
-.vocab-options li:last-child .vocab-option {
-  border-bottom: 1px solid var(--rule);
-}
-.vocab-option:disabled { cursor: default; }
-.vocab-option.is-ok { background: rgba(63, 122, 78, 0.08); }
-.vocab-option.is-no { background: rgba(139, 0, 0, 0.05); }
-.vocab-option-key {
-  flex: 0 0 auto;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
-  color: var(--muted);
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  padding: 1px 6px;
-}
-.vocab-option-text { flex: 1 1 auto; }
-.vocab-option-mark { flex: 0 0 auto; font-size: 17px; }
-
-.vocab-input {
-  display: block;
-  width: 100%;
-  max-width: 320px;
-  margin: 22px auto 0;
-  padding: 8px 0;
-  border: none;
-  border-bottom: 1px solid var(--rule);
-  background: transparent;
-  font-family: "EB Garamond", serif;
-  font-size: 26px;
-  text-align: center;
-  color: var(--ink);
-}
-.vocab-input:focus { outline: none; border-bottom-color: var(--accent); }
-
-.vocab-build-line,
-.vocab-build-bank {
-  margin: 18px 0 0;
+/* Word-bank build step. */
+.vocab-build-line {
+  min-height: 56px;
+  max-width: 470px;
+  margin: 28px auto 0;
+  padding: 10px 8px;
+  border-bottom: 1.5px solid rgba(26, 26, 26, 0.25);
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 9px;
   justify-content: center;
-  min-height: 30px;
+  align-items: center;
 }
-.vocab-build-line { border-bottom: 1px solid var(--rule); padding-bottom: 14px; }
+.vocab-build-bank {
+  max-width: 470px;
+  margin: 28px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 11px;
+  justify-content: center;
+}
 .vocab-build-placeholder { color: var(--muted); font-style: italic; }
 .vocab-tile {
-  padding: 8px 12px;
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  background: var(--paper);
+  padding: 8px 16px;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink);
   font-family: "EB Garamond", "Noto Serif SC", serif;
   font-size: 18px;
   cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
-.vocab-tile.is-chosen { border-color: var(--accent); }
+.vocab-tile:not(:disabled):hover { border-color: var(--accent); color: var(--accent); }
+.vocab-tile.is-chosen { border-color: rgba(63, 122, 78, 0.5); background: rgba(63, 122, 78, 0.07); }
 .vocab-tile.is-sel { border-color: var(--accent); color: var(--accent); }
-.vocab-tile.is-done { opacity: 0.32; cursor: default; }
-.vocab-tile.is-wrong { border-color: var(--accent); background: rgba(139, 0, 0, 0.06); }
+.vocab-tile.is-done { opacity: 0.28; border-color: rgba(139, 0, 0, 0.3); color: var(--accent); cursor: default; }
+.vocab-tile.is-wrong { border-color: rgba(26, 26, 26, 0.4); color: var(--muted); }
 
+/* Match step — two columns of tiles. */
 .vocab-match {
   display: flex;
-  gap: 14px;
-  justify-content: center;
-  margin-top: 20px;
+  gap: 16px;
+  max-width: 460px;
+  margin: 32px auto 0;
 }
 .vocab-match-col {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  flex: 0 1 180px;
+  gap: 12px;
 }
-.vocab-match-col .vocab-tile { width: 100%; }
+.vocab-match-col .vocab-tile { width: 100%; padding: 14px 10px; text-align: center; }
 
+/* Verdict banner — tinted, top-rule, with a filled continue button. */
 .vocab-fb {
-  margin: 22px 0 0;
-  padding-top: 18px;
-  border-top: 1px solid var(--rule);
+  margin-top: 40px;
+  padding: 24px;
+  text-align: center;
+  animation: vocab-fb-in 0.22s ease both;
 }
-.vocab-fb-verdict { margin: 0; font-size: 18px; }
+.vocab-fb.is-ok { background: rgba(63, 122, 78, 0.08); border-top: 2px solid var(--ok); }
+.vocab-fb.is-no { background: rgba(139, 0, 0, 0.055); border-top: 2px solid var(--accent); }
+@keyframes vocab-fb-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.vocab-fb-verdict {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
 .vocab-fb.is-ok .vocab-fb-verdict { color: var(--ok); }
 .vocab-fb.is-no .vocab-fb-verdict { color: var(--accent); }
-.vocab-fb.is-ok { color: var(--ok); }
-.vocab-fb-answer { margin: 10px 0 0; font-size: 18px; color: var(--ink); }
-.vocab-fb-answer span[lang="fr"] { color: var(--accent); }
+.vocab-fb-answer { margin: 14px 0 0; font-size: 18px; color: var(--ink); }
+.vocab-fb-answer span[lang="fr"] { color: var(--accent); font-weight: 500; }
 .vocab-fb-gloss { color: var(--muted); font-family: "Noto Serif SC", serif; font-size: 16px; }
+.vocab-fb-actions { margin-top: 22px; }
+.vocab-next {
+  padding: 9px 26px;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--paper);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 17px;
+  transition: opacity 0.15s ease;
+}
+.vocab-fb.is-ok .vocab-next { background: var(--ok); border-color: var(--ok); }
+.vocab-fb.is-no .vocab-next { background: var(--accent); border-color: var(--accent); }
+.vocab-next:hover { opacity: 0.85; }
+.vocab-next-key { margin-left: 6px; font-family: "JetBrains Mono", monospace; font-size: 11px; opacity: 0.8; }
+
+/* Done screen. */
+.vocab-done { margin-top: 48px; text-align: center; }
+.vocab-done-score {
+  margin: 10px 0 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 34px;
+  font-weight: 500;
+}
+.vocab-done-meta {
+  margin: 12px 0 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.vocab-done-rule { height: 1px; width: 54px; background: var(--rule); margin: 32px auto; }
+.vocab-review { max-width: 380px; margin: 0 auto; text-align: left; }
+.vocab-review-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 0;
+  border-top: 1px solid var(--rule);
+}
+.vocab-review-row span[lang="fr"] { font-size: 18px; }
+.vocab-review-zh { color: var(--muted); font-family: "Noto Serif SC", serif; font-size: 16px; }
+.vocab-done-actions {
+  margin-top: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+/* Controls strip (idle + done only). */
+.vocab-controls {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.vocab-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 16px;
+}
+.vocab-control-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.vocab-control-stats {
+  margin: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.vocab-control-stats span { color: var(--accent); }
+.vocab-dot { color: rgba(26, 26, 26, 0.18); }
+.vocab-msg { margin: 0; color: var(--muted); font-size: 14px; }
 /* ── Login · value-prop bullets (login mode) ───────────────────────── */
 .login-values {
   list-style: none;
