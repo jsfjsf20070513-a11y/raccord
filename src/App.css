@@ -3570,6 +3570,101 @@
 .vocab-control-stats span { color: var(--accent); }
 .vocab-dot { color: rgba(26, 26, 26, 0.18); }
 .vocab-msg { margin: 0; color: var(--muted); font-size: 14px; }
+/* ── Home · 扉页 (cover → daily theorem → meditation) ───────────────── */
+.home-cover { text-align: center; }
+.home-cover-kicker {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.home-cover-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.18;
+}
+.home-cover-subtitle { margin: 16px 0 0; color: var(--muted); font-size: 21px; font-style: italic; }
+.home-cover-edition {
+  margin: 22px 0 0;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.home-theorem {
+  margin-top: var(--section-gap);
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+}
+.home-theorem-kicker { margin: 0 0 8px; color: var(--accent); font-size: 14px; font-style: italic; }
+.home-theorem-title {
+  margin: 0 0 8px;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+.home-theorem-prelude { margin: 0 0 14px; color: var(--ink); }
+.home-theorem-formula { margin: 8px 0 18px; text-align: center; color: var(--ink); overflow-x: auto; }
+.home-theorem-note { margin: 0; color: var(--muted); font-size: 15px; }
+
+.home-proof { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--rule); }
+.home-proof summary {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--accent);
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  list-style: none;
+}
+.home-proof summary::-webkit-details-marker { display: none; }
+.home-proof summary > span:first-child { font-style: normal; }
+.home-proof-body { margin: 14px 0 0; display: grid; gap: 18px; text-align: left; }
+.home-proof-body .theorem-explanation-block { max-width: 34rem; margin: 0 auto; }
+.home-proof-body .theorem-explanation-lang { text-align: center; }
+.home-proof-credit {
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.home-meditation {
+  margin-top: var(--section-gap);
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+.home-meditation .section-coda { text-align: center; border: none; padding: 0; margin: 0; }
+.home-meditation .section-coda-kicker {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.home-meditation .section-coda-quote {
+  margin: 0 auto;
+  max-width: 34rem;
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.55;
+}
+.home-meditation .section-coda-translation {
+  margin: 10px auto 0;
+  max-width: 30rem;
+  color: var(--muted);
+  font-size: 15px;
+}
+
 /* ── Login · value-prop bullets (login mode) ───────────────────────── */
 .login-values {
   list-style: none;

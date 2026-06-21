@@ -17,7 +17,7 @@ export default function DailyMeditation({ offset = 0, className = '' }) {
 
   return (
     <aside className={['section-coda', className].filter(Boolean).join(' ')} aria-label="Daily meditation · 每日哲思">
-      <p className="section-coda-kicker">Meditation du jour</p>
+      <p className="section-coda-kicker">Méditation du jour · 冥想</p>
       <p className="section-coda-quote" lang="fr">
         {entry.text}
       </p>
