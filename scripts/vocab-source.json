@@ -3151,5 +3151,1393 @@
     "level": "C2",
     "tag": "connecteur",
     "example": "vérifié a posteriori"
+  },
+  {
+    "french": "tête",
+    "chinese": "头",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A1",
+    "tag": "corps",
+    "example": "mal à la tête"
+  },
+  {
+    "french": "cheveu",
+    "chinese": "头发",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A1",
+    "tag": "corps",
+    "example": "des cheveux noirs"
+  },
+  {
+    "french": "dent",
+    "chinese": "牙齿",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A1",
+    "tag": "corps",
+    "example": "se brosser les dents"
+  },
+  {
+    "french": "chapeau",
+    "chinese": "帽子",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A1",
+    "tag": "quotidien",
+    "example": "mettre un chapeau"
+  },
+  {
+    "french": "montre",
+    "chinese": "手表",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A1",
+    "tag": "quotidien",
+    "example": "regarder sa montre"
+  },
+  {
+    "french": "vache",
+    "chinese": "牛",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A1",
+    "tag": "animal",
+    "example": "une vache dans le pré"
+  },
+  {
+    "french": "cheval",
+    "chinese": "马",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A1",
+    "tag": "animal",
+    "example": "monter à cheval"
+  },
+  {
+    "french": "carotte",
+    "chinese": "胡萝卜",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A1",
+    "tag": "nourriture",
+    "example": "une soupe de carottes"
+  },
+  {
+    "french": "tomate",
+    "chinese": "番茄",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A1",
+    "tag": "nourriture",
+    "example": "une salade de tomates"
+  },
+  {
+    "french": "banane",
+    "chinese": "香蕉",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A1",
+    "tag": "nourriture",
+    "example": "manger une banane"
+  },
+  {
+    "french": "orange",
+    "chinese": "橙子",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A1",
+    "tag": "nourriture",
+    "example": "un jus d'orange"
+  },
+  {
+    "french": "gâteau",
+    "chinese": "蛋糕",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A1",
+    "tag": "nourriture",
+    "example": "un gâteau au chocolat"
+  },
+  {
+    "french": "sucre",
+    "chinese": "糖",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A1",
+    "tag": "nourriture",
+    "example": "du sucre dans le café"
+  },
+  {
+    "french": "verre",
+    "chinese": "玻璃杯",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A1",
+    "tag": "quotidien",
+    "example": "un verre d'eau"
+  },
+  {
+    "french": "couteau",
+    "chinese": "刀",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A1",
+    "tag": "quotidien",
+    "example": "un couteau de cuisine"
+  },
+  {
+    "french": "assiette",
+    "chinese": "盘子",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A1",
+    "tag": "quotidien",
+    "example": "une assiette propre"
+  },
+  {
+    "french": "jouer",
+    "chinese": "玩，演奏",
+    "pos": "verb",
+    "level": "A1",
+    "tag": "verbe",
+    "conjugation": "je joue · il joue · nous jouons",
+    "example": "jouer au foot"
+  },
+  {
+    "french": "chanter",
+    "chinese": "唱歌",
+    "pos": "verb",
+    "level": "A1",
+    "tag": "verbe",
+    "conjugation": "je chante · il chante · nous chantons",
+    "example": "chanter une chanson"
+  },
+  {
+    "french": "danser",
+    "chinese": "跳舞",
+    "pos": "verb",
+    "level": "A1",
+    "tag": "verbe",
+    "conjugation": "je danse · il danse · nous dansons",
+    "example": "danser ensemble"
+  },
+  {
+    "french": "courir",
+    "chinese": "跑",
+    "pos": "verb",
+    "level": "A1",
+    "tag": "verbe",
+    "conjugation": "je cours · il court · nous courons",
+    "example": "courir vite"
+  },
+  {
+    "french": "marcher",
+    "chinese": "走，运转",
+    "pos": "verb",
+    "level": "A1",
+    "tag": "verbe",
+    "conjugation": "je marche · il marche · nous marchons",
+    "example": "marcher dans la rue"
+  },
+  {
+    "french": "aider",
+    "chinese": "帮助",
+    "pos": "verb",
+    "level": "A1",
+    "tag": "verbe",
+    "conjugation": "j'aide · il aide · nous aidons",
+    "example": "aider un ami"
+  },
+  {
+    "french": "vert",
+    "chinese": "绿色的",
+    "pos": "adjective",
+    "level": "A1",
+    "tag": "couleur",
+    "example": "une feuille verte"
+  },
+  {
+    "french": "jaune",
+    "chinese": "黄色的",
+    "pos": "adjective",
+    "level": "A1",
+    "tag": "couleur",
+    "example": "le soleil jaune"
+  },
+  {
+    "french": "long",
+    "chinese": "长的",
+    "pos": "adjective",
+    "level": "A1",
+    "tag": "qualité",
+    "example": "une longue route"
+  },
+  {
+    "french": "vieux",
+    "chinese": "老的，旧的",
+    "pos": "adjective",
+    "level": "A1",
+    "tag": "qualité",
+    "example": "un vieux livre"
+  },
+  {
+    "french": "gentil",
+    "chinese": "友善的",
+    "pos": "adjective",
+    "level": "A1",
+    "tag": "qualité",
+    "example": "un garçon gentil"
+  },
+  {
+    "french": "boulangerie",
+    "chinese": "面包店",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A2",
+    "tag": "lieu",
+    "example": "acheter du pain à la boulangerie"
+  },
+  {
+    "french": "pharmacie",
+    "chinese": "药店",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A2",
+    "tag": "lieu",
+    "example": "aller à la pharmacie"
+  },
+  {
+    "french": "banque",
+    "chinese": "银行",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A2",
+    "tag": "lieu",
+    "example": "à la banque"
+  },
+  {
+    "french": "bureau",
+    "chinese": "办公室，书桌",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A2",
+    "tag": "travail",
+    "example": "travailler au bureau"
+  },
+  {
+    "french": "église",
+    "chinese": "教堂",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A2",
+    "tag": "lieu",
+    "example": "une vieille église"
+  },
+  {
+    "french": "pont",
+    "chinese": "桥",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A2",
+    "tag": "lieu",
+    "example": "traverser le pont"
+  },
+  {
+    "french": "forêt",
+    "chinese": "森林",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A2",
+    "tag": "nature",
+    "example": "se promener en forêt"
+  },
+  {
+    "french": "village",
+    "chinese": "村庄",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A2",
+    "tag": "lieu",
+    "example": "un petit village"
+  },
+  {
+    "french": "passeport",
+    "chinese": "护照",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A2",
+    "tag": "voyage",
+    "example": "montrer son passeport"
+  },
+  {
+    "french": "valise",
+    "chinese": "行李箱",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A2",
+    "tag": "voyage",
+    "example": "faire sa valise"
+  },
+  {
+    "french": "cadeau",
+    "chinese": "礼物",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A2",
+    "tag": "quotidien",
+    "example": "offrir un cadeau"
+  },
+  {
+    "french": "fête",
+    "chinese": "节日，聚会",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A2",
+    "tag": "quotidien",
+    "example": "une fête d'anniversaire"
+  },
+  {
+    "french": "bruit",
+    "chinese": "噪音，声音",
+    "pos": "noun",
+    "gender": "m",
+    "level": "A2",
+    "tag": "quotidien",
+    "example": "faire du bruit"
+  },
+  {
+    "french": "couleur",
+    "chinese": "颜色",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A2",
+    "tag": "quotidien",
+    "example": "ma couleur préférée"
+  },
+  {
+    "french": "forme",
+    "chinese": "形状，状态",
+    "pos": "noun",
+    "gender": "f",
+    "level": "A2",
+    "tag": "quotidien",
+    "example": "en bonne forme"
+  },
+  {
+    "french": "rester",
+    "chinese": "留下，保持",
+    "pos": "verb",
+    "level": "A2",
+    "tag": "verbe",
+    "conjugation": "je reste · il reste · nous restons",
+    "example": "rester à la maison"
+  },
+  {
+    "french": "arriver",
+    "chinese": "到达，发生",
+    "pos": "verb",
+    "level": "A2",
+    "tag": "verbe",
+    "conjugation": "j'arrive · il arrive · nous arrivons",
+    "example": "arriver à l'heure"
+  },
+  {
+    "french": "monter",
+    "chinese": "上，登上",
+    "pos": "verb",
+    "level": "A2",
+    "tag": "verbe",
+    "conjugation": "je monte · il monte · nous montons",
+    "example": "monter dans le train"
+  },
+  {
+    "french": "descendre",
+    "chinese": "下，下降",
+    "pos": "verb",
+    "level": "A2",
+    "tag": "verbe",
+    "conjugation": "je descends · il descend · nous descendons",
+    "example": "descendre l'escalier"
+  },
+  {
+    "french": "tomber",
+    "chinese": "跌倒，落下",
+    "pos": "verb",
+    "level": "A2",
+    "tag": "verbe",
+    "conjugation": "je tombe · il tombe · nous tombons",
+    "example": "tomber par terre"
+  },
+  {
+    "french": "porter",
+    "chinese": "携带，穿",
+    "pos": "verb",
+    "level": "A2",
+    "tag": "verbe",
+    "conjugation": "je porte · il porte · nous portons",
+    "example": "porter un sac"
+  },
+  {
+    "french": "tenir",
+    "chinese": "拿住，保持",
+    "pos": "verb",
+    "level": "A2",
+    "tag": "verbe",
+    "conjugation": "je tiens · il tient · nous tenons",
+    "example": "tenir la main"
+  },
+  {
+    "french": "appeler",
+    "chinese": "打电话，称呼",
+    "pos": "verb",
+    "level": "A2",
+    "tag": "verbe",
+    "conjugation": "j'appelle · il appelle · nous appelons",
+    "example": "appeler un ami"
+  },
+  {
+    "french": "visiter",
+    "chinese": "参观",
+    "pos": "verb",
+    "level": "A2",
+    "tag": "verbe",
+    "conjugation": "je visite · il visite · nous visitons",
+    "example": "visiter un musée"
+  },
+  {
+    "french": "rapide",
+    "chinese": "快的",
+    "pos": "adjective",
+    "level": "A2",
+    "tag": "qualité",
+    "example": "un train rapide"
+  },
+  {
+    "french": "lent",
+    "chinese": "慢的",
+    "pos": "adjective",
+    "level": "A2",
+    "tag": "qualité",
+    "example": "un rythme lent"
+  },
+  {
+    "french": "dangereux",
+    "chinese": "危险的",
+    "pos": "adjective",
+    "level": "A2",
+    "tag": "qualité",
+    "example": "une route dangereuse"
+  },
+  {
+    "french": "calme",
+    "chinese": "平静的",
+    "pos": "adjective",
+    "level": "A2",
+    "tag": "qualité",
+    "example": "une nuit calme"
+  },
+  {
+    "french": "tard",
+    "chinese": "晚",
+    "pos": "adverb",
+    "level": "A2",
+    "tag": "temps",
+    "example": "se coucher tard"
+  },
+  {
+    "french": "ensemble",
+    "chinese": "一起",
+    "pos": "adverb",
+    "level": "A2",
+    "tag": "quotidien",
+    "example": "travailler ensemble",
+    "id": "fr-ensemble-adv"
+  },
+  {
+    "french": "chômage",
+    "chinese": "失业",
+    "pos": "noun",
+    "gender": "m",
+    "level": "B1",
+    "tag": "société",
+    "example": "le taux de chômage"
+  },
+  {
+    "french": "impôt",
+    "chinese": "税",
+    "pos": "noun",
+    "gender": "m",
+    "level": "B1",
+    "tag": "société",
+    "example": "payer ses impôts"
+  },
+  {
+    "french": "budget",
+    "chinese": "预算",
+    "pos": "noun",
+    "gender": "m",
+    "level": "B1",
+    "tag": "société",
+    "example": "équilibrer le budget"
+  },
+  {
+    "french": "commerce",
+    "chinese": "贸易，商业",
+    "pos": "noun",
+    "gender": "m",
+    "level": "B1",
+    "tag": "société",
+    "example": "le commerce international"
+  },
+  {
+    "french": "industrie",
+    "chinese": "工业",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B1",
+    "tag": "société",
+    "example": "l'industrie automobile"
+  },
+  {
+    "french": "énergie",
+    "chinese": "能源，能量",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B1",
+    "tag": "société",
+    "example": "l'énergie solaire"
+  },
+  {
+    "french": "pollution",
+    "chinese": "污染",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B1",
+    "tag": "société",
+    "example": "lutter contre la pollution"
+  },
+  {
+    "french": "climat",
+    "chinese": "气候",
+    "pos": "noun",
+    "gender": "m",
+    "level": "B1",
+    "tag": "société",
+    "example": "le changement climatique"
+  },
+  {
+    "french": "espèce",
+    "chinese": "物种，种类",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B1",
+    "tag": "nature",
+    "example": "une espèce protégée"
+  },
+  {
+    "french": "population",
+    "chinese": "人口",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B1",
+    "tag": "société",
+    "example": "la population mondiale"
+  },
+  {
+    "french": "guerre",
+    "chinese": "战争",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B1",
+    "tag": "société",
+    "example": "la fin de la guerre"
+  },
+  {
+    "french": "paix",
+    "chinese": "和平",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B1",
+    "tag": "société",
+    "example": "vivre en paix"
+  },
+  {
+    "french": "justice",
+    "chinese": "正义，司法",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B1",
+    "tag": "société",
+    "example": "rendre la justice"
+  },
+  {
+    "french": "crime",
+    "chinese": "罪行",
+    "pos": "noun",
+    "gender": "m",
+    "level": "B1",
+    "tag": "société",
+    "example": "commettre un crime"
+  },
+  {
+    "french": "religion",
+    "chinese": "宗教",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B1",
+    "tag": "société",
+    "example": "la liberté de religion"
+  },
+  {
+    "french": "voter",
+    "chinese": "投票",
+    "pos": "verb",
+    "level": "B1",
+    "tag": "verbe",
+    "conjugation": "je vote · il vote · nous votons",
+    "example": "voter aux élections"
+  },
+  {
+    "french": "protéger",
+    "chinese": "保护",
+    "pos": "verb",
+    "level": "B1",
+    "tag": "verbe",
+    "conjugation": "je protège · il protège · nous protégeons",
+    "example": "protéger la nature"
+  },
+  {
+    "french": "consommer",
+    "chinese": "消费，消耗",
+    "pos": "verb",
+    "level": "B1",
+    "tag": "verbe",
+    "conjugation": "je consomme · il consomme · nous consommons",
+    "example": "consommer moins d'énergie"
+  },
+  {
+    "french": "partager",
+    "chinese": "分享，分割",
+    "pos": "verb",
+    "level": "B1",
+    "tag": "verbe",
+    "conjugation": "je partage · il partage · nous partageons",
+    "example": "partager un repas"
+  },
+  {
+    "french": "exprimer",
+    "chinese": "表达",
+    "pos": "verb",
+    "level": "B1",
+    "tag": "verbe",
+    "conjugation": "j'exprime · il exprime · nous exprimons",
+    "example": "exprimer son avis"
+  },
+  {
+    "french": "défendre",
+    "chinese": "捍卫，辩护",
+    "pos": "verb",
+    "level": "B1",
+    "tag": "verbe",
+    "conjugation": "je défends · il défend · nous défendons",
+    "example": "défendre une idée"
+  },
+  {
+    "french": "critiquer",
+    "chinese": "批评",
+    "pos": "verb",
+    "level": "B1",
+    "tag": "verbe",
+    "conjugation": "je critique · il critique · nous critiquons",
+    "example": "critiquer une décision"
+  },
+  {
+    "french": "juste",
+    "chinese": "公正的，恰好的",
+    "pos": "adjective",
+    "level": "B1",
+    "tag": "qualité",
+    "example": "une décision juste"
+  },
+  {
+    "french": "riche",
+    "chinese": "富有的",
+    "pos": "adjective",
+    "level": "B1",
+    "tag": "qualité",
+    "example": "un pays riche"
+  },
+  {
+    "french": "pauvre",
+    "chinese": "贫穷的",
+    "pos": "adjective",
+    "level": "B1",
+    "tag": "qualité",
+    "example": "une famille pauvre"
+  },
+  {
+    "french": "célèbre",
+    "chinese": "著名的",
+    "pos": "adjective",
+    "level": "B1",
+    "tag": "qualité",
+    "example": "un peintre célèbre"
+  },
+  {
+    "french": "heureusement",
+    "chinese": "幸好",
+    "pos": "adverb",
+    "level": "B1",
+    "tag": "connecteur",
+    "example": "Heureusement, tout va bien."
+  },
+  {
+    "french": "malheureusement",
+    "chinese": "不幸地",
+    "pos": "adverb",
+    "level": "B1",
+    "tag": "connecteur",
+    "example": "Malheureusement, c'est faux."
+  },
+  {
+    "french": "argument",
+    "chinese": "论点，论据",
+    "pos": "noun",
+    "gender": "m",
+    "level": "B2",
+    "tag": "logique",
+    "example": "un argument solide"
+  },
+  {
+    "french": "thèse",
+    "chinese": "论点，论文",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "logique",
+    "example": "défendre une thèse"
+  },
+  {
+    "french": "objection",
+    "chinese": "反对，异议",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "logique",
+    "example": "soulever une objection"
+  },
+  {
+    "french": "déduction",
+    "chinese": "演绎，推断",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "logique",
+    "example": "par déduction"
+  },
+  {
+    "french": "induction",
+    "chinese": "归纳",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "logique",
+    "example": "un raisonnement par induction"
+  },
+  {
+    "french": "certitude",
+    "chinese": "确定性",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "abstrait",
+    "example": "avoir la certitude"
+  },
+  {
+    "french": "probabilité",
+    "chinese": "概率，可能性",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "math",
+    "example": "une faible probabilité"
+  },
+  {
+    "french": "implication",
+    "chinese": "蕴含，牵涉",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "logique",
+    "example": "une implication logique"
+  },
+  {
+    "french": "équivalence",
+    "chinese": "等价",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "logique",
+    "example": "une relation d'équivalence"
+  },
+  {
+    "french": "symétrie",
+    "chinese": "对称",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "math",
+    "example": "un axe de symétrie"
+  },
+  {
+    "french": "continuité",
+    "chinese": "连续性",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "math",
+    "example": "la continuité d'une fonction"
+  },
+  {
+    "french": "périodicité",
+    "chinese": "周期性",
+    "pos": "noun",
+    "gender": "f",
+    "level": "B2",
+    "tag": "math",
+    "example": "la périodicité du signal"
+  },
+  {
+    "french": "formuler",
+    "chinese": "表述，提出",
+    "pos": "verb",
+    "level": "B2",
+    "tag": "verbe",
+    "conjugation": "je formule · il formule · nous formulons",
+    "example": "formuler une hypothèse"
+  },
+  {
+    "french": "établir",
+    "chinese": "确立，建立",
+    "pos": "verb",
+    "level": "B2",
+    "tag": "verbe",
+    "conjugation": "j'établis · il établit · nous établissons",
+    "example": "établir un résultat"
+  },
+  {
+    "french": "vérifier",
+    "chinese": "验证，核实",
+    "pos": "verb",
+    "level": "B2",
+    "tag": "verbe",
+    "conjugation": "je vérifie · il vérifie · nous vérifions",
+    "example": "vérifier une hypothèse"
+  },
+  {
+    "french": "généraliser",
+    "chinese": "推广，概括",
+    "pos": "verb",
+    "level": "B2",
+    "tag": "verbe",
+    "conjugation": "je généralise · il généralise · nous généralisons",
+    "example": "généraliser un théorème"
+  },
+  {
+    "french": "contredire",
+    "chinese": "反驳，与…矛盾",
+    "pos": "verb",
+    "level": "B2",
+    "tag": "verbe",
+    "conjugation": "je contredis · il contredit · nous contredisons",
+    "example": "contredire l'hypothèse"
+  },
+  {
+    "french": "impliquer",
+    "chinese": "蕴含，牵涉",
+    "pos": "verb",
+    "level": "B2",
+    "tag": "verbe",
+    "conjugation": "j'implique · il implique · nous impliquons",
+    "example": "A implique B"
+  },
+  {
+    "french": "caractériser",
+    "chinese": "刻画，表征",
+    "pos": "verb",
+    "level": "B2",
+    "tag": "verbe",
+    "conjugation": "je caractérise · il caractérise · nous caractérisons",
+    "example": "caractériser une solution"
+  },
+  {
+    "french": "approfondir",
+    "chinese": "深化",
+    "pos": "verb",
+    "level": "B2",
+    "tag": "verbe",
+    "conjugation": "j'approfondis · il approfondit · nous approfondissons",
+    "example": "approfondir une question"
+  },
+  {
+    "french": "cohérent",
+    "chinese": "连贯的，一致的",
+    "pos": "adjective",
+    "level": "B2",
+    "tag": "qualité",
+    "example": "un discours cohérent"
+  },
+  {
+    "french": "équivalent",
+    "chinese": "等价的，等同的",
+    "pos": "adjective",
+    "level": "B2",
+    "tag": "qualité",
+    "example": "deux énoncés équivalents"
+  },
+  {
+    "french": "symétrique",
+    "chinese": "对称的",
+    "pos": "adjective",
+    "level": "B2",
+    "tag": "qualité",
+    "example": "une matrice symétrique"
+  },
+  {
+    "french": "continu",
+    "chinese": "连续的",
+    "pos": "adjective",
+    "level": "B2",
+    "tag": "qualité",
+    "example": "une fonction continue"
+  },
+  {
+    "french": "rigoureusement",
+    "chinese": "严格地",
+    "pos": "adverb",
+    "level": "B2",
+    "tag": "connecteur",
+    "example": "rigoureusement exact"
+  },
+  {
+    "french": "précisément",
+    "chinese": "精确地，确切地",
+    "pos": "adverb",
+    "level": "B2",
+    "tag": "connecteur",
+    "example": "plus précisément"
+  },
+  {
+    "french": "conjecture",
+    "chinese": "猜想",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "une conjecture célèbre"
+  },
+  {
+    "french": "approximation",
+    "chinese": "近似",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "une bonne approximation"
+  },
+  {
+    "french": "estimation",
+    "chinese": "估计",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "une estimation grossière"
+  },
+  {
+    "french": "borne",
+    "chinese": "界，上下限",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "une borne supérieure"
+  },
+  {
+    "french": "voisinage",
+    "chinese": "邻域",
+    "pos": "noun",
+    "gender": "m",
+    "level": "C1",
+    "tag": "math",
+    "example": "un voisinage de zéro"
+  },
+  {
+    "french": "singularité",
+    "chinese": "奇点，奇异性",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "une singularité isolée"
+  },
+  {
+    "french": "convergence",
+    "chinese": "收敛",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "le rayon de convergence"
+  },
+  {
+    "french": "divergence",
+    "chinese": "发散",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "la divergence de la série"
+  },
+  {
+    "french": "récurrence",
+    "chinese": "递归，归纳",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "une preuve par récurrence"
+  },
+  {
+    "french": "bijection",
+    "chinese": "双射",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "établir une bijection"
+  },
+  {
+    "french": "injection",
+    "chinese": "单射",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "une application injective"
+  },
+  {
+    "french": "surjection",
+    "chinese": "满射",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "une surjection canonique"
+  },
+  {
+    "french": "topologie",
+    "chinese": "拓扑学",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C1",
+    "tag": "math",
+    "example": "la topologie du plan"
+  },
+  {
+    "french": "majorer",
+    "chinese": "求上界",
+    "pos": "verb",
+    "level": "C1",
+    "tag": "verbe",
+    "conjugation": "je majore · il majore · nous majorons",
+    "example": "majorer une somme"
+  },
+  {
+    "french": "minorer",
+    "chinese": "求下界",
+    "pos": "verb",
+    "level": "C1",
+    "tag": "verbe",
+    "conjugation": "je minore · il minore · nous minorons",
+    "example": "minorer une intégrale"
+  },
+  {
+    "french": "estimer",
+    "chinese": "估计，认为",
+    "pos": "verb",
+    "level": "C1",
+    "tag": "verbe",
+    "conjugation": "j'estime · il estime · nous estimons",
+    "example": "estimer l'erreur"
+  },
+  {
+    "french": "itérer",
+    "chinese": "迭代",
+    "pos": "verb",
+    "level": "C1",
+    "tag": "verbe",
+    "conjugation": "j'itère · il itère · nous itérons",
+    "example": "itérer le procédé"
+  },
+  {
+    "french": "diverger",
+    "chinese": "发散，分歧",
+    "pos": "verb",
+    "level": "C1",
+    "tag": "verbe",
+    "conjugation": "la série diverge · elles divergent",
+    "example": "l'intégrale diverge"
+  },
+  {
+    "french": "borné",
+    "chinese": "有界的",
+    "pos": "adjective",
+    "level": "C1",
+    "tag": "math",
+    "example": "une suite bornée",
+    "id": "fr-borne-adj"
+  },
+  {
+    "french": "dense",
+    "chinese": "稠密的",
+    "pos": "adjective",
+    "level": "C1",
+    "tag": "math",
+    "example": "un sous-ensemble dense"
+  },
+  {
+    "french": "compact",
+    "chinese": "紧的，紧凑的",
+    "pos": "adjective",
+    "level": "C1",
+    "tag": "math",
+    "example": "un espace compact"
+  },
+  {
+    "french": "dérivable",
+    "chinese": "可导的",
+    "pos": "adjective",
+    "level": "C1",
+    "tag": "math",
+    "example": "une fonction dérivable"
+  },
+  {
+    "french": "intégrable",
+    "chinese": "可积的",
+    "pos": "adjective",
+    "level": "C1",
+    "tag": "math",
+    "example": "une fonction intégrable"
+  },
+  {
+    "french": "mesurable",
+    "chinese": "可测的",
+    "pos": "adjective",
+    "level": "C1",
+    "tag": "math",
+    "example": "un ensemble mesurable"
+  },
+  {
+    "french": "dénombrable",
+    "chinese": "可数的",
+    "pos": "adjective",
+    "level": "C1",
+    "tag": "math",
+    "example": "un ensemble dénombrable"
+  },
+  {
+    "french": "uniformément",
+    "chinese": "一致地，均匀地",
+    "pos": "adverb",
+    "level": "C1",
+    "tag": "math",
+    "example": "converger uniformément"
+  },
+  {
+    "french": "lemme",
+    "chinese": "引理",
+    "pos": "noun",
+    "gender": "m",
+    "level": "C2",
+    "tag": "logique",
+    "example": "un lemme technique"
+  },
+  {
+    "french": "proposition",
+    "chinese": "命题",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C2",
+    "tag": "logique",
+    "example": "démontrer une proposition"
+  },
+  {
+    "french": "théorie",
+    "chinese": "理论",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C2",
+    "tag": "abstrait",
+    "example": "la théorie des ensembles"
+  },
+  {
+    "french": "formalisme",
+    "chinese": "形式体系，形式主义",
+    "pos": "noun",
+    "gender": "m",
+    "level": "C2",
+    "tag": "logique",
+    "example": "un formalisme rigoureux"
+  },
+  {
+    "french": "décidabilité",
+    "chinese": "可判定性",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C2",
+    "tag": "logique",
+    "example": "la décidabilité d'un problème"
+  },
+  {
+    "french": "complétude",
+    "chinese": "完备性",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C2",
+    "tag": "logique",
+    "example": "le théorème de complétude"
+  },
+  {
+    "french": "cardinalité",
+    "chinese": "基数",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C2",
+    "tag": "logique",
+    "example": "la cardinalité du continu"
+  },
+  {
+    "french": "foncteur",
+    "chinese": "函子",
+    "pos": "noun",
+    "gender": "m",
+    "level": "C2",
+    "tag": "math",
+    "example": "un foncteur covariant"
+  },
+  {
+    "french": "catégorie",
+    "chinese": "范畴",
+    "pos": "noun",
+    "gender": "f",
+    "level": "C2",
+    "tag": "math",
+    "example": "la théorie des catégories"
+  },
+  {
+    "french": "morphisme",
+    "chinese": "态射",
+    "pos": "noun",
+    "gender": "m",
+    "level": "C2",
+    "tag": "math",
+    "example": "un morphisme d'anneaux"
+  },
+  {
+    "french": "spectre",
+    "chinese": "谱",
+    "pos": "noun",
+    "gender": "m",
+    "level": "C2",
+    "tag": "math",
+    "example": "le spectre d'un opérateur"
+  },
+  {
+    "french": "postuler",
+    "chinese": "假定，公设",
+    "pos": "verb",
+    "level": "C2",
+    "tag": "verbe",
+    "conjugation": "je postule · il postule · nous postulons",
+    "example": "postuler l'existence"
+  },
+  {
+    "french": "quantifier",
+    "chinese": "量化",
+    "pos": "verb",
+    "level": "C2",
+    "tag": "verbe",
+    "conjugation": "je quantifie · il quantifie · nous quantifions",
+    "example": "quantifier une variable"
+  },
+  {
+    "french": "factoriser",
+    "chinese": "因式分解",
+    "pos": "verb",
+    "level": "C2",
+    "tag": "verbe",
+    "conjugation": "je factorise · il factorise · nous factorisons",
+    "example": "factoriser un polynôme"
+  },
+  {
+    "french": "diagonaliser",
+    "chinese": "对角化",
+    "pos": "verb",
+    "level": "C2",
+    "tag": "verbe",
+    "conjugation": "je diagonalise · il diagonalise · nous diagonalisons",
+    "example": "diagonaliser une matrice"
+  },
+  {
+    "french": "linéariser",
+    "chinese": "线性化",
+    "pos": "verb",
+    "level": "C2",
+    "tag": "verbe",
+    "conjugation": "je linéarise · il linéarise · nous linéarisons",
+    "example": "linéariser une équation"
+  },
+  {
+    "french": "trivial",
+    "chinese": "平凡的，显然的",
+    "pos": "adjective",
+    "level": "C2",
+    "tag": "math",
+    "example": "une solution triviale"
+  },
+  {
+    "french": "canonique",
+    "chinese": "典范的，标准的",
+    "pos": "adjective",
+    "level": "C2",
+    "tag": "math",
+    "example": "une forme canonique"
+  },
+  {
+    "french": "récursif",
+    "chinese": "递归的",
+    "pos": "adjective",
+    "level": "C2",
+    "tag": "logique",
+    "example": "une définition récursive"
+  },
+  {
+    "french": "décidable",
+    "chinese": "可判定的",
+    "pos": "adjective",
+    "level": "C2",
+    "tag": "logique",
+    "example": "un problème décidable"
+  },
+  {
+    "french": "complet",
+    "chinese": "完备的，完整的",
+    "pos": "adjective",
+    "level": "C2",
+    "tag": "math",
+    "example": "un espace complet"
   }
 ]
