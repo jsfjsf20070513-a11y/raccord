@@ -1,11 +1,22 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import PageHeader from '../components/PageHeader'
+import DailyMeditation from '../components/DailyMeditation'
 import PasswordField from '../components/PasswordField'
 import { supabase, isSupabaseConfigured, SUPABASE_MISSING_MESSAGE } from '../lib/supabase'
 
-const BACK_LABEL = 'Back to sign in · 返回登录'
-const HOME_LABEL = 'Back to title page · 返回扉页'
+// 重设密码 ResetPassword — design contract: centered « Réinitialisation »
+// masthead + a narrow underline-input form, with success / invalid states.
+// The real Supabase recovery-session logic is preserved.
+function Masthead({ title, summary }) {
+  return (
+    <header className="login-masthead">
+      <Link to="/login" className="login-back">返回登录 · Connexion</Link>
+      <p className="login-eyebrow">Réinitialisation</p>
+      <h1 className="login-title">{title}</h1>
+      <p className="login-summary">{summary}</p>
+    </header>
+  )
+}
 
 export default function ResetPassword() {
   const navigate = useNavigate()
@@ -47,11 +58,11 @@ export default function ResetPassword() {
       return
     }
     if (password.length < 6) {
-      setMessage('Password must be at least 6 characters. · 密码至少需要 6 位字符。')
+      setMessage('密码至少需要 6 位字符。')
       return
     }
     if (password !== confirmPassword) {
-      setMessage('The two passwords do not match. · 两次输入的密码不一致。')
+      setMessage('两次输入的密码不一致。')
       return
     }
 
@@ -63,10 +74,7 @@ export default function ResetPassword() {
       setPageState('success')
       setTimeout(() => navigate('/'), 2000)
     } catch (error) {
-      setMessage(
-        error.message ||
-          'Reset failed — please request a new reset link. · 重置失败，请重新申请重置链接。',
-      )
+      setMessage(error.message || '重置失败,请重新申请重置链接。')
     } finally {
       setSubmitting(false)
     }
@@ -74,84 +82,68 @@ export default function ResetPassword() {
 
   if (pageState === 'loading') {
     return (
-      <article className="page-column">
-        <PageHeader
-          kicker="Password Recovery"
-          title="Verifying reset link · 验证重置链接"
-          summary="Checking whether the current link is still valid. · 正在检查当前链接是否仍然有效。"
-          backTo="/login"
-          backLabel={BACK_LABEL}
-        />
+      <article className="page-column login-page">
+        <Masthead title="验证重置链接" summary="正在检查当前链接是否仍然有效…" />
       </article>
     )
   }
 
   if (pageState === 'invalid' || pageState === 'unavailable') {
     return (
-      <article className="page-column">
-        <PageHeader
-          kicker="Password Recovery"
-          title={pageState === 'invalid' ? 'Link expired · 链接已失效' : 'Feature unavailable · 功能暂不可用'}
-          summary={
-            pageState === 'invalid'
-              ? 'The reset link has expired or has already been used. Please request a new one. · 重置链接已过期或已使用，请重新申请一次。'
-              : SUPABASE_MISSING_MESSAGE
-          }
-          backTo="/login"
-          backLabel={BACK_LABEL}
+      <article className="page-column login-page">
+        <Masthead
+          title={pageState === 'invalid' ? '链接已失效' : '功能暂不可用'}
+          summary={pageState === 'invalid'
+            ? '这个重置链接已过期或已被使用。请回到登录页重新申请一封重置邮件。'
+            : SUPABASE_MISSING_MESSAGE}
         />
+        <div className="reset-state">
+          <p><Link to="/login" className="vocab-verify">重新申请 · 找回密码 →</Link></p>
+        </div>
       </article>
     )
   }
 
   if (pageState === 'success') {
     return (
-      <article className="page-column">
-        <PageHeader
-          kicker="Password Recovery"
-          title="Password reset · 密码已重置"
-          summary="The new password has been written to the account. Returning to the title page shortly. · 新密码已经写入账户，稍后将返回首页。"
-          backTo="/"
-          backLabel={HOME_LABEL}
-        />
+      <article className="page-column login-page">
+        <Masthead title="密码已更新" summary="密码已写入账户,现在可以用新密码登录了。" />
+        <div className="reset-state">
+          <p className="reset-ok">✓ 已更新</p>
+          <p><Link to="/login" className="vocab-verify">前往登录 · Connexion →</Link></p>
+        </div>
       </article>
     )
   }
 
   return (
-    <article className="page-column">
-      <PageHeader
-        kicker="Password Recovery"
-        title="Set a new password · 设置新密码"
-        summary="Enter a new sign-in password after arriving here from the reset link in your email. · 通过邮件中的重置链接进入后，在此写入新的登录密码。"
-        backTo="/login"
-        backLabel={BACK_LABEL}
-      />
+    <article className="page-column login-page">
+      <Masthead title="设置新密码" summary="为账号设置一个新的登录密码。" />
 
-      <section className="page-section">
-        <form className="editorial-form" onSubmit={handleSubmit}>
+      <section className="login-section">
+        <form className="editorial-form login-form" onSubmit={handleSubmit}>
           <PasswordField
-            label="New password · 新密码"
+            label="新密码 · Nouveau mot de passe"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
             autoComplete="new-password"
           />
           <PasswordField
-            label="Confirm new password · 确认新密码"
+            label="确认新密码 · Confirmer"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
             required
             autoComplete="new-password"
           />
-          <div className="editorial-actions">
-            <button type="submit" className="text-button" disabled={submitting}>
-              {submitting ? 'Submitting…' : 'Update password · 更新密码'}
+          <div className="editorial-actions login-submit">
+            <button type="submit" className="vocab-verify" disabled={submitting}>
+              {submitting ? '保存中…' : '保存新密码 · Enregistrer'}
             </button>
-            <Link to="/login">{BACK_LABEL}</Link>
           </div>
           {message ? <p className="status-line is-error">{message}</p> : null}
         </form>
+        <DailyMeditation offset={3} />
       </section>
     </article>
   )

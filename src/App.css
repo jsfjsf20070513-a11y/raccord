@@ -3668,6 +3668,53 @@
   font-size: 15px;
 }
 
+/* ── 404 NotFound (centered) ────────────────────────────────────────── */
+.notfound-page { text-align: center; }
+.notfound-code { margin: 0; font-family: "JetBrains Mono", monospace; font-size: 13px; letter-spacing: 0.3em; color: var(--accent); }
+.notfound-title { margin: 18px 0 0; font-family: "Noto Serif SC", "Source Han Serif SC", serif; font-size: 36px; font-weight: 500; }
+.notfound-sub { margin: 10px 0 0; color: var(--muted); font-size: 18px; }
+.notfound-quote { margin: 30px auto 0; max-width: 34rem; color: var(--ink); font-style: italic; font-size: 19px; line-height: 1.55; }
+.notfound-quote-zh { margin: 10px auto 0; max-width: 30rem; color: var(--muted); font-size: 15px; }
+.notfound-rule { height: 1px; width: 64px; background: var(--rule); margin: 34px auto; }
+.notfound-lead { margin: 0 auto 18px; max-width: 32rem; color: var(--muted); font-size: 16px; }
+.notfound-exits { display: flex; justify-content: center; gap: 26px; flex-wrap: wrap; }
+.notfound-exits a, .notfound-exits a:visited { color: var(--accent); border-bottom: 1px solid currentColor; font-size: 17px; white-space: nowrap; }
+.notfound-exits a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.notfound-home { margin: 30px 0 0; }
+.notfound-home a, .notfound-home a:visited { color: var(--muted); border-bottom: none; font-size: 16px; }
+.notfound-home a:hover { color: var(--accent); }
+
+/* ── PageLoading (quiet carnet loader) ──────────────────────────────── */
+.pl-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: var(--paper);
+  animation: pl-fade 0.4s ease both;
+}
+.pl-overlay.is-leaving { opacity: 0; transition: opacity 0.35s ease; }
+.pl-inline { display: flex; justify-content: center; padding-top: 96px; }
+.pl-shell { max-width: 440px; width: 100%; text-align: center; }
+.pl-eyebrow { margin: 0; font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); }
+.pl-body { min-height: 128px; display: flex; flex-direction: column; justify-content: center; margin-top: 34px; }
+.pl-fr { margin: 0; font-style: italic; font-size: 19px; line-height: 1.5; color: var(--accent); animation: pl-fade 0.5s ease both; }
+.pl-zh { margin: 12px 0 0; font-family: "Noto Serif SC", "Source Han Serif SC", serif; font-size: 22px; line-height: 1.5; color: var(--ink); animation: pl-fade 0.5s ease both; }
+.pl-note { margin: 14px 0 0; color: var(--muted); font-size: 13px; animation: pl-fade 0.5s ease both; }
+.pl-foot { margin-top: 40px; display: flex; align-items: center; gap: 16px; justify-content: center; }
+.pl-track { position: relative; width: 140px; height: 2px; background: rgba(26, 26, 26, 0.1); overflow: hidden; }
+.pl-sweep { position: absolute; top: 0; left: 0; height: 2px; width: 30%; background: var(--accent); animation: pl-sweep 1.2s ease-in-out infinite; }
+.pl-count { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; }
+@keyframes pl-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pl-sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(320%); } }
+@media (prefers-reduced-motion: reduce) {
+  .pl-overlay, .pl-fr, .pl-zh, .pl-note { animation: none; }
+  .pl-sweep { animation: none; width: 100%; opacity: 0.5; }
+}
+
 /* ── Witness · 班级寄语墙 (memorial wall, fully centered) ────────────── */
 .witness-page { text-align: center; }
 .witness-masthead { text-align: center; }
@@ -3943,6 +3990,11 @@
   gap: 28px;
   flex-wrap: wrap;
 }
+
+.reset-state { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--rule); text-align: center; }
+.reset-state p { margin: 0 0 18px; }
+.reset-state p:last-child { margin-bottom: 0; }
+.reset-ok { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ok); }
 
 /* ── Login · value-prop bullets (login mode) ───────────────────────── */
 .login-values {
