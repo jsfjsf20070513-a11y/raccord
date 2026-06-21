@@ -237,7 +237,7 @@ export default function Login() {
           <Link to="/vocabulary" className="vocab-verify">去背词 →</Link>
           <Link to="/witness" className="vocab-verify">去寄语墙 →</Link>
         </div>
-        <DailyMeditation offset={7} />
+        <section className="home-meditation"><DailyMeditation offset={7} /></section>
       </article>
     )
   }
@@ -365,7 +365,7 @@ export default function Login() {
           </div>
           {message ? <p className={`status-line ${message.type === 'error' ? 'is-error' : 'is-success'}`}>{message.text}</p> : null}
         </form>
-        <DailyMeditation offset={7} />
+        <section className="home-meditation"><DailyMeditation offset={7} /></section>
       </section>
     </article>
   )

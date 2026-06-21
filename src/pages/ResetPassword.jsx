@@ -143,7 +143,7 @@ export default function ResetPassword() {
           </div>
           {message ? <p className="status-line is-error">{message}</p> : null}
         </form>
-        <DailyMeditation offset={3} />
+        <section className="home-meditation"><DailyMeditation offset={3} /></section>
       </section>
     </article>
   )
