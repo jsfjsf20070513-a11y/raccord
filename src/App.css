@@ -3668,6 +3668,74 @@
   font-size: 15px;
 }
 
+/* ── Resources · 资源与书目 (BIBLIOTHÈQUE → 书架索引 → 编号书架) ──────── */
+.biblio-masthead { text-align: center; }
+.biblio-kicker {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.biblio-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.biblio-quote { margin: 16px auto 0; max-width: 34rem; color: var(--muted); font-size: 17px; font-style: italic; }
+.biblio-quote-zh { margin: 6px auto 0; max-width: 30rem; color: var(--muted); font-size: 15px; }
+
+.biblio-index { margin-top: 56px; }
+.biblio-index-row,
+.biblio-index-row:visited {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 0 16px;
+  align-items: baseline;
+  padding: 13px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: none;
+  color: var(--ink);
+  text-decoration: none;
+}
+.biblio-index-row:hover { color: var(--accent); }
+.biblio-index-label { font-size: 18px; }
+.biblio-index-count { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+.biblio-roman { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--accent); }
+
+.biblio-shelf { margin-top: 72px; scroll-margin-top: 24px; }
+.biblio-shelf-head { display: flex; align-items: baseline; gap: 12px; }
+.biblio-shelf-title {
+  margin: 0;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+  font-size: 26px;
+  font-weight: 500;
+}
+.biblio-entries { list-style: none; margin: 18px 0 0; padding: 0; }
+.biblio-entry { padding: 15px 0; border-top: 1px solid var(--rule); }
+.biblio-entry-row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+.biblio-entry-title,
+.biblio-entry-title:visited {
+  font-size: 18px;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(139, 0, 0, 0.35);
+}
+.biblio-entry-title:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.biblio-entry-tag {
+  flex: none;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+.biblio-entry-desc { margin: 5px 0 0; color: var(--muted); font-size: 15px; }
+
+.biblio-coda { margin-top: 80px; }
+
 /* ── Atelier · 协作 (masthead → doorways → AI teaser) ───────────────── */
 .atelier-masthead { text-align: center; }
 .atelier-kicker {
