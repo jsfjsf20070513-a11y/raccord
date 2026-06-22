@@ -29,6 +29,9 @@ const TYPE_ROTATION = [
   EXERCISE_TYPES.listen,
   EXERCISE_TYPES.spelling,
 ]
+// 真人法语发音:同域 Worker 代理 ElevenLabs(Cloudflare 边缘缓存,每词只生成一
+// 次);加载失败时回退浏览器 speechSynthesis,听写功能永不因此中断。
+const SPEAK_ENDPOINT = 'https://rucmathclass.com/api/speak'
 
 const VALID_DECK = cleanFrenchDeck(frenchVocabulary).valid
 const DECK_TAGS = ['all', ...Array.from(new Set(VALID_DECK.map((w) => w.tag).filter(Boolean)))]
@@ -111,6 +114,7 @@ export default function Vocabulary() {
   const fileInputRef = useRef(null)
   const inputRef = useRef(null)
   const audioRef = useRef(null)
+  const voiceRef = useRef(null)
   const spokenRef = useRef(-1)
 
   const current = steps[i]
@@ -143,7 +147,7 @@ export default function Vocabulary() {
     }
   }, [])
 
-  const speak = useCallback((text) => {
+  const browserTTS = useCallback((text) => {
     try {
       const synth = window.speechSynthesis
       if (!synth || !text) return
@@ -158,6 +162,22 @@ export default function Vocabulary() {
       // speech is optional
     }
   }, [])
+
+  // Prefer the real ElevenLabs voice via the Worker; fall back to browser TTS
+  // if the audio can't load (offline / quota / dev without the Worker).
+  const speak = useCallback((text) => {
+    if (!text) return
+    try { window.speechSynthesis && window.speechSynthesis.cancel() } catch { /* ignore */ }
+    try {
+      const a = voiceRef.current || (voiceRef.current = new Audio())
+      a.onerror = () => browserTTS(text)
+      a.src = `${SPEAK_ENDPOINT}?text=${encodeURIComponent(text.slice(0, 160))}`
+      const p = a.play()
+      if (p && typeof p.catch === 'function') p.catch(() => browserTTS(text))
+    } catch {
+      browserTTS(text)
+    }
+  }, [browserTTS])
 
   const load = useCallback(async () => {
     if (!user) return
