@@ -1,6 +1,37 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import katex from 'katex'
 import { useAuth } from '../context/useAuth'
+
+// 把助手回复里的 $...$ / $$...$$ 渲染成 KaTeX 公式,**粗体** 转 <strong>,其余
+// 文本 HTML 转义后原样保留(容器 white-space:pre-wrap 负责换行)。KaTeX 输出是
+// 安全 HTML;katex 随本 lazy 路由加载,不进主包。
+const HTML_ESCAPE = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
+function escapeHtml(s) {
+  return `${s}`.replace(/[&<>"']/g, (c) => HTML_ESCAPE[c])
+}
+function renderProse(s) {
+  return escapeHtml(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+}
+function renderRich(text) {
+  const out = []
+  const re = /\$\$([\s\S]+?)\$\$|\$([^$\n]+?)\$/g
+  let last = 0
+  let m
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) out.push(renderProse(text.slice(last, m.index)))
+    const display = m[1] !== undefined
+    const expr = display ? m[1] : m[2]
+    try {
+      out.push(katex.renderToString(expr, { throwOnError: false, displayMode: display, output: 'html' }))
+    } catch {
+      out.push(escapeHtml(m[0]))
+    }
+    last = re.lastIndex
+  }
+  if (last < text.length) out.push(renderProse(text.slice(last)))
+  return out.join('')
+}
 
 // 班级 AI 助手 — 前端只跟同域 Worker 代理对话(/api/chat),Gemini key 在
 // Cloudflare secret 里,前端产物永不含它。无状态:历史只存在本页 state。
@@ -95,7 +126,11 @@ export default function Assistant() {
           messages.map((m, idx) => (
             <div key={idx} className={`assistant-turn is-${m.role === 'user' ? 'user' : 'ai'}`}>
               <p className="assistant-turn-role" aria-hidden="true">{m.role === 'user' ? '你' : 'Assistant'}</p>
-              <p className="assistant-turn-text">{m.content}</p>
+              {m.role === 'user' ? (
+                <p className="assistant-turn-text">{m.content}</p>
+              ) : (
+                <p className="assistant-turn-text" dangerouslySetInnerHTML={{ __html: renderRich(m.content) }} />
+              )}
             </div>
           ))
         )}

@@ -82,7 +82,7 @@ async function handleChat(request, env, origin) {
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents,
-          generationConfig: { temperature: 0.5, maxOutputTokens: 800 },
+          generationConfig: { temperature: 0.5, maxOutputTokens: 8192 },
         }),
       },
     )
@@ -151,6 +151,16 @@ export default {
     const origin = request.headers.get('Origin') || ''
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(origin) })
+    }
+    // 简单限流:每 IP 每分钟若干次,防刷爆 Gemini/ElevenLabs 配额。绑定缺失时跳过。
+    if (env.RATE_LIMITER) {
+      const ip = request.headers.get('CF-Connecting-IP') || 'anon'
+      try {
+        const { success } = await env.RATE_LIMITER.limit({ key: ip })
+        if (!success) return json({ error: 'Trop de requêtes — réessaie dans un instant.' }, 429, origin)
+      } catch {
+        // limiter is best-effort; never block on its failure
+      }
     }
     const url = new URL(request.url)
     if (url.pathname.endsWith('/api/speak')) return handleSpeak(request, env, ctx, url, origin)
