@@ -24,6 +24,7 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const SolanaWitness = lazy(() => import('./pages/SolanaWitness'))
 const Vocabulary = lazy(() => import('./pages/Vocabulary'))
+const Assistant = lazy(() => import('./pages/Assistant'))
 
 const LOADING_FADE_DURATION = 180
 const INITIAL_LOADING_DURATION = 760
@@ -137,6 +138,7 @@ function AppRoutes() {
         <Route path="timeline/*" element={<Navigate to="/" replace />} />
         <Route path="announcements/*" element={<Navigate to="/" replace />} />
         <Route path="vocabulary" element={<DeferredPage><Vocabulary /></DeferredPage>} />
+        <Route path="assistant" element={<DeferredPage><Assistant /></DeferredPage>} />
         <Route path="resources" element={<DeferredPage><Resources /></DeferredPage>} />
         <Route path="resources/curate" element={<DeferredPage><ResourceCurate /></DeferredPage>} />
         {/* 资源详情页已下线(资源直接外链);旧 /resources/:id 链接回资源目录。 */}
