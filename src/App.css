@@ -4202,3 +4202,42 @@
   transition: color 0.15s ease, border-color 0.15s ease;
 }
 .assistant-clear:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* 图片问答:气泡内缩略图 + 待发送预览 + 上传按钮 */
+.assistant-turn-img {
+  max-width: 220px;
+  max-height: 220px;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+  margin-bottom: 6px;
+}
+.assistant-attach {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: rgba(139, 0, 0, 0.03);
+}
+.assistant-attach-thumb { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; }
+.assistant-attach-label { flex: 1; color: var(--muted); font-size: 13px; }
+.assistant-attach-remove {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 20px; line-height: 1; padding: 0 4px;
+}
+.assistant-attach-remove:hover { color: var(--accent); }
+.assistant-attach-btn {
+  flex: none;
+  width: 44px;
+  align-self: stretch;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--paper);
+  font-size: 19px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.assistant-attach-btn:hover:not(:disabled) { border-color: var(--accent); }
+.assistant-attach-btn:disabled { opacity: 0.45; cursor: default; }
