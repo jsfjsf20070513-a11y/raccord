@@ -4189,3 +4189,16 @@
 }
 .assistant-send:disabled { opacity: 0.45; cursor: default; }
 .assistant-foot { margin: 14px 0 0; text-align: center; color: var(--muted); font-size: 12px; }
+.assistant-toolbar { display: flex; justify-content: flex-end; margin: 0 0 8px; }
+.assistant-clear {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.assistant-clear:hover { color: var(--accent); border-bottom-color: var(--accent); }

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import katex from 'katex'
 import { useAuth } from '../context/useAuth'
+import { clearMessages, fetchMessages, saveMessage } from '../lib/aiAssistantBackend'
 
 // 把助手回复里的 $...$ / $$...$$ 渲染成 KaTeX 公式,**粗体** 转 <strong>,其余
 // 文本 HTML 转义后原样保留(容器 white-space:pre-wrap 负责换行)。KaTeX 输出是
@@ -58,6 +59,21 @@ export default function Assistant() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, loading])
 
+  // 登录后从云端加载已保存的对话(跨设备)。表未建(compat)时返回空,静默降级为
+  // 仅本次会话内存。
+  useEffect(() => {
+    if (!user) return undefined
+    let alive = true
+    fetchMessages(user.id)
+      .then(({ messages: loaded }) => {
+        if (alive && loaded.length) setMessages(loaded)
+      })
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [user])
+
   const send = useCallback(
     async (text) => {
       const content = `${text}`.trim()
@@ -67,6 +83,7 @@ export default function Assistant() {
       setMessages(next)
       setInput('')
       setLoading(true)
+      if (user) saveMessage(user.id, 'user', content).catch(() => {})
       try {
         const res = await fetch(AI_ENDPOINT, {
           method: 'POST',
@@ -78,6 +95,7 @@ export default function Assistant() {
         const reply = `${data?.text || ''}`.trim()
         if (!reply) throw new Error('空回复')
         setMessages((m) => [...m, { role: 'model', content: reply }])
+        if (user) saveMessage(user.id, 'model', reply).catch(() => {})
       } catch (err) {
         setError(err?.message || '请求失败,请稍后再试。')
       } finally {
@@ -85,8 +103,14 @@ export default function Assistant() {
         inputRef.current?.focus()
       }
     },
-    [messages, loading],
+    [messages, loading, user],
   )
+
+  const handleClear = useCallback(() => {
+    setMessages([])
+    setError('')
+    if (user) clearMessages(user.id).catch(() => {})
+  }, [user])
 
   if (!user) {
     return (
@@ -111,6 +135,12 @@ export default function Assistant() {
         <h1 className="assistant-title">中法双语数学答疑</h1>
         <p className="assistant-subtitle" lang="fr">Pose une question de maths ou de français — en chinois ou en français.</p>
       </header>
+
+      {messages.length > 0 ? (
+        <div className="assistant-toolbar">
+          <button type="button" className="assistant-clear" onClick={handleClear}>清空历史 · Effacer</button>
+        </div>
+      ) : null}
 
       <div className="assistant-thread" ref={scrollRef}>
         {messages.length === 0 ? (
