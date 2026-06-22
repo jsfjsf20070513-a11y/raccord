@@ -46,14 +46,43 @@ const STARTERS = [
   'Explique la différence entre limite et continuité',
 ]
 
+// 选图后在浏览器里压缩:缩到最长边 1536、转 JPEG q0.85——既省 token 又统一格式。
+// 返回 { mimeType, data(纯 base64), preview(data URL 用于缩略图) }。
+async function compressImage(file) {
+  const dataUrl = await new Promise((res, rej) => {
+    const fr = new FileReader()
+    fr.onload = () => res(fr.result)
+    fr.onerror = rej
+    fr.readAsDataURL(file)
+  })
+  const img = await new Promise((res, rej) => {
+    const im = new Image()
+    im.onload = () => res(im)
+    im.onerror = rej
+    im.src = dataUrl
+  })
+  const maxDim = 1536
+  const scale = Math.min(1, maxDim / Math.max(img.width, img.height))
+  const w = Math.max(1, Math.round(img.width * scale))
+  const h = Math.max(1, Math.round(img.height * scale))
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = h
+  canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+  const out = canvas.toDataURL('image/jpeg', 0.85)
+  return { mimeType: 'image/jpeg', data: out.split(',')[1], preview: out }
+}
+
 export default function Assistant() {
   const { user } = useAuth()
   const [messages, setMessages] = useState([]) // {role:'user'|'model', content}
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [image, setImage] = useState(null) // { mimeType, data, preview }
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
+  const fileRef = useRef(null)
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -76,19 +105,26 @@ export default function Assistant() {
 
   const send = useCallback(
     async (text) => {
-      const content = `${text}`.trim()
-      if (!content || loading) return
+      const typed = `${text}`.trim()
+      if ((!typed && !image) || loading) return
       setError('')
-      const next = [...messages, { role: 'user', content }].slice(-MAX_HISTORY)
+      const content = typed || '请看图,用中文一步步解释这道题并给出答案。'
+      const sentImage = image
+      const userMsg = { role: 'user', content, image: sentImage?.preview }
+      const next = [...messages, userMsg].slice(-MAX_HISTORY)
       setMessages(next)
       setInput('')
+      setImage(null)
       setLoading(true)
       if (user) saveMessage(user.id, 'user', content).catch(() => {})
       try {
+        // 只把 {role, content} 发给模型(不回传缩略图);当前这轮的图走 body.image。
+        const body = { messages: next.map((m) => ({ role: m.role, content: m.content })) }
+        if (sentImage) body.image = { mimeType: sentImage.mimeType, data: sentImage.data }
         const res = await fetch(AI_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: next }),
+          body: JSON.stringify(body),
         })
         if (!res.ok) throw new Error(`服务返回 ${res.status}`)
         const data = await res.json()
@@ -103,8 +139,28 @@ export default function Assistant() {
         inputRef.current?.focus()
       }
     },
-    [messages, loading, user],
+    [messages, loading, user, image],
   )
+
+  const onPickImage = useCallback(async (event) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setError('只支持图片文件。')
+      return
+    }
+    if (file.size > 12 * 1024 * 1024) {
+      setError('图片太大,请小于 12MB。')
+      return
+    }
+    try {
+      setError('')
+      setImage(await compressImage(file))
+    } catch {
+      setError('图片处理失败,换一张试试。')
+    }
+  }, [])
 
   const handleClear = useCallback(() => {
     setMessages([])
@@ -157,7 +213,10 @@ export default function Assistant() {
             <div key={idx} className={`assistant-turn is-${m.role === 'user' ? 'user' : 'ai'}`}>
               <p className="assistant-turn-role" aria-hidden="true">{m.role === 'user' ? '你' : 'Assistant'}</p>
               {m.role === 'user' ? (
-                <p className="assistant-turn-text">{m.content}</p>
+                <>
+                  {m.image ? <img className="assistant-turn-img" src={m.image} alt="附图" /> : null}
+                  <p className="assistant-turn-text">{m.content}</p>
+                </>
               ) : (
                 <p className="assistant-turn-text" dangerouslySetInnerHTML={{ __html: renderRich(m.content) }} />
               )}
@@ -174,6 +233,14 @@ export default function Assistant() {
 
       {error ? <p className="assistant-error">{error}</p> : null}
 
+      {image ? (
+        <div className="assistant-attach">
+          <img className="assistant-attach-thumb" src={image.preview} alt="待发送的图片" />
+          <span className="assistant-attach-label">图片已附上 · 发送即一起提问</span>
+          <button type="button" className="assistant-attach-remove" onClick={() => setImage(null)} aria-label="移除图片">×</button>
+        </div>
+      ) : null}
+
       <form
         className="assistant-composer"
         onSubmit={(e) => {
@@ -181,6 +248,17 @@ export default function Assistant() {
           send(input)
         }}
       >
+        <button
+          type="button"
+          className="assistant-attach-btn"
+          onClick={() => fileRef.current?.click()}
+          disabled={loading}
+          aria-label="上传图片(拍数学题)"
+          title="上传图片(拍数学题)"
+        >
+          📷
+        </button>
+        <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: 'none' }} />
         <textarea
           ref={inputRef}
           className="assistant-input"
@@ -192,16 +270,16 @@ export default function Assistant() {
               send(input)
             }
           }}
-          placeholder="问一个数学或法语问题…（Entrée 发送，Shift+Entrée 换行）"
+          placeholder="问问题,或 📷 拍张数学题…（Entrée 发送，Shift+Entrée 换行）"
           rows={2}
           disabled={loading}
           aria-label="向 AI 助手提问"
         />
-        <button type="submit" className="assistant-send" disabled={loading || !input.trim()}>
+        <button type="submit" className="assistant-send" disabled={loading || (!input.trim() && !image)}>
           {loading ? '…' : '发送'}
         </button>
       </form>
-      <p className="assistant-foot">由 Gemini 驱动 · 仅供学习参考,请自行核对。</p>
+      <p className="assistant-foot">由 Gemini 驱动 · 可拍题问图 · 仅供学习参考,请自行核对。</p>
     </main>
   )
 }

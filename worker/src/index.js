@@ -17,6 +17,9 @@ const ALLOWED_ORIGINS = new Set([
 const CHAT_MODEL = 'gemini-flash-latest'
 const MAX_MESSAGES = 20
 const MAX_CHARS = 4000
+// 图片问答(多模态):只收常见图片类型,base64 体积设上限防刷配额。
+const ALLOWED_IMAGE = new Set(['image/jpeg', 'image/png', 'image/webp'])
+const MAX_IMAGE_B64 = 7000000 // ≈5MB 二进制
 
 // 与首页朗读一致:ElevenLabs George storyteller voice + multilingual_v2。
 const TTS_VOICE = 'JBFqnCBsd6RMkjVDRZzb'
@@ -71,6 +74,17 @@ async function handleChat(request, env, origin) {
     if (text.trim()) contents.push({ role, parts: [{ text }] })
   }
   if (!contents.length) return json({ error: 'No messages' }, 400, origin)
+
+  // 多模态:把当前这轮的图片附到最后一条 user 消息上(inlineData)。
+  const img = body && body.image
+  if (img && typeof img.data === 'string' && ALLOWED_IMAGE.has(img.mimeType) && img.data.length <= MAX_IMAGE_B64) {
+    for (let i = contents.length - 1; i >= 0; i -= 1) {
+      if (contents[i].role === 'user') {
+        contents[i].parts.push({ inlineData: { mimeType: img.mimeType, data: img.data } })
+        break
+      }
+    }
+  }
 
   let upstream
   try {
