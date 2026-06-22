@@ -259,7 +259,7 @@ export default function Login() {
           </li>
           <li>
             <span className="login-value-mark" aria-hidden="true">◆</span>
-            <span className="login-value-text">班级 AI 助手 —— 双语数学答疑,登录后可用<span className="login-value-soon">(即将开放)</span>。</span>
+            <span className="login-value-text">班级 AI 助手 —— 双语数学答疑、可拍题问图,登录后即用。</span>
           </li>
         </ul>
       ) : null}
