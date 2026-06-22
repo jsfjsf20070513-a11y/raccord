@@ -46,14 +46,14 @@ export default function ManageHub() {
       </section>
 
       <section className="atelier-teaser">
-        <p className="atelier-teaser-kicker">À venir · 即将</p>
+        <p className="atelier-teaser-kicker">Disponible · 现已上线</p>
         <div className="atelier-teaser-head">
           <h2 className="atelier-teaser-title">班级 AI 助手</h2>
           <span className="atelier-teaser-flag">登录可用</span>
         </div>
         <p className="atelier-teaser-desc">
           一个中法双语数学答疑助手,可就任意定理或法语词条提问 —— 登录后即可使用。{' '}
-          <Link to="/login">登录 →</Link>
+          <Link to="/assistant">进入助手 →</Link>
         </p>
       </section>
 
