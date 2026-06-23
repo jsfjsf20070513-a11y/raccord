@@ -3,6 +3,12 @@ main = "src/index.js"
 compatibility_date = "2025-06-01"
 workers_dev = false
 
+# ElevenLabs 声音。⚠️ 免费层 API 只能用 premade(全英语)声音;法语「库声音」需
+# EL 付费层(否则 402 paid_plan_required)。升级后把 TTS_VOICE 改成法语 Voice ID
+# 即可(代码 env.TTS_VOICE 优先,缓存按声音区分);现回退到能用的 premade George。
+[vars]
+TTS_VOICE = "JBFqnCBsd6RMkjVDRZzb"
+
 # 路由:生产域名下的 /api/chat 绑到本 Worker(同域,前端同源调用)。
 # 静态站其余路径仍由 Vultr 源站经 Cloudflare 代理提供;只有 /api/chat 走 Worker。
 [[routes]]
