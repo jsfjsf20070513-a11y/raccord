@@ -342,7 +342,7 @@ export const theoremExplanations = {
 }
 
 export const explanationsCredit = {
-  "generator": "Anthropic Claude · claude-opus-4.7",
+  "generator": "Anthropic Claude · claude-opus-4.8",
   "mode": "Bilingual stepped proof outlines (Chinese / French) with KaTeX-rendered math",
   "scope": "Generated during a Dev3pack development session. Stored statically because the public deployment runs on free static infrastructure; a production deployment would route runtime requests through a Cloudflare Worker with the API key."
 }
