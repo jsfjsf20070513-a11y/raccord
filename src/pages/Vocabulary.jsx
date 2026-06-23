@@ -29,9 +29,12 @@ const TYPE_ROTATION = [
   EXERCISE_TYPES.listen,
   EXERCISE_TYPES.spelling,
 ]
-// 真人法语发音:同域 Worker 代理 ElevenLabs(Cloudflare 边缘缓存,每词只生成一
-// 次);加载失败时回退浏览器 speechSynthesis,听写功能永不因此中断。
+// 法语发音:USE_WORKER_VOICE 为 true 时优先走同域 Worker(真人音 + 边缘缓存),
+// 失败回退浏览器 TTS。当前 ElevenLabs 免费层无法用法语库声音(George 是英音),
+// 故暂时直接用浏览器法语 TTS(免费、法语、单声音);接好 Google TTS 真人法语音后
+// 把开关置 true 即可切回 Worker 路径。
 const SPEAK_ENDPOINT = 'https://rucmathclass.com/api/speak'
+const USE_WORKER_VOICE = false
 
 const VALID_DECK = cleanFrenchDeck(frenchVocabulary).valid
 const DECK_TAGS = ['all', ...Array.from(new Set(VALID_DECK.map((w) => w.tag).filter(Boolean)))]
@@ -152,30 +155,56 @@ export default function Vocabulary() {
       const synth = window.speechSynthesis
       if (!synth || !text) return
       synth.cancel()
-      const u = new SpeechSynthesisUtterance(text)
-      u.lang = 'fr-FR'
-      u.rate = 0.9
-      const voice = (synth.getVoices() || []).find((v) => /fr/i.test(v.lang))
-      if (voice) u.voice = voice
-      synth.speak(u)
+      let done = false
+      // Speak with a FRENCH voice. getVoices() is often empty on first call until
+      // the engine loads — wait once for `voiceschanged`, with a timed safety. The
+      // `done` flag guarantees exactly one utterance (never English + French double).
+      const speakWith = () => {
+        if (done) return
+        done = true
+        const u = new SpeechSynthesisUtterance(text)
+        u.lang = 'fr-FR'
+        u.rate = 0.9
+        const fr = (synth.getVoices() || []).find((v) => /fr/i.test(v.lang))
+        if (fr) u.voice = fr
+        synth.speak(u)
+      }
+      if ((synth.getVoices() || []).length) {
+        speakWith()
+      } else {
+        synth.addEventListener('voiceschanged', speakWith, { once: true })
+        setTimeout(speakWith, 300)
+      }
     } catch {
       // speech is optional
     }
   }, [])
 
-  // Prefer the real ElevenLabs voice via the Worker; fall back to browser TTS
-  // if the audio can't load (offline / quota / dev without the Worker).
+  // Prefer the real voice via the Worker; fall back to browser TTS if the audio
+  // can't load. `fallbackOnce` guards so the fallback fires AT MOST ONCE — both
+  // `onerror` and the play() rejection used to fire it, causing a double voice.
   const speak = useCallback((text) => {
     if (!text) return
     try { window.speechSynthesis && window.speechSynthesis.cancel() } catch { /* ignore */ }
+    // 暂走浏览器法语 TTS(见 USE_WORKER_VOICE 注释)。
+    if (!USE_WORKER_VOICE) {
+      browserTTS(text)
+      return
+    }
+    let usedFallback = false
+    const fallbackOnce = () => {
+      if (usedFallback) return
+      usedFallback = true
+      browserTTS(text)
+    }
     try {
       const a = voiceRef.current || (voiceRef.current = new Audio())
-      a.onerror = () => browserTTS(text)
+      a.onerror = fallbackOnce
       a.src = `${SPEAK_ENDPOINT}?text=${encodeURIComponent(text.slice(0, 160))}`
       const p = a.play()
-      if (p && typeof p.catch === 'function') p.catch(() => browserTTS(text))
+      if (p && typeof p.catch === 'function') p.catch(fallbackOnce)
     } catch {
-      browserTTS(text)
+      fallbackOnce()
     }
   }, [browserTTS])
 

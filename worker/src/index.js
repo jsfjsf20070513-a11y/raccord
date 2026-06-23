@@ -118,16 +118,18 @@ async function handleSpeak(request, env, ctx, url, origin) {
   const text = `${url.searchParams.get('text') || ''}`.trim().slice(0, TTS_MAX_CHARS)
   if (!text) return json({ error: 'No text' }, 400, origin)
 
-  // 边缘缓存:同一个词的 URL 只命中一次上游,之后全走缓存(配额只在首次消耗)。
+  const voiceId = env.TTS_VOICE || TTS_VOICE
+
+  // 边缘缓存:key 含 voiceId,这样换声音会自动失效(同词的旧声音缓存不再命中)。
   const cache = caches.default
-  const cacheKey = new Request(`https://rucmathclass.com/api/speak?text=${encodeURIComponent(text)}`, { method: 'GET' })
+  const cacheKey = new Request(`https://rucmathclass.com/api/speak?v=${voiceId}&text=${encodeURIComponent(text)}`, { method: 'GET' })
   const hit = await cache.match(cacheKey)
   if (hit) return hit
 
   let upstream
   try {
     upstream = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${TTS_VOICE}?output_format=mp3_44100_128`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
       {
         method: 'POST',
         headers: {
@@ -145,7 +147,15 @@ async function handleSpeak(request, env, ctx, url, origin) {
   } catch {
     return json({ error: 'Upstream unreachable' }, 502, origin)
   }
-  if (!upstream.ok) return json({ error: 'TTS error', status: upstream.status }, 502, origin)
+  if (!upstream.ok) {
+    let detail = ''
+    try {
+      detail = (await upstream.text()).slice(0, 400)
+    } catch {
+      // ignore
+    }
+    return json({ error: 'TTS error', status: upstream.status, detail }, 502, origin)
+  }
 
   const audio = await upstream.arrayBuffer()
   const resp = new Response(audio, {
