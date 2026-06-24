@@ -4283,3 +4283,28 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ── 背词:例句中文 + 讲解(study 卡 / 反馈)──────────────────────── */
+.vocab-study-example-zh {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+.vocab-study-note {
+  margin: 18px auto 0;
+  max-width: 32rem;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: rgba(139, 0, 0, 0.03);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.65;
+  text-align: left;
+}
+.vocab-fb-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}

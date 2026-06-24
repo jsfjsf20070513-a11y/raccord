@@ -87,7 +87,12 @@ function buildSession(queue, deck) {
     steps.push({ kind: 'match', exercise: buildMatchExercise(four.map((q) => q.word)) })
   }
   queue.forEach((item, idx) => {
-    const type = TYPE_ROTATION[idx % TYPE_ROTATION.length]
+    let type = TYPE_ROTATION[idx % TYPE_ROTATION.length]
+    // 「词块拼句」要求把例句译成法语,必须有例句中文(exampleZh)做题干;没有就
+    // 换成拼写题,绝不出"考拼句却不给中文"的残题。
+    if (type === EXERCISE_TYPES.build && !item.word.exampleZh) {
+      type = EXERCISE_TYPES.spelling
+    }
     steps.push({ kind: 'card', word: item.word, state: item.state, exercise: buildExercise(item.word, deck, { type }) })
   })
   return steps
@@ -596,8 +601,8 @@ export default function Vocabulary() {
         const map = Object.fromEntries(ex.bank.map((t) => [t.id, t.w]))
         return (
           <>
-            <p className="vocab-prompt">Traduisez la phrase · 词块拼句</p>
-            <p className="vocab-cue vocab-cue-sm">{current.word?.chinese}</p>
+            <p className="vocab-prompt">Traduisez en français · 把下面这句话拼成法语</p>
+            <p className="vocab-cue vocab-cue-sm">{current.word?.exampleZh}</p>
             <div className="vocab-build-line" lang="fr">
               {chosen.length
                 ? chosen.map((id) => (
@@ -631,13 +636,14 @@ export default function Vocabulary() {
     const correct = (ex.type === EXERCISE_TYPES.recognition || ex.type === EXERCISE_TYPES.build)
       ? ex.answer
       : (current.word?.french || ex.answer)
-    const gloss = ex.type === EXERCISE_TYPES.build ? null : current.word?.chinese
+    const gloss = ex.type === EXERCISE_TYPES.build ? current.word?.exampleZh : current.word?.chinese
     return (
       <div className={`vocab-fb ${ok ? 'is-ok' : 'is-no'}`}>
         <p className="vocab-fb-verdict">{isMatch ? '配对完成 ✓' : ok ? '答对 ✓ Juste' : '答错 ✗ Faux'}</p>
         {!ok ? (
           <p className="vocab-fb-answer">正确答案 <span lang="fr">{correct}</span>{gloss ? <span className="vocab-fb-gloss"> · {gloss}</span> : null}</p>
         ) : null}
+        {!isMatch && current.word?.note ? <p className="vocab-fb-note">💡 {current.word.note}</p> : null}
         <div className="vocab-fb-actions">
           <button type="button" className="vocab-next" onClick={next}>
             {i + 1 >= steps.length ? 'Terminer · 结束' : 'Continuer · 继续'} <span className="vocab-next-key">↵</span>
@@ -769,6 +775,8 @@ export default function Vocabulary() {
               <div className="vocab-study-rule" aria-hidden="true" />
               <p className="vocab-study-zh">{sw.chinese}</p>
               {sw.example ? <p className="vocab-study-example" lang="fr">{sw.example}</p> : null}
+              {sw.exampleZh ? <p className="vocab-study-example-zh">{sw.exampleZh}</p> : null}
+              {sw.note ? <p className="vocab-study-note">💡 {sw.note}</p> : null}
             </div>
             <div className="vocab-study-actions">
               <button type="button" className="vocab-verify" onClick={studyNext}>
