@@ -2,7 +2,8 @@
 //
 // 两个无状态端点,持有的 API key 都是 Wrangler secret,浏览器永远拿不到:
 //   POST /api/chat   → Gemini(GEMINI_API_KEY)双语数学/法语答疑,返回 { text }。
-//   GET  /api/speak  → ElevenLabs(ELEVENLABS_API_KEY)按需法语朗读,返回 audio/mpeg。
+//   GET  /api/speak  → Gemini TTS(同一把 GEMINI_API_KEY)按需法语朗读;Gemini 返回
+//                      16-bit PCM,Worker 包 WAV 头后返回 audio/wav。免费层、不绑卡。
 //                      用 Cloudflare 边缘缓存(caches.default),每个词一辈子只生成一次。
 //
 // 设计取向与主站一致:静态 SPA + 极薄无状态代理;不引入数据库、不存对话。
@@ -21,9 +22,9 @@ const MAX_CHARS = 4000
 const ALLOWED_IMAGE = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const MAX_IMAGE_B64 = 7000000 // ≈5MB 二进制
 
-// 与首页朗读一致:ElevenLabs George storyteller voice + multilingual_v2。
-const TTS_VOICE = 'JBFqnCBsd6RMkjVDRZzb'
-const TTS_MODEL = 'eleven_multilingual_v2'
+// Gemini 原生 TTS:多语种预置声音(支持法语)。换声音改 env.TTS_VOICE。
+const TTS_MODEL = 'gemini-2.5-flash-preview-tts'
+const TTS_VOICE = 'Kore'
 const TTS_MAX_CHARS = 160
 
 const SYSTEM_PROMPT = [
@@ -111,57 +112,100 @@ async function handleChat(request, env, origin) {
   return json({ text }, 200, origin)
 }
 
+// base64 → Uint8Array(Worker 有全局 atob)。
+function base64ToBytes(b64) {
+  const bin = atob(b64)
+  const out = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i += 1) out[i] = bin.charCodeAt(i)
+  return out
+}
+
+// 给裸 PCM 加 44 字节 WAV 头,使 <audio> 能直接播。
+function wavFromPcm(pcm, sampleRate, channels, bits) {
+  const blockAlign = channels * (bits / 8)
+  const byteRate = sampleRate * blockAlign
+  const dataLen = pcm.length
+  const buf = new Uint8Array(44 + dataLen)
+  const dv = new DataView(buf.buffer)
+  const wr = (off, s) => { for (let i = 0; i < s.length; i += 1) dv.setUint8(off + i, s.charCodeAt(i)) }
+  wr(0, 'RIFF'); dv.setUint32(4, 36 + dataLen, true); wr(8, 'WAVE')
+  wr(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true)
+  dv.setUint16(22, channels, true); dv.setUint32(24, sampleRate, true)
+  dv.setUint32(28, byteRate, true); dv.setUint16(32, blockAlign, true); dv.setUint16(34, bits, true)
+  wr(36, 'data'); dv.setUint32(40, dataLen, true)
+  buf.set(pcm, 44)
+  return buf
+}
+
 async function handleSpeak(request, env, ctx, url, origin) {
   if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405, origin)
-  if (!env.ELEVENLABS_API_KEY) return json({ error: 'Server not configured' }, 500, origin)
+  if (!env.GEMINI_API_KEY) return json({ error: 'Server not configured' }, 500, origin)
 
   const text = `${url.searchParams.get('text') || ''}`.trim().slice(0, TTS_MAX_CHARS)
   if (!text) return json({ error: 'No text' }, 400, origin)
 
-  const voiceId = env.TTS_VOICE || TTS_VOICE
+  const voice = env.TTS_VOICE || TTS_VOICE
+  const model = env.TTS_MODEL || TTS_MODEL
 
-  // 边缘缓存:key 含 voiceId,这样换声音会自动失效(同词的旧声音缓存不再命中)。
+  // 边缘缓存:key 含 voice/model,换声音/模型自动失效。
   const cache = caches.default
-  const cacheKey = new Request(`https://rucmathclass.com/api/speak?v=${voiceId}&text=${encodeURIComponent(text)}`, { method: 'GET' })
+  const cacheKey = new Request(`https://rucmathclass.com/api/speak?v=${voice}&m=${model}&text=${encodeURIComponent(text)}`, { method: 'GET' })
   const hit = await cache.match(cacheKey)
   if (hit) return hit
 
-  let upstream
-  try {
-    upstream = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
-      {
-        method: 'POST',
-        headers: {
-          'xi-api-key': env.ELEVENLABS_API_KEY,
-          'Content-Type': 'application/json',
-          Accept: 'audio/mpeg',
-        },
-        body: JSON.stringify({
-          text,
-          model_id: TTS_MODEL,
-          voice_settings: { stability: 0.4, similarity_boost: 0.8 },
-        }),
-      },
-    )
-  } catch {
-    return json({ error: 'Upstream unreachable' }, 502, origin)
-  }
-  if (!upstream.ok) {
-    let detail = ''
-    try {
-      detail = (await upstream.text()).slice(0, 400)
-    } catch {
-      // ignore
-    }
-    return json({ error: 'TTS error', status: upstream.status, detail }, 502, origin)
-  }
+  const reqBody = JSON.stringify({
+    contents: [{ parts: [{ text: `Lis en français, clairement et lentement : ${text}` }] }],
+    generationConfig: {
+      responseModalities: ['AUDIO'],
+      speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } },
+    },
+  })
 
-  const audio = await upstream.arrayBuffer()
-  const resp = new Response(audio, {
+  // Gemini TTS preview 偶发空返回(finishReason OTHER),重试一次让它稳。
+  let inline = null
+  let lastDetail = ''
+  for (let attempt = 0; attempt < 2 && !inline; attempt += 1) {
+    let upstream
+    try {
+      upstream = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-goog-api-key': env.GEMINI_API_KEY },
+          body: reqBody,
+        },
+      )
+    } catch {
+      return json({ error: 'Upstream unreachable' }, 502, origin)
+    }
+    if (!upstream.ok) {
+      try {
+        lastDetail = (await upstream.text()).slice(0, 400)
+      } catch {
+        // ignore
+      }
+      // 4xx(配额/参数)重试也没用,直接返回
+      if (upstream.status >= 400 && upstream.status < 500) {
+        return json({ error: 'TTS error', status: upstream.status, detail: lastDetail }, 502, origin)
+      }
+      continue
+    }
+    const data = await upstream.json()
+    const parts = (((data.candidates || [])[0] || {}).content || {}).parts || []
+    inline = parts.map((p) => p && p.inlineData).filter(Boolean)[0] || null
+    if (!inline) lastDetail = JSON.stringify(data).slice(0, 300)
+  }
+  if (!inline || !inline.data) {
+    return json({ error: 'No audio', detail: lastDetail }, 502, origin)
+  }
+  const rateMatch = /rate=(\d+)/.exec(inline.mimeType || '')
+  const rate = rateMatch ? Number(rateMatch[1]) : 24000
+  const wav = wavFromPcm(base64ToBytes(inline.data), rate, 1, 16)
+
+  const resp = new Response(wav, {
     status: 200,
     headers: {
-      'Content-Type': 'audio/mpeg',
+      'Content-Type': 'audio/wav',
       'Cache-Control': 'public, max-age=31536000, immutable',
       ...corsHeaders(origin),
     },
