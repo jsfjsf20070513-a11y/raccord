@@ -4241,3 +4241,70 @@
 }
 .assistant-attach-btn:hover:not(:disabled) { border-color: var(--accent); }
 .assistant-attach-btn:disabled { opacity: 0.45; cursor: default; }
+
+/* ── 移动端适配 + 无障碍 ─────────────────────────────────────────── */
+
+/* KaTeX 展示式在窄屏可横向滚动,不撑破布局。 */
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+.home-theorem-formula { overflow-x: auto; }
+
+/* 背词页此前整段没有窄屏规则,固定字号/宽度会在手机上溢出。 */
+@media (max-width: 600px) {
+  .vocab-page { max-width: 100%; }
+  .vocab-word { font-size: 38px; }
+  .vocab-cue { font-size: 30px; }
+  .vocab-cue-sm { font-size: 22px; }
+  .vocab-sentence { font-size: 20px; }
+  .vocab-study-title h2 { font-size: 36px; }
+  .vocab-options,
+  .vocab-input,
+  .vocab-match,
+  .vocab-build-line,
+  .vocab-build-bank { max-width: 100%; }
+}
+@media (max-width: 400px) {
+  .vocab-word { font-size: 32px; }
+  .vocab-cue { font-size: 26px; }
+  .vocab-study-title h2 { font-size: 30px; }
+  .vocab-tile { padding: 11px 12px; }            /* 触控目标 ≥44px */
+  .vocab-match-col .vocab-tile { padding: 12px 8px; }
+}
+
+/* 减少动效:一次性把所有动画/过渡降到瞬时(覆盖全部 @keyframes,
+   含定理淡入、表单字段、背词反馈、AI 点点、加载页)。动画仍跑到终态,
+   所以淡入元素不会卡在 opacity:0。 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── 背词:例句中文 + 讲解(study 卡 / 反馈)──────────────────────── */
+.vocab-study-example-zh {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+.vocab-study-note {
+  margin: 18px auto 0;
+  max-width: 32rem;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: rgba(139, 0, 0, 0.03);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.65;
+  text-align: left;
+}
+.vocab-fb-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}

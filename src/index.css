@@ -20,6 +20,20 @@
   font-synthesis: none;
 }
 
+/* 间距 tokens 在窄屏收紧,避免移动端"大空白板"。 */
+@media (max-width: 720px) {
+  :root {
+    --section-gap: 52px;
+    --paragraph-gap: 18px;
+  }
+}
+@media (max-width: 480px) {
+  :root {
+    --section-gap: 40px;
+    --paragraph-gap: 14px;
+  }
+}
+
 html,
 body,
 #root {
