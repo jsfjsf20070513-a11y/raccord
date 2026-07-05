@@ -13,17 +13,4 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.js'],
   },
-  define: {
-    // @solana/web3.js + @coral-xyz/anchor reference Node's `global`.
-    global: 'globalThis',
-  },
-  resolve: {
-    alias: {
-      // Provide a browser-friendly Buffer for Solana packages.
-      buffer: 'buffer',
-    },
-  },
-  optimizeDeps: {
-    include: ['buffer', '@solana/web3.js', '@coral-xyz/anchor', 'bn.js'],
-  },
 })

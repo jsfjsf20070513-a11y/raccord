@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import DailyMeditation from '../components/DailyMeditation'
+import { Link } from 'react-router-dom'
 import PasswordField from '../components/PasswordField'
 import { supabase, isSupabaseConfigured, SUPABASE_MISSING_MESSAGE } from '../lib/supabase'
 
@@ -19,7 +18,6 @@ function Masthead({ title, summary }) {
 }
 
 export default function ResetPassword() {
-  const navigate = useNavigate()
   const [pageState, setPageState] = useState('loading')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -72,7 +70,6 @@ export default function ResetPassword() {
       const { error } = await supabase.auth.updateUser({ password })
       if (error) throw error
       setPageState('success')
-      setTimeout(() => navigate('/'), 2000)
     } catch (error) {
       setMessage(error.message || '重置失败,请重新申请重置链接。')
     } finally {
@@ -107,9 +104,9 @@ export default function ResetPassword() {
   if (pageState === 'success') {
     return (
       <article className="page-column login-page">
-        <Masthead title="密码已更新" summary="密码已写入账户,现在可以用新密码登录了。" />
+        <Masthead title="Nouveau mot de passe" summary="密码已更新。现在可以用新密码登录了。" />
         <div className="reset-state">
-          <p className="reset-ok">✓ 已更新</p>
+          <p className="reset-ok">✓ Réinitialisé · 已重置</p>
           <p><Link to="/login" className="vocab-verify">前往登录 · Connexion →</Link></p>
         </div>
       </article>
@@ -118,7 +115,7 @@ export default function ResetPassword() {
 
   return (
     <article className="page-column login-page">
-      <Masthead title="设置新密码" summary="为账号设置一个新的登录密码。" />
+      <Masthead title="Nouveau mot de passe" summary="为你的账号设置一个新密码。" />
 
       <section className="login-section">
         <form className="editorial-form login-form" onSubmit={handleSubmit}>
@@ -143,7 +140,6 @@ export default function ResetPassword() {
           </div>
           {message ? <p className="status-line is-error">{message}</p> : null}
         </form>
-        <section className="home-meditation"><DailyMeditation offset={3} /></section>
       </section>
     </article>
   )

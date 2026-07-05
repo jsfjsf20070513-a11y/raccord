@@ -87,6 +87,8 @@ public/uploads/
 *.JPG
 *.jpeg
 *.png
+!public/worlds/
+!public/worlds/*.png
 *.webp
 setup_admin.sql
 setup_admin_v2.sql

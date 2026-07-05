@@ -13,6 +13,9 @@ import {
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
 import PageLoading from './components/PageLoading'
+import WorldProvider from './context/WorldProvider'
+import { hasEnteredCarnet } from './context/world-context'
+import Enter from './pages/Enter'
 import Home from './pages/Home'
 import './App.css'
 
@@ -22,7 +25,8 @@ const ManageHub = lazy(() => import('./pages/ManageHub'))
 const Login = lazy(() => import('./pages/Login'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const NotFound = lazy(() => import('./pages/NotFound'))
-const SolanaWitness = lazy(() => import('./pages/SolanaWitness'))
+const Testimonials = lazy(() => import('./pages/Testimonials'))
+const Recueil = lazy(() => import('./pages/Recueil'))
 const Vocabulary = lazy(() => import('./pages/Vocabulary'))
 const Assistant = lazy(() => import('./pages/Assistant'))
 
@@ -32,33 +36,12 @@ const ROUTE_LOADING_DURATION = 180
 const RESOURCE_LOADING_DURATION = 110
 const RESOURCE_INTERNAL_LOADING_DURATION = 60
 const MAX_LOADING_DURATION = 2200
-const CARNET_VISITED_KEY = 'carnet_visited'
 const RETURNING_LOADING_FACTOR = 0.27
 
 const RouteLoadingContext = createContext({
   pathname: '/',
   markRouteReady: () => {},
 })
-
-function hasVisitedCarnet() {
-  if (typeof window === 'undefined') {
-    return false
-  }
-
-  try {
-    return window.localStorage.getItem(CARNET_VISITED_KEY) !== null
-  } catch {
-    return false
-  }
-}
-
-function rememberCarnetVisited() {
-  try {
-    window.localStorage.setItem(CARNET_VISITED_KEY, '1')
-  } catch {
-    // Loading should never fail just because storage is unavailable.
-  }
-}
 
 function scaleLoadingDuration(duration, factor) {
   return Math.max(0, Math.round(duration * factor))
@@ -119,18 +102,29 @@ function DeferredPage({ children }) {
   )
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [pathname])
+
+  return null
+}
+
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/enter" element={<ReadyPage><Enter /></ReadyPage>} />
       <Route path="/" element={<Layout />}>
         <Route index element={<ReadyPage><Home /></ReadyPage>} />
-        <Route path="witness" element={<DeferredPage><SolanaWitness /></DeferredPage>} />
-        {/* 已下线页面 → 重定向兜底,旧链接/书签不硬 404。
-            黑客松陈列与 web3 个人页撤除,链上能力保留在「班级寄语墙」/witness;
-            图版(涉及同学人脸)整体下线,回首页。 */}
-        <Route path="hackathon" element={<Navigate to="/witness" replace />} />
-        <Route path="web3-profile" element={<Navigate to="/witness" replace />} />
-        <Route path="web3-student-profile" element={<Navigate to="/witness" replace />} />
+        <Route path="recueil" element={<DeferredPage><Recueil /></DeferredPage>} />
+        <Route path="testimonials" element={<DeferredPage><Testimonials /></DeferredPage>} />
+        {/* Web3 已退役；旧书签进入保留历史说明的新寄语簿。 */}
+        <Route path="witness" element={<Navigate to="/testimonials" replace />} />
+        <Route path="hackathon" element={<Navigate to="/testimonials" replace />} />
+        <Route path="web3-profile" element={<Navigate to="/testimonials" replace />} />
+        <Route path="web3-student-profile" element={<Navigate to="/testimonials" replace />} />
         <Route path="gallery" element={<Navigate to="/" replace />} />
         <Route path="gallery/contribute" element={<Navigate to="/" replace />} />
         <Route path="album/*" element={<Navigate to="/" replace />} />
@@ -159,6 +153,19 @@ function AppRoutes() {
   )
 }
 
+function EntryGate() {
+  const location = useLocation()
+  const bypassEntrance = location.pathname === '/enter'
+    || location.pathname === '/login'
+    || location.pathname === '/reset-password'
+
+  if (!bypassEntrance && !hasEnteredCarnet()) {
+    return <Navigate to="/enter" state={{ from: location.pathname }} replace />
+  }
+
+  return <AppRoutes />
+}
+
 function RoutedExperience() {
   const location = useLocation()
   const [loadingPhase, setLoadingPhase] = useState('visible')
@@ -167,8 +174,7 @@ function RoutedExperience() {
   const activePathnameRef = useRef(location.pathname)
   const minVisibleUntilRef = useRef(Date.now())
   const timerRef = useRef({ leave: 0, hide: 0, safety: 0 })
-  const isReturningVisitorRef = useRef(hasVisitedCarnet())
-  const shouldRememberVisitRef = useRef(!isReturningVisitorRef.current)
+  const isReturningVisitorRef = useRef(hasEnteredCarnet())
   const loadingTimingRef = useRef({
     fadeDuration: LOADING_FADE_DURATION,
     maxDuration: MAX_LOADING_DURATION,
@@ -202,12 +208,6 @@ function RoutedExperience() {
     timerRef.current.hide = window.setTimeout(() => {
       if (pathname === activePathnameRef.current) {
         setLoadingPhase('hidden')
-
-        if (shouldRememberVisitRef.current) {
-          rememberCarnetVisited()
-          shouldRememberVisitRef.current = false
-          isReturningVisitorRef.current = true
-        }
       }
     }, remaining + fadeDuration)
   }, [])
@@ -262,6 +262,7 @@ function RoutedExperience() {
   return (
     <RouteLoadingContext.Provider value={routeLoadingValue}>
       <>
+        <ScrollToTop />
         {loadingPhase !== 'hidden' ? (
           <PageLoading
             fullscreen
@@ -269,7 +270,7 @@ function RoutedExperience() {
             pathname={location.pathname}
           />
         ) : null}
-        <AppRoutes />
+        <EntryGate />
       </>
     </RouteLoadingContext.Provider>
   )
@@ -277,11 +278,11 @@ function RoutedExperience() {
 
 function App() {
   return (
-    <>
+    <WorldProvider>
       <BrowserRouter>
         <RoutedExperience />
       </BrowserRouter>
-    </>
+    </WorldProvider>
   )
 }
 

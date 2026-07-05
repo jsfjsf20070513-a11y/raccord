@@ -8,8 +8,8 @@ const doorways = [
     numeral: 'I',
     fr: 'Mur de la classe',
     zh: '班级寄语墙',
-    desc: '给这个班留下一句话 —— 永久保存、公开可见、谁都改不了。',
-    to: '/witness',
+    desc: '给这个班留下一句话 —— 存入公开可读的班级档案。',
+    to: '/testimonials',
   },
   {
     numeral: 'II',
