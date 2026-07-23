@@ -11,7 +11,7 @@ export default function MobileWorldLayout({ world, pathname, user, isAuthEnabled
     <div className={`site-shell world-site-shell site-layout-mobile${isHome ? ' is-world-home' : ''}${navigation.length ? '' : ' has-quiet-header'}`} data-site-world={world} data-site-scope={scope}>
       <header className="site-header world-site-header mobile-world-header">
         <div className="mobile-world-bar">
-          <Link to="/" className="site-wordmark">{scope === 'tool' ? 'Outils · Carnet de classe' : WORLD_LABELS[world]}</Link>
+          <Link to="/" className="site-wordmark">{scope === 'tool' ? 'Outils · Raccord' : WORLD_LABELS[world]}</Link>
           <div className="mobile-world-utilities">
             {scope !== 'tool' && !isHome ? <Link to="/vocabulary" className="site-tool-link" aria-label="打开背词工具">SRS</Link> : null}
             {!isHome ? (user ? <button type="button" className="site-auth-link" onClick={onSignOut}>退出</button> : isAuthEnabled ? <Link to="/login" className="site-auth-link">Login</Link> : null) : null}

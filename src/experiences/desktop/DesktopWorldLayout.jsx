@@ -12,7 +12,7 @@ export default function DesktopWorldLayout({ world, pathname, user, displayName,
       <header className="site-header world-site-header">
         <div className="site-header-inner world-site-header-inner">
           <div className="site-brand-lockup">
-            <Link to="/" className="site-wordmark">Carnet de classe</Link>
+            <Link to="/" className="site-wordmark">Raccord</Link>
             <span className="site-world-label">{scope === 'tool' ? 'Outils · hors monde' : WORLD_LABELS[world]}</span>
           </div>
           {navigation.length ? <nav className="site-nav world-site-nav" aria-label="Navigation du monde">

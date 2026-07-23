@@ -10,7 +10,7 @@
   border-bottom: 1px solid var(--rule);
 }
 
-/* Design header: « Carnet de classe » wordmark + auth on one row,
+/* Design header: « Raccord » wordmark + auth on one row,
    four nav items inline below. Naturally responsive via flex-wrap. */
 .site-header-inner {
   max-width: var(--header-width);

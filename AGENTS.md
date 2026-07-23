@@ -13,9 +13,10 @@
 ## 当前产品状态（2026-07-23）
 
 - React 18 + React Router 7 + Vite 5 静态 SPA，Supabase anon client + RLS。
-- **第一章《Le ciel de Poincaré》已获作者认可成立**（2026-07-23，轻量认可，见转向决议附记）：三界共享 `localStorage.poincare_sky_v1` 的 seed / memory / scar 命运对象，通行过场由共享 signature 驱动。隐晦语法（Carnet 驻留显影、Limite 长按加载）是有意保留的赌注，不加提示。`Raccord 01` 依决议第八条封存为实验档案，代码保留。公开名称与署名待定。
+- **第一章《Le ciel de Poincaré》已获作者认可成立**（2026-07-23，轻量认可，见转向决议附记）：三界共享 `localStorage.poincare_sky_v1` 的 seed / memory / scar 命运对象，通行过场由共享 signature 驱动。隐晦语法（Carnet 驻留显影、Limite 长按加载）是有意保留的赌注，不加提示。`Raccord 01` 依决议第八条封存为实验档案，代码保留。
 - 当前三条 world key / 路由仍为 `carnet`、`plan`、`limite`。本期分别采用纸页、工程图和暗色仪器的表现语言；三者不得复用同一首页内容模板，但这些语言与内容归属可以在后续 edition 中演化。
 - 桌面端与移动端是两条独立体验线，只挂载当前 viewport 对应的 DOM；共享层只放 domain data、world state、SRS/API 与 `components/material` primitives。禁止同时渲染双端后用 CSS 隐藏，也禁止把桌面侧栏/双栏仅靠 media query 压成手机。
+- **站名 `Raccord`**（2026-07-23 拍板）：wordmark、`<title>` 与 og 元数据均为 Raccord；章节名保留法语；署名以 Enter 页脚落款「金铄莑 · 诞生于中国人民大学中法学院 2025 级数学班」承载。不得回退为「班级官网」措辞。
 - 世界状态写入 `localStorage.carnet_world`，首访入口使用 `localStorage.carnet_visited`，根节点为 `<html data-world>`.
 - 当前 edition 以同一件 `Raccord 01` 连续曲线贯穿三界：PLAN 用 Bézier 控制柄把两段曲线从 G⁰ 接向 C²；Carnet 以 Cauchy / Bergson 的边注追问连续与同一；Limite 把同一曲线置于 A350 / 航空连续曲率启发的无量纲载荷试验中。当前关系是「PLAN 构造 → Limite 施压 → Carnet 留痕与提问 → 返回 PLAN」，不是三项强制流程。
 - `Raccord 01` 的 Bézier 控制柄是三界共享且持久化的对象（`localStorage.raccord_artifact_v1`），不是三张相似插图：PLAN 改动后，Carnet 与 Limite 必须读取同一组坐标。数值读取、边界归一化和飞行载荷都在 `components/material/raccordWorldMath.js` 保持为可测试纯函数。

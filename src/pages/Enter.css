@@ -97,6 +97,19 @@
   transition: color 0.38s ease;
 }
 
+.enter-page.enter-portal .enter-colophon {
+  position: relative;
+  z-index: 2;
+  padding: clamp(10px, 1.6vw, 16px) clamp(18px, 4vw, 44px) clamp(14px, 2.4vw, 22px);
+  color: var(--enter-ink);
+  opacity: 0.34;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  text-align: center;
+}
+
 .enter-page.enter-portal .enter-hero {
   position: relative;
   z-index: 2;

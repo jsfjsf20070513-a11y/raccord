@@ -28,7 +28,7 @@ export default function EnterMobile({ worlds, onSelect }) {
       <WorldStageField mode={activeWorldId || 'idle'} pointerField={stagePointer} />
       <div className="enter-content">
         <header className="enter-header">
-          <span>Carnet de classe</span>
+          <span>Raccord</span>
           <span>MMXXVI</span>
         </header>
         <main className="enter-hero" aria-live="polite">
@@ -54,6 +54,7 @@ export default function EnterMobile({ worlds, onSelect }) {
             </ScrollAwaken>
           ))}
         </nav>
+        <footer className="enter-colophon">金铄莑 · 诞生于中国人民大学中法学院 2025 级数学班</footer>
       </div>
     </div>
   )
