@@ -2,15 +2,26 @@
 
 本仓是 math 主线唯一活跃代码仓与 `rucmathclass.com` 的构建来源。改代码、提交、部署只在这里进行；兄弟仓 `MathClassWebsite` 已归档，只作为私有班级照片源。
 
-## 当前产品状态（2026-07-03）
+## 产品意图正本
+
+- 产品宪法是 [`docs/design/product-constitution.md`](docs/design/product-constitution.md)。它规定判断、删减与演化原则；与旧设计研究的产品意图冲突时，以宪法为准。
+- 作者身份转向期同时遵守 [`docs/design/author-work-transition-resolution.md`](docs/design/author-work-transition-resolution.md)：涉及作者与班级边界、思想化身真实性、章节制及“是否必须共享同一对象”的判断，以该临时决议为准；具体人物与场景仍须原型验证，尚未写入正式宪法。
+- 领域语言见 [`CONTEXT.md`](CONTEXT.md)。本站当前称“作者作品”，数学班是“出生坐标”；禁止再把它默认描述为代表班级集体意志的“班级官网”。
+- 三世界不是三个固定功能部门，而是当前使用的三种表现形式。它们可以换题材、对象、动作和媒介；现有路由与内容分工只描述当前实现，不构成永久产品定义。
+- 美是产品价值，不是功能外皮。一个体验可以改变共享对象，也可以只留下真实的感知、理解或记忆余韵；但不能既无对象、也无余韵，只靠功能数量或视觉新鲜感成立。
+
+## 当前产品状态（2026-07-16）
 
 - React 18 + React Router 7 + Vite 5 静态 SPA，Supabase anon client + RLS。
-- 三世界：`carnet`（默认档案馆）、`plan`（门面/书目）、`limite`（背词与 AI 仪器）。
+- 当前三条 world key / 路由仍为 `carnet`、`plan`、`limite`。本期分别采用纸页、工程图和暗色仪器的表现语言；三者不得复用同一首页内容模板，但这些语言与内容归属可以在后续 edition 中演化。
+- 桌面端与移动端是两条独立体验线，只挂载当前 viewport 对应的 DOM；共享层只放 domain data、world state、SRS/API 与 `components/material` primitives。禁止同时渲染双端后用 CSS 隐藏，也禁止把桌面侧栏/双栏仅靠 media query 压成手机。
 - 世界状态写入 `localStorage.carnet_world`，首访入口使用 `localStorage.carnet_visited`，根节点为 `<html data-world>`.
-- 首页是同一天、同一定理、同一句冥想的三种「Page du jour」版式；数据继续来自 `dailyTheoremNotes.generated.js` 与 `siteContent.js`。
-- `/testimonials` 是 Carnet 寄语簿；历史链上人类内容已静态归档，新写入使用独立 `testimonials` 表。
+- 当前 edition 以同一件 `Raccord 01` 连续曲线贯穿三界：PLAN 用 Bézier 控制柄把两段曲线从 G⁰ 接向 C²；Carnet 以 Cauchy / Bergson 的边注追问连续与同一；Limite 把同一曲线置于 A350 / 航空连续曲率启发的无量纲载荷试验中。当前关系是「PLAN 构造 → Limite 施压 → Carnet 留痕与提问 → 返回 PLAN」，不是三项强制流程。
+- `Raccord 01` 的 Bézier 控制柄是三界共享且持久化的对象（`localStorage.raccord_artifact_v1`），不是三张相似插图：PLAN 改动后，Carnet 与 Limite 必须读取同一组坐标。数值读取、边界归一化和飞行载荷都在 `components/material/raccordWorldMath.js` 保持为可测试纯函数。
+- PLAN 的 Atlas / Chantier、Carnet 的 archives / register 与站点级 Vocabulary 继续存在于深层工具路由，不与首页中心对象争抢首屏；Assistant 只在具体学习失败后作为上下文动作出现。
+- `/testimonials` 路由与独立 `testimonials` 表继续存在，但页面已降为只读「来源附录」：已验证技术痕迹与未验证用户记录分开，编辑样例不渲染，不再提供新留言界面。
 - Web3 前端已退役。`programs/class-anchor/` 与 Anchor 文档只作历史，不再 build/deploy；不得重新接回钱包、Solana 依赖或链写入 UI。
-- `/vocabulary` 的 SRS、词库真相源与 `/assistant` 的 Cloudflare Worker 保持原管线。
+- `/vocabulary` 的 SRS、词库真相源与 `/assistant` 的 Cloudflare Worker 保持原管线；管线存在不等于产品核心地位，背词默认是工具，AI 默认退到具体对象之后。
 
 ## 常用命令
 
@@ -38,10 +49,12 @@ npm audit --omit=dev --audit-level=high
 ## 视觉约束
 
 - 只允许一个强调色，且必须和底色同温度。
-- Carnet：`#fdfcf8 / #1a1a1a / #8b0000`，EB Garamond + Noto Serif SC，无框表单与发丝线。
-- PLAN ℝ：`#e9e7df / #121211 / #1a23e6`，Archivo 900 + 方格/制图结构；已验收视觉，改动前先问。
-- Limite：`#100d0b / #ece7dd / #ff4d2e`，Archivo 900 + JetBrains Mono，动态信号仪器。
+- 当前 Carnet 谱系：`#fbfaf6 / #201d1a / #7f302b`，EB Garamond + Noto Serif SC 400，象牙纸、无框表单与发丝线。
+- 当前 PLAN ℝ 谱系：`#efede6 / #171716 / #2e3fbd`，只在每屏主标题使用 Archivo 900，正文使用 400/500/600；本期保留方格与制图结构。
+- 当前 Limite 谱系：`#12100e / #e9e3d9 / #d9614d`，Archivo 500/600 + JetBrains Mono，红只作活性信号，不再把整页变成告警面板。
 - 每屏一个主视觉重心；不要把正文装进通用圆角卡片。
+- Enter 与三世界所有材质变化连续、可逆、低噪声；pointer 停则插值完成后停帧，离开/松手沉睡；scroll 只负责 dormant→awakened。不要粒子、大面积 glow、普通 hover 放大、廉价毛玻璃或永续 RAF。
+- Claude 设计稿继续作为当前 edition 的色调、字体、字重、发丝线与异质响应基线，不是永久内容宪法；旧稿的五项统一导航、解释性长文、假朗读、三世界重复同一今日页和 AI 冻结条款已被后续用户决策覆盖。
 
 ## 部署
 
