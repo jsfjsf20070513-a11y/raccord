@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import PasswordField from '../components/PasswordField'
 import { supabase, isSupabaseConfigured, SUPABASE_MISSING_MESSAGE } from '../lib/supabase'
 
@@ -10,7 +10,7 @@ const COPY = {
   login: {
     titleFr: 'Connexion',
     titleZh: '登录',
-    summary: '登录以跨设备同步背词进度,并使用班级 AI 助手。',
+    summary: '登录以跨设备同步学习进度。',
     submit: '登录 · Connexion',
     submitting: '登录中…',
   },
@@ -51,6 +51,11 @@ const ERRORS = {
 }
 
 export default function Login() {
+  const location = useLocation()
+  const requestedReturn = location.state?.from
+  const returnTo = typeof requestedReturn === 'string' && requestedReturn.startsWith('/') && !requestedReturn.startsWith('//')
+    ? requestedReturn
+    : '/vocabulary'
   const [mode, setMode] = useState('login')
   const [loginMethod, setLoginMethod] = useState('email')
   const [email, setEmail] = useState('')
@@ -236,21 +241,16 @@ export default function Login() {
           <h1 className="login-title">Connecté</h1>
           <p className="login-title-zh">已登录</p>
         </header>
-        <p className="login-signed-copy">登录成功,背词进度已同步。接下来去哪儿?</p>
+        <p className="login-signed-copy">登录成功。</p>
         <div className="login-destinations">
-          <Link to="/vocabulary">
+          <Link to={returnTo}>
             <span>01</span>
-            <span><strong>背词 · Vocabulaire</strong><small>进度已同步 · progression synchronisée</small></span>
+            <span><strong>继续 · Reprendre</strong><small>返回刚才的位置</small></span>
             <i>→</i>
           </Link>
-          <Link to="/assistant">
+          <Link to="/">
             <span>02</span>
-            <span><strong>AI 助手 · Assistant</strong><small>双语答疑,现已开放 · ouvert</small></span>
-            <i>→</i>
-          </Link>
-          <Link to="/testimonials">
-            <span>03</span>
-            <span><strong>寄语簿 · Témoignages</strong><small>给班级留一句 · un mot à la classe</small></span>
+            <span><strong>返回世界 · Le monde</strong><small>回到进入工具前的视觉世界</small></span>
             <i>→</i>
           </Link>
         </div>
@@ -271,13 +271,6 @@ export default function Login() {
         <p className="login-title-zh">{copy.titleZh}</p>
         <p className="login-summary">{copy.summary}</p>
       </header>
-
-      {mode === 'login' ? (
-        <div className="login-values">
-          <p>背词进度跨设备同步 —— 手机上背的,电脑上接着背。</p>
-          <p>班级 AI 助手 —— 双语数学答疑,<span>现已开放</span>。</p>
-        </div>
-      ) : null}
 
       <section className="login-section">
         <div className="editorial-actions tabs login-tabs">

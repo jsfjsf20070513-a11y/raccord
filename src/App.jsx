@@ -120,7 +120,7 @@ function AppRoutes() {
         <Route index element={<ReadyPage><Home /></ReadyPage>} />
         <Route path="recueil" element={<DeferredPage><Recueil /></DeferredPage>} />
         <Route path="testimonials" element={<DeferredPage><Testimonials /></DeferredPage>} />
-        {/* Web3 已退役；旧书签进入保留历史说明的新寄语簿。 */}
+        {/* Web3 已退役；旧书签进入只读的来源附录。 */}
         <Route path="witness" element={<Navigate to="/testimonials" replace />} />
         <Route path="hackathon" element={<Navigate to="/testimonials" replace />} />
         <Route path="web3-profile" element={<Navigate to="/testimonials" replace />} />
@@ -160,7 +160,7 @@ function EntryGate() {
     || location.pathname === '/reset-password'
 
   if (!bypassEntrance && !hasEnteredCarnet()) {
-    return <Navigate to="/enter" state={{ from: location.pathname }} replace />
+    return <Navigate to="/enter" state={{ from: `${location.pathname}${location.search}` }} replace />
   }
 
   return <AppRoutes />
@@ -263,7 +263,7 @@ function RoutedExperience() {
     <RouteLoadingContext.Provider value={routeLoadingValue}>
       <>
         <ScrollToTop />
-        {loadingPhase !== 'hidden' ? (
+        {loadingPhase !== 'hidden' && !['/', '/enter'].includes(location.pathname) ? (
           <PageLoading
             fullscreen
             isLeaving={loadingPhase === 'leaving'}

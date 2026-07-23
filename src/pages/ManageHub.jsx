@@ -1,18 +1,9 @@
 import { Link } from 'react-router-dom'
-import DailyMeditation from '../components/DailyMeditation'
 
-// 协作 Atelier — design contract: 报头 → 两个编号细线入口(I 班级寄语墙 / II 资源增补)
-// → 班级 AI 助手「即将 · 登录可用」预告 → 细页脚。旧的草稿/审核/案头/图版补录工作台已收敛掉。
+// Legacy collaboration route: keep the one action with a real review pipeline.
 const doorways = [
   {
     numeral: 'I',
-    fr: 'Mur de la classe',
-    zh: '班级寄语墙',
-    desc: '给这个班留下一句话 —— 存入公开可读的班级档案。',
-    to: '/testimonials',
-  },
-  {
-    numeral: 'II',
     fr: 'Curation de ressources',
     zh: '资源增补',
     desc: '推荐一条书目或课程链接,审阅后并入「资源」页的公开书架。',
@@ -25,9 +16,8 @@ export default function ManageHub() {
     <article className="page-column atelier-page">
       <header className="atelier-masthead">
         <p className="atelier-kicker">Participer · 共建</p>
-        <h1 className="atelier-title">在这本册子里留下点什么</h1>
-        <p className="atelier-subtitle" lang="fr">Tenir le carnet à plusieurs mains, sans en troubler la page.</p>
-        <p className="atelier-subtitle-zh">众手同修一册,而不扰其页。</p>
+        <h1 className="atelier-title">Outils publics</h1>
+        <p className="atelier-subtitle-zh">服务于网站，但不定义任何世界。</p>
       </header>
 
       <section className="atelier-doorways">
@@ -45,19 +35,6 @@ export default function ManageHub() {
         ))}
       </section>
 
-      <section className="atelier-teaser">
-        <p className="atelier-teaser-kicker">Disponible · 现已上线</p>
-        <div className="atelier-teaser-head">
-          <h2 className="atelier-teaser-title">班级 AI 助手</h2>
-          <span className="atelier-teaser-flag">登录可用</span>
-        </div>
-        <p className="atelier-teaser-desc">
-          一个中法双语数学答疑助手,可就任意定理或法语词条提问 —— 登录后即可使用。{' '}
-          <Link to="/assistant">进入助手 →</Link>
-        </p>
-      </section>
-
-      <section className="home-meditation"><DailyMeditation /></section>
     </article>
   )
 }

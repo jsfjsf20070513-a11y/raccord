@@ -1,16 +1,28 @@
 :root {
-  --bg: #fdfcf8;
-  --ink: #1a1a1a;
-  --muted: #6b6b6b;
-  --accent: #8b0000;
-  --panel: #faf8f1;
-  --line: rgba(26, 26, 26, 0.16);
+  --plan-paper-refined: #efede6;
+  --plan-ink-refined: #171716;
+  --plan-accent-refined: #2e3fbd;
+  --plan-muted-refined: #595853;
+  --carnet-paper-refined: #fbfaf6;
+  --carnet-ink-refined: #201d1a;
+  --carnet-accent-refined: #7f302b;
+  --carnet-muted-refined: #6b635b;
+  --limite-bg-refined: #12100e;
+  --limite-ink-refined: #e9e3d9;
+  --limite-accent-refined: #d9614d;
+  --limite-muted-refined: #918a80;
+  --bg: var(--carnet-paper-refined);
+  --ink: var(--carnet-ink-refined);
+  --muted: var(--carnet-muted-refined);
+  --accent: var(--carnet-accent-refined);
+  --panel: #f5f2ea;
+  --line: rgba(32, 29, 26, 0.16);
   --font-display: "EB Garamond", serif;
   --font-body: "Noto Serif SC", "Source Han Serif SC", serif;
   --font-mono: "JetBrains Mono", monospace;
   --paper: var(--bg);
   --rule: var(--line);
-  --ok: #3f7a4e;
+  --ok: var(--carnet-accent-refined);
   --page-width: 900px;
   --header-width: 920px;
   --section-gap: 80px;
@@ -27,27 +39,27 @@
 }
 
 :root[data-world="plan"] {
-  --bg: #e9e7df;
-  --ink: #121211;
-  --accent: #1a23e6;
-  --muted: #6b6a64;
-  --panel: #f2f0e8;
-  --line: rgba(18, 18, 17, 0.18);
+  --bg: var(--plan-paper-refined);
+  --ink: var(--plan-ink-refined);
+  --accent: var(--plan-accent-refined);
+  --muted: var(--plan-muted-refined);
+  --panel: #f4f2ec;
+  --line: rgba(23, 23, 22, 0.18);
   --font-display: "Archivo", "Noto Sans SC", sans-serif;
   --font-body: "Noto Sans SC", sans-serif;
-  --ok: #1a23e6;
+  --ok: var(--plan-accent-refined);
 }
 
 :root[data-world="limite"] {
-  --bg: #100d0b;
-  --ink: #ece7dd;
-  --accent: #ff4d2e;
-  --muted: #7a756c;
-  --panel: #17120f;
-  --line: rgba(236, 231, 221, 0.16);
+  --bg: var(--limite-bg-refined);
+  --ink: var(--limite-ink-refined);
+  --accent: var(--limite-accent-refined);
+  --muted: var(--limite-muted-refined);
+  --panel: #171411;
+  --line: rgba(233, 227, 217, 0.16);
   --font-display: "Archivo", "Noto Sans SC", sans-serif;
   --font-body: "Archivo", "Noto Sans SC", sans-serif;
-  --ok: #ff4d2e;
+  --ok: var(--limite-accent-refined);
 }
 
 /* 间距 tokens 在窄屏收紧,避免移动端"大空白板"。 */

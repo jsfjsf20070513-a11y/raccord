@@ -32,7 +32,7 @@ export default function PageLoading({ fullscreen = false, isLeaving = false, pat
   const plancheLabel = ['I', 'II', 'III', 'IV'][index % 4]
 
   const content = (
-    <div className="pl-shell" role="status" aria-live="polite" aria-busy="true">
+    <div className="pl-shell" data-route={resolvedPathname} role="status" aria-live="polite" aria-busy="true">
       <p className="pl-eyebrow">Planche {plancheLabel} — en cours</p>
       <div className="pl-body">
         {entry.fr ? <p key={`fr-${index}`} className="pl-fr" lang="fr">{entry.fr}</p> : null}
