@@ -54,7 +54,6 @@ export default function EnterDesktop({ worlds, onSelect }) {
             </ScrollAwaken>
           ))}
         </nav>
-        <footer className="enter-colophon">金铄莑 · 诞生于中国人民大学中法学院 2025 级数学班</footer>
       </div>
     </div>
   )
