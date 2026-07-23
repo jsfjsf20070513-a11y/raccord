@@ -1,0 +1,100 @@
+.poincare-chapter-desktop {
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  min-height: calc(100svh - 58px);
+  margin-left: -50vw;
+  overflow: hidden;
+}
+
+.poincare-chapter-desktop > .poincare-field {
+  position: absolute;
+  inset: 0;
+}
+
+.poincare-chapter-heading {
+  position: absolute;
+  z-index: 5;
+  top: clamp(22px, 3.4svh, 36px);
+  left: clamp(34px, 4vw, 64px);
+  right: clamp(34px, 4vw, 64px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  gap: 24px;
+  pointer-events: none;
+}
+
+.poincare-chapter-heading h1 {
+  margin: 0;
+  font: italic 400 clamp(25px, 2vw, 32px)/1 "EB Garamond", serif;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.poincare-chapter-heading > span {
+  font: 400 10px/1 "JetBrains Mono", monospace;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.poincare-chapter-heading > span:last-child { text-align: right; }
+
+.poincare-chapter-passage {
+  position: absolute;
+  z-index: 6;
+  right: clamp(34px, 4vw, 64px);
+  bottom: clamp(22px, 3.4svh, 34px);
+  left: clamp(34px, 4vw, 64px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.poincare-chapter-passage > span {
+  font: 400 9px/1 "JetBrains Mono", monospace;
+  letter-spacing: .14em;
+}
+
+.poincare-chapter-passage button {
+  min-width: 132px;
+  padding: 10px 0 7px;
+  border: 0;
+  border-top: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font: 400 10px/1 "JetBrains Mono", monospace;
+  letter-spacing: .16em;
+  text-align: right;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.poincare-chapter-passage button:hover,
+.poincare-chapter-passage button:focus-visible {
+  color: inherit;
+  border-top-width: 2px;
+  outline: none;
+}
+
+.poincare-plan-desktop { min-height: calc(100svh - 58px); color: #2e3fbd; background: #efede6; }
+.poincare-carnet-desktop { color: #7f302b; background: #fbfaf6; }
+.poincare-limite-desktop { color: #d9614d; background: #12100e; }
+
+.poincare-plan-desktop .poincare-chapter-heading h1 { color: #171716; }
+.poincare-carnet-desktop .poincare-chapter-heading h1 { color: #7f302b; }
+.poincare-limite-desktop .poincare-chapter-heading h1 { color: #d9614d; }
+
+.poincare-passage-desktop {
+  position: fixed;
+  z-index: 30;
+  inset: 58px 0 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+@media (max-height: 650px) {
+  .poincare-chapter-heading { top: 18px; }
+  .poincare-chapter-passage { bottom: 18px; }
+}

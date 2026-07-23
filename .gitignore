@@ -89,6 +89,12 @@ public/uploads/
 *.png
 !public/worlds/
 !public/worlds/*.png
+!public/assets/poincare/plan-relief.png
+!public/assets/poincare/carnet-relief.png
+!public/assets/poincare/limite-relief.png
+!docs/design/poincare/selected-option-2.png
+!docs/design/poincare/qa/comparison-desktop-final.jpg
+!docs/design/poincare/qa/comparison-continuity-final.jpg
 *.webp
 setup_admin.sql
 setup_admin_v2.sql

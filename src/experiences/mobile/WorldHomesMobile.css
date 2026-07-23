@@ -1,0 +1,33 @@
+.plan-world-mobile,
+.carnet-world-mobile,
+.limite-world-mobile {
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+}
+
+.plan-world-mobile {
+  background: var(--plan-paper-refined);
+  color: var(--plan-ink-refined);
+}
+
+.carnet-world-mobile {
+  overflow: visible;
+  background: var(--carnet-paper-refined);
+  color: var(--carnet-ink-refined);
+}
+
+.limite-world-mobile {
+  min-height: calc(100svh - 52px);
+  background: var(--limite-bg-refined);
+  color: var(--limite-ink-refined);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plan-world-mobile *,
+  .carnet-world-mobile *,
+  .limite-world-mobile * {
+    transition-duration: .01ms !important;
+  }
+}

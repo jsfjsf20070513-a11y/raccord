@@ -1,0 +1,7 @@
+import { Link } from 'react-router-dom'
+import '../../WorldInternalExperience.css'
+import '../../WorldRefinement.css'
+
+export default function CarnetArchivesDesktop({ volumes, selectedIndex, onSelect, todayIndex, theorem }) {
+  return <article className="carnet-archives carnet-archives-desktop"><header><p>Le Carnet · Archives</p><h1>Vingt-quatre théorèmes</h1></header><div className="archives-desktop-spread"><aside>{volumes.map((volume) => <section key={volume.roman}><p>{volume.roman} · {volume.title}</p>{volume.indices.map((index) => <button key={index} type="button" className={index === selectedIndex ? 'is-active' : ''} onClick={() => onSelect(index)}><small>N°{String(index + 1).padStart(2, '0')}</small><span>{theorem(index).title}</span>{index === todayIndex ? <i>Aujourd’hui</i> : null}</button>)}</section>)}</aside><section className="archive-reader"><header><span>N°{String(selectedIndex + 1).padStart(2, '0')}</span><span>{selectedIndex === todayIndex ? 'Aujourd’hui · 今日' : ''}</span></header><h2>{theorem(selectedIndex).title}</h2><p>{theorem(selectedIndex).prelude}</p><div className="archive-formula" dangerouslySetInnerHTML={{ __html: theorem(selectedIndex).displayHtml || theorem(selectedIndex).fallback }} /><span aria-hidden="true" /><p className="archive-note"><i>批：</i>{theorem(selectedIndex).note}</p><Link to="/">Retour à aujourd’hui →</Link></section></div></article>
+}

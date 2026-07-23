@@ -1,0 +1,62 @@
+.enter-page.enter-portal.enter-desktop {
+  overflow: hidden;
+}
+
+.enter-page.enter-portal.enter-desktop .enter-content {
+  min-height: 100svh;
+}
+
+.enter-page.enter-portal.enter-desktop .enter-hero {
+  min-height: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  padding: clamp(18px, 3.2vw, 34px) clamp(28px, 4vw, 52px) clamp(8px, 1.5vw, 18px);
+}
+
+.enter-page.enter-portal.enter-desktop .enter-hero h1 {
+  max-width: min(76vw, 960px);
+  font-size: clamp(72px, 13.6vw, 202px);
+  line-height: 0.86;
+}
+
+.enter-page.enter-portal.enter-desktop .enter-worlds {
+  width: min(calc(100% - 56px), 988px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(18px, 1.9vw, 24px);
+  padding-bottom: clamp(26px, 3.8vw, 44px);
+}
+
+.enter-page.enter-portal.enter-desktop .scroll-awaken {
+  max-width: 308px;
+}
+
+.enter-page.enter-portal.enter-desktop .world-material-frame,
+.enter-page.enter-portal.enter-desktop .world-portal-card[data-world-id] .world-material-frame {
+  height: clamp(176px, 14.2vw, 198px);
+  aspect-ratio: auto;
+}
+
+@media (max-height: 780px) and (min-width: 761px) {
+  .enter-page.enter-portal.enter-desktop .enter-header {
+    padding-top: 18px;
+    padding-bottom: 14px;
+  }
+
+  .enter-page.enter-portal.enter-desktop .enter-hero {
+    padding-top: 12px;
+    padding-bottom: 4px;
+  }
+
+  .enter-page.enter-portal.enter-desktop .enter-hero h1 {
+    font-size: clamp(72px, 11vw, 140px);
+  }
+
+  .enter-page.enter-portal.enter-desktop .world-material-frame,
+  .enter-page.enter-portal.enter-desktop .world-portal-card[data-world-id] .world-material-frame {
+    height: 154px;
+  }
+
+  .enter-page.enter-portal.enter-desktop .enter-worlds {
+    padding-bottom: 12px;
+  }
+}
