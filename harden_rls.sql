@@ -49,6 +49,14 @@ create table if not exists public.profiles (
   created_at timestamptz default now()
 );
 
+create table if not exists public.testimonials (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  content text not null check (char_length(content) between 1 and 120),
+  signature text not null default 'anonyme' check (char_length(signature) between 1 and 24),
+  created_at timestamptz not null default now()
+);
+
 -- =========================================================================
 -- 1. Admin check helpers.  SECURITY DEFINER functions let policies read
 --    `public.profiles` without recursively triggering profiles RLS, and
@@ -93,6 +101,7 @@ drop policy if exists "comments_delete_own_or_admin"        on public.comments;
 drop policy if exists "albums_admin_write"                  on public.albums;
 drop policy if exists "album_photos_admin_write"            on public.album_photos;
 drop policy if exists "resources_admin_write"               on public.resources;
+drop policy if exists "testimonials_delete_own_or_admin"     on public.testimonials;
 
 drop function if exists public.is_admin(uuid);
 drop function if exists public.is_super_admin(uuid);
@@ -177,6 +186,52 @@ with check (
   -- Prevent a super_admin from writing an invalid role string.
   and role in ('user', 'admin', 'super_admin')
 );
+
+-- =========================================================================
+-- 2b. testimonials
+--     Public-readable class register with owner-bound writes. The table has
+--     no email column; identity is kept only as auth.users FK for RLS.
+-- =========================================================================
+alter table public.testimonials enable row level security;
+
+drop policy if exists "testimonials_select_public"       on public.testimonials;
+drop policy if exists "testimonials_insert_own"          on public.testimonials;
+drop policy if exists "testimonials_update_own"          on public.testimonials;
+drop policy if exists "testimonials_delete_own"          on public.testimonials;
+drop policy if exists "testimonials_delete_own_or_admin" on public.testimonials;
+
+create policy "testimonials_select_public"
+on public.testimonials
+for select
+to public
+using ( true );
+
+create policy "testimonials_insert_own"
+on public.testimonials
+for insert
+to authenticated
+with check ( auth.uid() = user_id );
+
+create policy "testimonials_update_own"
+on public.testimonials
+for update
+to authenticated
+using ( auth.uid() = user_id )
+with check ( auth.uid() = user_id );
+
+create policy "testimonials_delete_own_or_admin"
+on public.testimonials
+for delete
+to authenticated
+using (
+  auth.uid() = user_id
+  or public.is_admin()
+);
+
+revoke all on table public.testimonials from anon, authenticated;
+grant select on table public.testimonials to anon, authenticated;
+grant insert, update, delete on table public.testimonials to authenticated;
+grant usage, select on sequence public.testimonials_id_seq to authenticated;
 
 -- =========================================================================
 -- 3. comments  (also holds the ops_queue rows on album_id = 0)

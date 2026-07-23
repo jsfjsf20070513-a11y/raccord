@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import DailyMeditation from '../components/DailyMeditation'
+import { Link, useLocation } from 'react-router-dom'
 import PasswordField from '../components/PasswordField'
 import { supabase, isSupabaseConfigured, SUPABASE_MISSING_MESSAGE } from '../lib/supabase'
 
@@ -9,26 +8,30 @@ const OTP_RESEND_SECONDS = 60
 
 const COPY = {
   login: {
-    title: '登录 · Connexion',
-    summary: '登录后,背词进度跨设备同步。',
+    titleFr: 'Connexion',
+    titleZh: '登录',
+    summary: '登录以跨设备同步学习进度。',
     submit: '登录 · Connexion',
     submitting: '登录中…',
   },
   signup: {
-    title: '注册 · Créer un compte',
-    summary: '注册一个账号,保存你的背词进度。',
+    titleFr: 'Créer un compte',
+    titleZh: '注册',
+    summary: '创建一个仅限本班网站的账号。',
     submit: '注册 · Créer un compte',
     submitting: '注册中…',
   },
   forgot: {
-    title: '找回密码 · Mot de passe oublié',
+    titleFr: 'Mot de passe oublié',
+    titleZh: '找回密码',
     summary: '通过邮箱接收密码重置链接。',
     submit: '发送重置链接 · Envoyer le lien',
     submitting: '发送中…',
   },
   otp: {
-    title: '验证码登录 · Code',
-    summary: '用邮箱验证码登录已有账号。',
+    titleFr: 'Code à usage unique',
+    titleZh: '验证码登录',
+    summary: '用邮箱收到的一次性验证码登录已有账号。',
     submit: '发送验证码 · Envoyer le code',
     submitting: '发送中…',
     verify: '验证并登录 · Vérifier',
@@ -48,6 +51,11 @@ const ERRORS = {
 }
 
 export default function Login() {
+  const location = useLocation()
+  const requestedReturn = location.state?.from
+  const returnTo = typeof requestedReturn === 'string' && requestedReturn.startsWith('/') && !requestedReturn.startsWith('//')
+    ? requestedReturn
+    : '/vocabulary'
   const [mode, setMode] = useState('login')
   const [loginMethod, setLoginMethod] = useState('email')
   const [email, setEmail] = useState('')
@@ -230,14 +238,26 @@ export default function Login() {
       <article className="page-column login-page">
         <header className="login-masthead">
           <p className="login-eyebrow">Connecté · 已登录</p>
-          <h1 className="login-title">欢迎回来</h1>
-          <p className="login-summary">接下来去哪儿?</p>
+          <h1 className="login-title">Connecté</h1>
+          <p className="login-title-zh">已登录</p>
         </header>
-        <div className="login-dest">
-          <Link to="/vocabulary" className="vocab-verify">去背词 →</Link>
-          <Link to="/witness" className="vocab-verify">去寄语墙 →</Link>
+        <p className="login-signed-copy">登录成功。</p>
+        <div className="login-destinations">
+          <Link to={returnTo}>
+            <span>01</span>
+            <span><strong>继续 · Reprendre</strong><small>返回刚才的位置</small></span>
+            <i>→</i>
+          </Link>
+          <Link to="/">
+            <span>02</span>
+            <span><strong>返回世界 · Le monde</strong><small>回到进入工具前的视觉世界</small></span>
+            <i>→</i>
+          </Link>
         </div>
-        <section className="home-meditation"><DailyMeditation offset={7} /></section>
+        <section className="login-coda">
+          <blockquote lang="fr">Une porte n&apos;est qu&apos;un seuil ; ce qui compte est la pièce où l&apos;on entre.</blockquote>
+          <p>门只是门槛 —— 真正要紧的,是你走进的那间屋子。</p>
+        </section>
       </article>
     )
   }
@@ -246,36 +266,22 @@ export default function Login() {
     <article className="page-column login-page">
       <header className="login-masthead">
         <Link to="/" className="login-back">返回扉页 · Retour</Link>
-        <p className="login-eyebrow">Authentification</p>
-        <h1 className="login-title">{copy.title}</h1>
+        <p className="login-eyebrow">Authentification · 登录</p>
+        <h1 className="login-title">{copy.titleFr}</h1>
+        <p className="login-title-zh">{copy.titleZh}</p>
         <p className="login-summary">{copy.summary}</p>
       </header>
 
-      {mode === 'login' ? (
-        <ul className="login-values">
-          <li>
-            <span className="login-value-mark" aria-hidden="true">◆</span>
-            <span className="login-value-text">背词进度跨设备同步 —— 手机上背的,电脑上接着背。</span>
-          </li>
-          <li>
-            <span className="login-value-mark" aria-hidden="true">◆</span>
-            <span className="login-value-text">班级 AI 助手 —— 双语数学答疑、可拍题问图,登录后即用。</span>
-          </li>
-        </ul>
-      ) : null}
-
       <section className="login-section">
         <div className="editorial-actions tabs login-tabs">
-          <button type="button" className={`text-button ${mode === 'login' ? 'active' : ''}`} onClick={() => switchMode('login')}>登录</button>
-          <button type="button" className={`text-button ${mode === 'signup' ? 'active' : ''}`} onClick={() => switchMode('signup')}>注册</button>
-          <button type="button" className={`text-button ${mode === 'otp' ? 'active' : ''}`} onClick={() => switchMode('otp')}>验证码</button>
-          <button type="button" className={`text-button ${mode === 'forgot' ? 'active' : ''}`} onClick={() => switchMode('forgot')}>找回密码</button>
+          <button type="button" className={`login-tab ${mode === 'login' ? 'active' : ''}`} onClick={() => switchMode('login')}>登录 · Connexion</button>
+          <button type="button" className={`login-tab ${mode === 'signup' ? 'active' : ''}`} onClick={() => switchMode('signup')}>注册 · Créer</button>
         </div>
 
         {mode === 'login' || mode === 'signup' ? (
           <div className="editorial-actions tabs login-tabs">
-            <button type="button" className={`text-button ${loginMethod === 'email' ? 'active' : ''}`} onClick={() => setLoginMethod('email')}>邮箱</button>
-            <button type="button" className={`text-button ${loginMethod === 'phone' ? 'active' : ''}`} onClick={() => setLoginMethod('phone')}>手机</button>
+            <button type="button" className={`login-tab ${loginMethod === 'email' ? 'active' : ''}`} onClick={() => setLoginMethod('email')}>邮箱</button>
+            <button type="button" className={`login-tab ${loginMethod === 'phone' ? 'active' : ''}`} onClick={() => setLoginMethod('phone')}>手机</button>
           </div>
         ) : null}
 
@@ -365,7 +371,16 @@ export default function Login() {
           </div>
           {message ? <p className={`status-line ${message.type === 'error' ? 'is-error' : 'is-success'}`}>{message.text}</p> : null}
         </form>
-        <section className="home-meditation"><DailyMeditation offset={7} /></section>
+        {mode === 'login' || mode === 'signup' ? (
+          <div className="login-secondary">
+            <button type="button" onClick={() => switchMode('otp')}>验证码登录 · Code</button>
+            <button type="button" onClick={() => switchMode('forgot')}>忘记密码?· Oublié</button>
+          </div>
+        ) : null}
+        <section className="login-coda">
+          <blockquote lang="fr">Une porte n&apos;est qu&apos;un seuil ; ce qui compte est la pièce où l&apos;on entre.</blockquote>
+          <p>门只是门槛 —— 真正要紧的,是你走进的那间屋子。</p>
+        </section>
       </section>
     </article>
   )

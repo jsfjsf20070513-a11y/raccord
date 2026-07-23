@@ -1,0 +1,141 @@
+.enter-page.enter-portal.enter-mobile {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.enter-page.enter-portal.enter-mobile .enter-content {
+  min-height: 100svh;
+}
+
+.enter-page.enter-portal.enter-mobile .enter-header {
+  min-height: 52px;
+  padding: 20px 18px 16px;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+}
+
+.enter-page.enter-portal.enter-mobile .enter-hero {
+  min-height: clamp(282px, 39svh, 334px);
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 34px 20px 42px;
+  text-align: center;
+  transform: none;
+}
+
+.enter-page.enter-portal.enter-mobile .enter-hero > p {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  margin: 0;
+  color: var(--enter-accent);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  transform: translateX(-50%);
+}
+
+.enter-page.enter-portal.enter-mobile .enter-hero h1 {
+  width: 100%;
+  max-width: none;
+  font-size: clamp(54px, 18.2vw, 71px);
+  letter-spacing: -0.045em;
+  line-height: 0.84;
+  text-align: center;
+}
+
+.enter-page.enter-portal.enter-mobile .enter-hero h1 span {
+  display: block;
+}
+
+.enter-page.enter-portal.enter-mobile .enter-hero h1.is-active {
+  font-size: clamp(48px, 16vw, 64px);
+}
+
+.enter-page.enter-portal.enter-mobile .enter-worlds {
+  width: min(calc(100% - 36px), 356px);
+  grid-template-columns: 1fr;
+  gap: 30px;
+  padding-bottom: 52px;
+}
+
+.enter-page.enter-portal.enter-mobile .scroll-awaken {
+  max-width: none;
+}
+
+.enter-page.enter-portal.enter-mobile .world-material-frame,
+.enter-page.enter-portal.enter-mobile .world-portal-card[data-world-id] .world-material-frame {
+  height: auto;
+  aspect-ratio: 1.72 / 1;
+}
+
+.enter-page.enter-portal.enter-mobile .world-portal-meta {
+  justify-content: center;
+  gap: 9px;
+  padding-top: 11px;
+}
+
+.enter-page.enter-portal.enter-mobile .world-portal-meta strong {
+  font-size: 15px;
+}
+
+.enter-page.enter-portal.enter-mobile .world-portal-number {
+  font-size: 7px;
+}
+
+.enter-page.enter-portal.enter-mobile .enter-optical-lens {
+  display: none;
+}
+
+@media (min-width: 620px) {
+  .enter-page.enter-portal.enter-mobile .enter-hero {
+    min-height: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 18px 28px 10px;
+    text-align: left;
+  }
+
+  .enter-page.enter-portal.enter-mobile .enter-hero > p {
+    display: none;
+  }
+
+  .enter-page.enter-portal.enter-mobile .enter-hero h1,
+  .enter-page.enter-portal.enter-mobile .enter-hero h1.is-active {
+    max-width: 76vw;
+    font-size: clamp(72px, 13.6vw, 104px);
+    line-height: .86;
+    text-align: left;
+  }
+
+  .enter-page.enter-portal.enter-mobile .enter-hero h1 span {
+    display: block;
+  }
+
+  .enter-page.enter-portal.enter-mobile .enter-hero h1 span + span::before {
+    content: none;
+  }
+
+  .enter-page.enter-portal.enter-mobile .enter-worlds {
+    width: min(calc(100% - 48px), 720px);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    padding-bottom: 44px;
+  }
+
+  .enter-page.enter-portal.enter-mobile .world-material-frame,
+  .enter-page.enter-portal.enter-mobile .world-portal-card[data-world-id] .world-material-frame {
+    height: clamp(154px, 23.2vw, 176px);
+    aspect-ratio: auto;
+  }
+
+  .enter-page.enter-portal.enter-mobile .world-portal-meta {
+    gap: 6px;
+  }
+
+  .enter-page.enter-portal.enter-mobile .world-portal-meta strong {
+    font-size: 12px;
+  }
+}

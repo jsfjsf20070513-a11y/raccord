@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import katex from 'katex'
 import { useAuth } from '../context/useAuth'
+import AssistantDesktopView from '../experiences/desktop/assistant/AssistantDesktopView'
+import AssistantMobileView from '../experiences/mobile/assistant/AssistantMobileView'
+import useExperienceMode from '../experiences/shared/useExperienceMode'
 import { clearMessages, fetchMessages, saveMessage } from '../lib/aiAssistantBackend'
 
 // 把助手回复里的 $...$ / $$...$$ 渲染成 KaTeX 公式,**粗体** 转 <strong>,其余
@@ -46,6 +49,12 @@ const STARTERS = [
   'Explique la différence entre limite et continuité',
 ]
 
+const MODE_PROMPTS = {
+  guider: '采用引导模式：先诊断学生卡在哪里，通过简短问题推动其独立推理，不直接给出完整答案。',
+  expliquer: '采用解释模式：用中法双语中的合适语言清楚解释概念，并给一个最小例子。',
+  verifier: '采用核验模式：逐步检查用户的证明、计算或法语表达，指出第一个关键错误和修正理由。',
+}
+
 // 选图后在浏览器里压缩:缩到最长边 1536、转 JPEG q0.85——既省 token 又统一格式。
 // 返回 { mimeType, data(纯 base64), preview(data URL 用于缩略图) }。
 async function compressImage(file) {
@@ -75,18 +84,26 @@ async function compressImage(file) {
 
 export default function Assistant() {
   const { user } = useAuth()
+  const location = useLocation()
+  const experienceMode = useExperienceMode()
   const [messages, setMessages] = useState([]) // {role:'user'|'model', content}
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [image, setImage] = useState(null) // { mimeType, data, preview }
-  const scrollRef = useRef(null)
+  const [mode, setMode] = useState('guider')
   const inputRef = useRef(null)
   const fileRef = useRef(null)
+  const requestRef = useRef(null)
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, loading])
+    const params = new URLSearchParams(location.search)
+    const requestedMode = params.get('mode')
+    const term = params.get('term')
+    const answer = params.get('answer')
+    if (MODE_PROMPTS[requestedMode]) setMode(requestedMode)
+    if (term) setInput(`请解释法语词 « ${term} »${answer ? `，并分析我刚才的答案「${answer}」为什么不对` : ''}。`)
+  }, [location.search])
 
   // 登录后从云端加载已保存的对话(跨设备)。表未建(compat)时返回空,静默降级为
   // 仅本次会话内存。
@@ -119,12 +136,18 @@ export default function Assistant() {
       if (user) saveMessage(user.id, 'user', content).catch(() => {})
       try {
         // 只把 {role, content} 发给模型(不回传缩略图);当前这轮的图走 body.image。
-        const body = { messages: next.map((m) => ({ role: m.role, content: m.content })) }
+        const modelMessages = next.map((m) => ({ role: m.role, content: m.content }))
+        const lastUserIndex = modelMessages.findLastIndex((message) => message.role === 'user')
+        if (lastUserIndex >= 0) modelMessages[lastUserIndex].content = `${MODE_PROMPTS[mode]}\n\n${modelMessages[lastUserIndex].content}`
+        const body = { messages: modelMessages }
         if (sentImage) body.image = { mimeType: sentImage.mimeType, data: sentImage.data }
+        const controller = new AbortController()
+        requestRef.current = controller
         const res = await fetch(AI_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
+          signal: controller.signal,
         })
         if (!res.ok) throw new Error(`服务返回 ${res.status}`)
         const data = await res.json()
@@ -133,13 +156,14 @@ export default function Assistant() {
         setMessages((m) => [...m, { role: 'model', content: reply }])
         if (user) saveMessage(user.id, 'model', reply).catch(() => {})
       } catch (err) {
-        setError(err?.message || '请求失败,请稍后再试。')
+        if (err?.name !== 'AbortError') setError(err?.message || '请求失败,请稍后再试。')
       } finally {
+        requestRef.current = null
         setLoading(false)
         inputRef.current?.focus()
       }
     },
-    [messages, loading, user, image],
+    [messages, loading, user, image, mode],
   )
 
   const onPickImage = useCallback(async (event) => {
@@ -168,118 +192,10 @@ export default function Assistant() {
     if (user) clearMessages(user.id).catch(() => {})
   }, [user])
 
-  if (!user) {
-    return (
-      <main className="page-column assistant-page">
-        <header className="assistant-masthead">
-          <p className="assistant-kicker">Assistant · 班级 AI 助手</p>
-          <h1 className="assistant-title">中法双语数学答疑</h1>
-          <p className="assistant-subtitle" lang="fr">Pose une question de maths ou de français — en chinois ou en français.</p>
-        </header>
-        <div className="assistant-gate">
-          <p>登录后即可使用班级 AI 助手。</p>
-          <p><Link to="/login" className="assistant-link">前往登录 →</Link></p>
-        </div>
-      </main>
-    )
-  }
+  const handleStop = useCallback(() => {
+    requestRef.current?.abort()
+  }, [])
 
-  return (
-    <main className="page-column assistant-page">
-      <header className="assistant-masthead">
-        <p className="assistant-kicker">Assistant · 班级 AI 助手</p>
-        <h1 className="assistant-title">中法双语数学答疑</h1>
-        <p className="assistant-subtitle" lang="fr">Pose une question de maths ou de français — en chinois ou en français.</p>
-      </header>
-
-      {messages.length > 0 ? (
-        <div className="assistant-toolbar">
-          <button type="button" className="assistant-clear" onClick={handleClear}>清空历史 · Effacer</button>
-        </div>
-      ) : null}
-
-      <div className="assistant-thread" ref={scrollRef}>
-        {messages.length === 0 ? (
-          <div className="assistant-starters">
-            <p className="assistant-starters-label">试试问:</p>
-            {STARTERS.map((s) => (
-              <button key={s} type="button" className="assistant-starter" onClick={() => send(s)} lang={/[a-zA-Zéèàçù]/.test(s[0]) ? 'fr' : undefined}>
-                {s}
-              </button>
-            ))}
-          </div>
-        ) : (
-          messages.map((m, idx) => (
-            <div key={idx} className={`assistant-turn is-${m.role === 'user' ? 'user' : 'ai'}`}>
-              <p className="assistant-turn-role" aria-hidden="true">{m.role === 'user' ? '你' : 'Assistant'}</p>
-              {m.role === 'user' ? (
-                <>
-                  {m.image ? <img className="assistant-turn-img" src={m.image} alt="附图" /> : null}
-                  <p className="assistant-turn-text">{m.content}</p>
-                </>
-              ) : (
-                <p className="assistant-turn-text" dangerouslySetInnerHTML={{ __html: renderRich(m.content) }} />
-              )}
-            </div>
-          ))
-        )}
-        {loading ? (
-          <div className="assistant-turn is-ai">
-            <p className="assistant-turn-role" aria-hidden="true">Assistant</p>
-            <p className="assistant-turn-text assistant-typing"><span /><span /><span /></p>
-          </div>
-        ) : null}
-      </div>
-
-      {error ? <p className="assistant-error">{error}</p> : null}
-
-      {image ? (
-        <div className="assistant-attach">
-          <img className="assistant-attach-thumb" src={image.preview} alt="待发送的图片" />
-          <span className="assistant-attach-label">图片已附上 · 发送即一起提问</span>
-          <button type="button" className="assistant-attach-remove" onClick={() => setImage(null)} aria-label="移除图片">×</button>
-        </div>
-      ) : null}
-
-      <form
-        className="assistant-composer"
-        onSubmit={(e) => {
-          e.preventDefault()
-          send(input)
-        }}
-      >
-        <button
-          type="button"
-          className="assistant-attach-btn"
-          onClick={() => fileRef.current?.click()}
-          disabled={loading}
-          aria-label="上传图片(拍数学题)"
-          title="上传图片(拍数学题)"
-        >
-          📷
-        </button>
-        <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: 'none' }} />
-        <textarea
-          ref={inputRef}
-          className="assistant-input"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              send(input)
-            }
-          }}
-          placeholder="问问题,或 📷 拍张数学题…（Entrée 发送，Shift+Entrée 换行）"
-          rows={2}
-          disabled={loading}
-          aria-label="向 AI 助手提问"
-        />
-        <button type="submit" className="assistant-send" disabled={loading || (!input.trim() && !image)}>
-          {loading ? '…' : '发送'}
-        </button>
-      </form>
-      <p className="assistant-foot">由 Gemini 驱动 · 可拍题问图 · 仅供学习参考,请自行核对。</p>
-    </main>
-  )
+  const View = experienceMode === 'mobile' ? AssistantMobileView : AssistantDesktopView
+  return <View user={user} messages={messages} starters={STARTERS} mode={mode} setMode={setMode} input={input} setInput={setInput} loading={loading} error={error} image={image} setImage={setImage} send={send} stop={handleStop} clear={handleClear} pickImage={onPickImage} fileRef={fileRef} inputRef={inputRef} renderRich={renderRich} />
 }

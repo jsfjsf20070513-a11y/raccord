@@ -1,0 +1,118 @@
+.plan-cycle-desktop .plan-center-prototype-desktop {
+  min-height: calc(100svh - 58px);
+}
+
+.plan-cycle-desktop .plan-prototype-masthead > p {
+  color: var(--plan-accent-refined);
+}
+
+.carnet-cycle-desktop {
+  min-height: calc(100svh - 58px);
+  background: var(--carnet-paper-refined);
+}
+
+.carnet-cycle-spread {
+  position: relative;
+  min-height: calc(100svh - 58px);
+  display: grid;
+  grid-template-columns: 40% 60%;
+}
+
+.carnet-cycle-spine {
+  position: absolute;
+  z-index: 3;
+  inset: 0 auto 0 40%;
+  width: 1px;
+  background: rgba(127, 48, 43, .13);
+}
+
+.carnet-cycle-question,
+.carnet-cycle-trace {
+  min-width: 0;
+  padding: clamp(48px, 5vw, 72px);
+}
+
+.carnet-cycle-question {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.carnet-cycle-question > p,
+.carnet-cycle-trace > p,
+.carnet-cycle-question footer {
+  margin: 0;
+  color: var(--carnet-accent-refined);
+  font: 400 10px/1.4 "JetBrains Mono", monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.carnet-cycle-question h1 {
+  max-width: 12ch;
+  margin: auto;
+  color: var(--carnet-ink-refined);
+  font: italic 400 clamp(42px, 4.7vw, 66px)/1.03 "EB Garamond", serif;
+  letter-spacing: -.015em;
+}
+
+.carnet-cycle-question footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid rgba(32, 29, 26, .18);
+  color: var(--carnet-muted-refined);
+}
+
+.carnet-cycle-trace {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-inline: clamp(38px, 4vw, 60px);
+}
+
+.carnet-cycle-trace > p {
+  margin-bottom: 12px;
+}
+
+.limite-cycle-desktop {
+  min-height: calc(100svh - 58px);
+  padding: 26px clamp(44px, 4.6vw, 70px) 34px;
+}
+
+.limite-cycle-running {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 13px;
+  border-bottom: 1px solid rgba(233, 227, 217, .2);
+  color: var(--limite-muted-refined);
+  font: 400 10px/1 "JetBrains Mono", monospace;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.limite-cycle-running span:first-child { color: var(--limite-accent-refined); }
+
+.limite-cycle-stage {
+  min-height: calc(100svh - 118px);
+  display: grid;
+  grid-template-columns: minmax(190px, .3fr) minmax(0, 1fr);
+  gap: clamp(38px, 4.6vw, 68px);
+  align-items: start;
+  padding: clamp(66px, 9svh, 92px) 0 24px;
+}
+
+.limite-cycle-stage > div > p {
+  margin: 0;
+  color: var(--limite-accent-refined);
+  font: 500 10px/1.4 "JetBrains Mono", monospace;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.limite-cycle-stage h1 {
+  margin: 20px 0 0;
+  font: 500 clamp(68px, 6.6vw, 88px)/.9 Archivo, sans-serif;
+  letter-spacing: -.045em;
+}

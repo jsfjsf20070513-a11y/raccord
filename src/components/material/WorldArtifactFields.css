@@ -1,0 +1,95 @@
+.raccord-memory-field,
+.flight-limit-instrument {
+  position: relative;
+  min-width: 0;
+}
+
+.raccord-memory-field {
+  background: #fbfaf6;
+  color: #201d1a;
+  touch-action: pan-y pinch-zoom;
+}
+
+.flight-limit-instrument > header,
+.flight-limit-instrument > footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 11px 13px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.raccord-memory-field canvas {
+  display: block;
+  width: 100%;
+  height: clamp(450px, 62svh, 620px);
+}
+
+.raccord-memory-field:focus-visible,
+.flight-limit-instrument:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
+}
+
+.flight-limit-instrument {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: min(68svh, 560px);
+  border: 1px solid rgba(233, 227, 217, .16);
+  background: #171411;
+  color: #e9e3d9;
+  touch-action: pan-y pinch-zoom;
+  transition: border-color .24s linear;
+}
+
+.flight-limit-instrument[data-load-phase="loading"],
+.flight-limit-instrument[data-load-phase="loaded"] { border-color: rgba(217, 97, 77, .34); }
+
+.flight-limit-instrument > header {
+  border-bottom: 1px solid rgba(233, 227, 217, .13);
+  color: #918a80;
+}
+
+.flight-limit-instrument > header span:first-child,
+.flight-limit-instrument output {
+  color: #d9614d;
+}
+
+.flight-limit-instrument > footer {
+  border-top: 1px solid rgba(233, 227, 217, .13);
+  color: #918a80;
+}
+
+.flight-limit-instrument canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.flight-limit-instrument.is-compact > header,
+.flight-limit-instrument.is-compact > footer {
+  min-height: 42px;
+  align-items: center;
+  padding: 9px 10px;
+  font-size: 9px;
+}
+
+.raccord-memory-field.is-compact canvas { height: clamp(360px, 52svh, 470px); }
+.flight-limit-instrument.is-compact { min-height: clamp(360px, 54svh, 480px); }
+
+.material-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

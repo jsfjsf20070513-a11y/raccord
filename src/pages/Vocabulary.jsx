@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
+import VocabularyDesktopShell from '../experiences/desktop/vocabulary/VocabularyDesktopShell'
+import VocabularyMobileShell from '../experiences/mobile/vocabulary/VocabularyMobileShell'
+import useExperienceMode from '../experiences/shared/useExperienceMode'
 import { frenchVocabulary } from '../data/frenchVocabulary'
 import {
   REVIEW_RESULT,
@@ -18,6 +21,7 @@ import {
 } from '../lib/exerciseGenerator'
 import { fetchReviewStateMap, importReviewStates, saveReviewState } from '../lib/vocabularyBackend'
 import { parseProgressImport, serializeProgress } from '../lib/vocabularyProgress'
+import { estimateSessionMinutes, selectNewWordPreview, selectSessionQueue } from '../lib/vocabularySession'
 
 const MAX_NEW = 8
 const MAX_REVIEW = 40
@@ -41,6 +45,7 @@ const DECK_TAGS = ['all', ...Array.from(new Set(VALID_DECK.map((w) => w.tag).fil
 // CEFR ladder A1→C2; only the levels actually present in the deck are offered.
 const LEVEL_ORDER = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 const DECK_LEVELS = ['all', ...LEVEL_ORDER.filter((l) => VALID_DECK.some((w) => w.level === l))]
+const MATH_TAG_PATTERN = /math|mathématiques|analyse|algèbre|géométr|probabil|statisti|calcul|nombre|fonction|équation|logique/i
 
 // Filter the deck on both axes the learner controls: CEFR level and theme tag.
 function selectDeck(level, tag) {
@@ -100,7 +105,10 @@ function buildSession(queue, deck) {
 
 export default function Vocabulary() {
   const { user } = useAuth()
-  const [status, setStatus] = useState('loading') // loading|study|ready|disabled|compat|empty|error|done
+  const experienceMode = useExperienceMode()
+  const [status, setStatus] = useState('loading') // loading|calibrate|study|ready|disabled|compat|empty|error|done
+  const [sessionMode, setSessionMode] = useState('due') // due|weak|math|free
+  const [pendingQueue, setPendingQueue] = useState([])
   const [studyList, setStudyList] = useState([]) // {word, state} — preview deck shown before the test
   const [studyIdx, setStudyIdx] = useState(0)
   const [steps, setSteps] = useState([])
@@ -222,16 +230,20 @@ export default function Vocabulary() {
       if (mode === 'disabled') return setStatus('disabled')
       if (mode === 'compat') return setStatus('compat')
       const now = new Date().toISOString()
-      const deck = selectDeck(level, tag)
+      const selectedDeck = selectDeck(level, tag)
+      const deck = sessionMode === 'math'
+        ? selectedDeck.filter((word) => MATH_TAG_PATTERN.test(`${word.tag || ''} ${word.french || ''}`))
+        : selectedDeck
       setDeckStats({
         ...computeDeckStats({ deck, stateMap: states, now }),
         streak: computeStudyStreak(Object.values(states), now),
       })
       let queue = buildStudyQueue({ deck, stateMap: states, now, maxNew: MAX_NEW, maxReview: MAX_REVIEW })
+      queue = selectSessionQueue(queue, sessionMode)
       if (shuffle) queue = shuffled(queue)
-      const built = buildSession(queue, deck)
-      setSteps(built)
-      setStudyList(queue.map((q) => ({ word: q.word, state: q.state })))
+      setPendingQueue(queue)
+      setSteps([])
+      setStudyList([])
       setStudyIdx(0)
       setI(0)
       setPhase('answer')
@@ -242,14 +254,13 @@ export default function Vocabulary() {
       setStats({ correct: 0, attempts: 0, combo: 0, maxCombo: 0 })
       setWrong([])
       spokenRef.current = -1
-      // Preview new words first (先学一遍); the test begins after study or skip.
-      setStatus(built.length ? (queue.length ? 'study' : 'ready') : 'empty')
+      setStatus(queue.length ? 'calibrate' : 'empty')
     } catch (error) {
       setErrorMessage(error?.message || '加载背词数据失败。')
       setStatus('error')
     }
     return undefined
-  }, [user, tag, level, shuffle])
+  }, [user, tag, level, shuffle, sessionMode])
 
   useEffect(() => {
     if (user) load()
@@ -378,6 +389,31 @@ export default function Vocabulary() {
     })
   }, [studyList.length])
   const skipStudy = useCallback(() => setStatus('ready'), [])
+
+  const startSession = useCallback(() => {
+    const deck = sessionMode === 'math'
+      ? selectDeck(level, tag).filter((word) => MATH_TAG_PATTERN.test(`${word.tag || ''} ${word.french || ''}`))
+      : selectDeck(level, tag)
+    const built = buildSession(pendingQueue, deck)
+    const newWords = selectNewWordPreview(pendingQueue)
+    setSteps(built)
+    setStudyList(newWords.map(({ word, state }) => ({ word, state })))
+    setStudyIdx(0)
+    setI(0)
+    setStatus(newWords.length ? 'study' : 'ready')
+  }, [level, pendingQueue, sessionMode, tag])
+
+  useEffect(() => {
+    if (status !== 'calibrate') return undefined
+    const onKey = (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        startSession()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [startSession, status])
 
   // speak the listen prompt when its step appears; autofocus the spelling input
   useEffect(() => {
@@ -643,8 +679,9 @@ export default function Vocabulary() {
         {!ok ? (
           <p className="vocab-fb-answer">正确答案 <span lang="fr">{correct}</span>{gloss ? <span className="vocab-fb-gloss"> · {gloss}</span> : null}</p>
         ) : null}
-        {!isMatch && current.word?.note ? <p className="vocab-fb-note">💡 {current.word.note}</p> : null}
+        {!isMatch && current.word?.note ? <p className="vocab-fb-note">Note · {current.word.note}</p> : null}
         <div className="vocab-fb-actions">
+          {!ok && current.word ? <Link className="vocab-explain" to={`/assistant?mode=expliquer&term=${encodeURIComponent(current.word.french)}&answer=${encodeURIComponent(picked || input || '')}`}>Expliquer · 交给 Assistant</Link> : null}
           <button type="button" className="vocab-next" onClick={next}>
             {i + 1 >= steps.length ? 'Terminer · 结束' : 'Continuer · 继续'} <span className="vocab-next-key">↵</span>
           </button>
@@ -674,23 +711,30 @@ export default function Vocabulary() {
     )
   }
 
+  function renderSessionModes() {
+    const modes = [
+      ['due', 'À faire', '今日到期'],
+      ['weak', 'Faiblesses', '薄弱复习'],
+      ['math', 'Mathématiques', '数学术语'],
+      ['free', 'Libre', '自由选择'],
+    ]
+    return (
+      <nav className="vocab-session-modes" aria-label="学习入口">
+        {modes.map(([id, label, note], index) => (
+          <button key={id} type="button" className={sessionMode === id ? 'is-active' : ''} onClick={() => setSessionMode(id)} aria-pressed={sessionMode === id}>
+            <small>0{index + 1}</small><strong>{label}</strong><span>{note}</span>
+          </button>
+        ))}
+      </nav>
+    )
+  }
+
   function renderControls() {
     return (
       <div className="vocab-controls">
-        {renderLevelRow()}
-        <div className="vocab-control-row">
-          <span className="vocab-control-label" aria-hidden="true">标签</span>
-          {DECK_TAGS.map((t) => (
-            <button key={t} type="button" onClick={() => setTag(t)} aria-pressed={tag === t} className={`vocab-link-btn${tag === t ? ' is-active' : ''}`}>
-              {t === 'all' ? '全部' : t}
-            </button>
-          ))}
-          <span className="vocab-dot" aria-hidden="true">·</span>
-          <button type="button" className={`vocab-link-btn${shuffle ? ' is-active' : ''}`} onClick={() => setShuffle((s) => !s)} aria-pressed={shuffle}>乱序 {shuffle ? '开' : '关'}</button>
-          <button type="button" className="vocab-link-btn" onClick={handleExport}>导出</button>
-          <button type="button" className="vocab-link-btn" onClick={() => fileInputRef.current?.click()}>导入</button>
-          <input ref={fileInputRef} type="file" accept="application/json,.json" onChange={handleImportFile} style={{ display: 'none' }} />
-        </div>
+        {renderSessionModes()}
+        {sessionMode === 'free' ? <div className="vocab-free-controls">{renderLevelRow()}<label><span>主题</span><select value={tag} onChange={(event) => setTag(event.target.value)}>{DECK_TAGS.map((value) => <option key={value} value={value}>{value === 'all' ? '全部主题' : value}</option>)}</select></label></div> : null}
+        <details className="vocab-settings"><summary>Réglages · 设置</summary><div><button type="button" className={`vocab-link-btn${shuffle ? ' is-active' : ''}`} onClick={() => setShuffle((s) => !s)} aria-pressed={shuffle}>乱序 {shuffle ? '开' : '关'}</button><button type="button" className="vocab-link-btn" onClick={handleExport}>导出</button><button type="button" className="vocab-link-btn" onClick={() => fileInputRef.current?.click()}>导入</button><input ref={fileInputRef} type="file" accept="application/json,.json" onChange={handleImportFile} hidden /></div></details>
         {deckStats ? (
           <p className="vocab-control-stats" aria-label="学习进度">
             已掌握 <span>{deckStats.mastered}</span> · 学习中 <span>{deckStats.learning}</span> · 新词 <span>{deckStats.newCount}</span> · 连续 <span>{deckStats.streak}</span> 天
@@ -701,8 +745,11 @@ export default function Vocabulary() {
     )
   }
 
+  const Shell = experienceMode === 'mobile' ? VocabularyMobileShell : VocabularyDesktopShell
+
   return (
-    <main className="page-column vocab-page">
+    <Shell status={status}>
+      <div className="page-column vocab-page limite-vocab-page" data-session-mode={sessionMode}>
       {user && status === 'ready' && current ? (
         <div
           className="vocab-progress"
@@ -723,8 +770,8 @@ export default function Vocabulary() {
 
       {!user ? (
         <div className="vocab-notice">
-          <p>背词进度按账号保存,请先登录。</p>
-          <p><Link to="/login" className="vocab-link">前往登录 →</Link></p>
+          <p>进度随账号同步。</p>
+          <p><Link to="/login" state={{ from: '/vocabulary' }} className="vocab-link">登录 →</Link></p>
         </div>
       ) : null}
 
@@ -755,6 +802,17 @@ export default function Vocabulary() {
         </div>
       ) : null}
 
+      {user && status === 'calibrate' ? renderControls() : null}
+
+      {user && status === 'calibrate' ? (
+        <section className="vocab-calibration">
+          <p className="vocab-prompt">Calibration · 本轮校准</p>
+          <h1>{sessionMode === 'due' ? 'À faire' : sessionMode === 'weak' ? 'Faiblesses' : sessionMode === 'math' ? 'Mathématiques' : 'Libre'}</h1>
+          <dl><div><dt>Nouveaux</dt><dd>{pendingQueue.filter((item) => item.isNew).length}</dd></div><div><dt>Révisions</dt><dd>{pendingQueue.filter((item) => !item.isNew).length}</dd></div><div><dt>Durée</dt><dd>≈ {estimateSessionMinutes(pendingQueue)} min</dd></div></dl>
+          <button type="button" className="vocab-start" onClick={startSession}>Commencer · 开始</button>
+        </section>
+      ) : null}
+
       {user && status === 'study' && studyList[studyIdx] ? (() => {
         const sw = studyList[studyIdx].word
         const last = studyIdx + 1 >= studyList.length
@@ -776,7 +834,7 @@ export default function Vocabulary() {
               <p className="vocab-study-zh">{sw.chinese}</p>
               {sw.example ? <p className="vocab-study-example" lang="fr">{sw.example}</p> : null}
               {sw.exampleZh ? <p className="vocab-study-example-zh">{sw.exampleZh}</p> : null}
-              {sw.note ? <p className="vocab-study-note">💡 {sw.note}</p> : null}
+              {sw.note ? <p className="vocab-study-note">Note · {sw.note}</p> : null}
             </div>
             <div className="vocab-study-actions">
               <button type="button" className="vocab-verify" onClick={studyNext}>
@@ -823,7 +881,8 @@ export default function Vocabulary() {
         </div>
       ) : null}
 
-      {showControls ? renderControls() : null}
-    </main>
+        {showControls ? renderControls() : null}
+      </div>
+    </Shell>
   )
 }

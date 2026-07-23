@@ -1,0 +1,49 @@
+.prototype-switcher {
+  position: fixed;
+  z-index: 1000;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 44px minmax(138px, auto) 44px;
+  min-height: 48px;
+  overflow: hidden;
+  border: 1px solid rgba(239, 237, 230, .2);
+  border-radius: 999px;
+  background: #171716;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .2);
+  color: #efede6;
+  transform: translateX(-50%);
+}
+
+.prototype-switcher button {
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: #efede6;
+  font: 500 17px/1 Archivo, sans-serif;
+}
+
+.prototype-switcher button:hover,
+.prototype-switcher button:focus-visible {
+  background: #2e3fbd;
+  outline: 0;
+}
+
+.prototype-switcher button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.prototype-switcher output {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border-inline: 1px solid rgba(239, 237, 230, .18);
+  color: #efede6;
+  font: 500 10px/1 "JetBrains Mono", monospace;
+  letter-spacing: .08em;
+  white-space: nowrap;
+  text-transform: uppercase;
+}

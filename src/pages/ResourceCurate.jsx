@@ -1,7 +1,10 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../context/useAuth'
+import { useWorld } from '../context/useWorld'
 import { resourceCategories } from '../data/resourceCatalog'
+import PlanChantierDesktop from '../experiences/desktop/plan/PlanChantierDesktop'
+import PlanChantierMobile from '../experiences/mobile/plan/PlanChantierMobile'
+import useExperienceMode from '../experiences/shared/useExperienceMode'
 import { normalizeResourcePayload, submitOpsSubmission } from '../lib/opsQueue'
 
 // 资源增补 ResourceCurate — design contract: centered « Curation de ressources »
@@ -17,10 +20,16 @@ const EMPTY = { category: resourceCategories[0]?.label || '', title: '', url: ''
 
 export default function ResourceCurate() {
   const { user } = useAuth()
+  const { setWorld } = useWorld()
+  const mode = useExperienceMode()
   const [form, setForm] = useState(EMPTY)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(null)
+
+  useEffect(() => {
+    setWorld('plan')
+  }, [setWorld])
 
   const set = (key) => (event) => setForm((current) => ({ ...current, [key]: event.target.value }))
 
@@ -49,59 +58,18 @@ export default function ResourceCurate() {
     setForm(EMPTY)
   }
 
+  const Chantier = mode === 'mobile' ? PlanChantierMobile : PlanChantierDesktop
   return (
-    <article className="page-column curate-page">
-      <header className="login-masthead">
-        <Link to="/atelier" className="login-back">返回协作 · Atelier</Link>
-        <p className="login-eyebrow">Curation de ressources</p>
-        <h1 className="login-title">推荐一条资源</h1>
-        <p className="login-summary">推荐一条书目或课程链接,审阅后并入「资源」页的公开书架。</p>
-      </header>
-
-      {done ? (
-        <div className="reset-state">
-          <p className="reset-ok">✓ 已提交</p>
-          <p>谢谢你的推荐 ——「{done.title}」已进入待审队列,通过后会并入资源页的书架。</p>
-          <div className="login-dest">
-            <button type="button" className="vocab-verify" onClick={again}>再推荐一条</button>
-            <Link to="/atelier" className="vocab-verify">回到协作 →</Link>
-          </div>
-        </div>
-      ) : !user ? (
-        <div className="reset-state">
-          <p>推荐资源需要先登录。</p>
-          <p><Link to="/login" className="vocab-verify">前往登录 →</Link></p>
-        </div>
-      ) : (
-        <section className="login-section">
-          <form className="editorial-form curate-form" onSubmit={submit}>
-            <label>
-              <span>归入书架 · Rayon</span>
-              <select value={form.category} onChange={set('category')}>
-                {SHELVES.map((shelf) => <option key={shelf.value} value={shelf.value}>{shelf.label}</option>)}
-              </select>
-            </label>
-            <label>
-              <span>标题 · Titre</span>
-              <input type="text" value={form.title} onChange={set('title')} placeholder="例:MIT OCW — Linear Algebra" required />
-            </label>
-            <label>
-              <span>链接 · Lien</span>
-              <input type="url" value={form.url} onChange={set('url')} placeholder="https://…" required />
-            </label>
-            <label>
-              <span>推荐理由 · Pourquoi</span>
-              <textarea rows={3} value={form.description} onChange={set('description')} placeholder="一句话说明它好在哪、适合谁。" />
-            </label>
-            <div className="editorial-actions curate-actions">
-              <button type="submit" className="vocab-verify" disabled={submitting}>{submitting ? '提交中…' : '提交待审 · Proposer'}</button>
-              <Link to="/atelier">取消</Link>
-            </div>
-            <p className="curate-note">提交后由管理员审阅;通过后会出现在资源页对应书架。</p>
-            {error ? <p className="status-line is-error">{error}</p> : null}
-          </form>
-        </section>
-      )}
-    </article>
+    <Chantier
+      user={user}
+      form={form}
+      shelves={SHELVES}
+      onField={set}
+      onSubmit={submit}
+      submitting={submitting}
+      error={error}
+      done={done}
+      onAgain={again}
+    />
   )
 }

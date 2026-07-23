@@ -20,15 +20,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.29.0",
+    "@fontsource/archivo": "^5.2.8",
     "@fontsource/eb-garamond": "^5.2.7",
     "@fontsource/jetbrains-mono": "^5.2.8",
+    "@fontsource/noto-sans-sc": "^5.2.9",
     "@fontsource/noto-serif-sc": "^5.2.9",
-    "@solana/web3.js": "^1.98.4",
+    "@fontsource/spectral": "^5.2.8",
     "@supabase/supabase-js": "^2.97.0",
-    "bn.js": "^5.2.3",
-    "bs58": "^6.0.0",
-    "buffer": "^6.0.3",
     "classnames": "^2.5.1",
     "katex": "^0.16.45",
     "lucide-react": "^0.574.0",

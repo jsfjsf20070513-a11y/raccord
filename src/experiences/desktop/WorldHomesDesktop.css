@@ -1,0 +1,25 @@
+.plan-world-desktop,
+.carnet-world-desktop,
+.limite-world-desktop {
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+}
+
+.plan-world-desktop {
+  background: var(--plan-paper-refined);
+  color: var(--plan-ink-refined);
+}
+
+.carnet-world-desktop {
+  overflow: visible;
+  background: var(--carnet-paper-refined);
+  color: var(--carnet-ink-refined);
+}
+
+.limite-world-desktop {
+  min-height: calc(100svh - 58px);
+  background: var(--limite-bg-refined);
+  color: var(--limite-ink-refined);
+}
