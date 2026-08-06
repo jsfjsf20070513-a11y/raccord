@@ -20,6 +20,15 @@ zone_name = "rucmathclass.com"
 pattern = "rucmathclass.com/api/speak*"
 zone_name = "rucmathclass.com"
 
+# Raccord 站(raccord.rucmathclass.com,2026-08-06 切分上线)同一 Worker、同一套 secret:
+[[routes]]
+pattern = "raccord.rucmathclass.com/api/chat"
+zone_name = "rucmathclass.com"
+
+[[routes]]
+pattern = "raccord.rucmathclass.com/api/speak*"
+zone_name = "rucmathclass.com"
+
 # 限流绑定:每 IP 每 60s 最多 30 次(防刷爆 Gemini/ElevenLabs 配额)。
 # namespace_id 是自取的整数标识。代码里 env.RATE_LIMITER 缺失会自动跳过。
 [[unsafe.bindings]]

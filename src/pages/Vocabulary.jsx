@@ -37,7 +37,7 @@ const TYPE_ROTATION = [
 // 失败回退浏览器 TTS。当前 ElevenLabs 免费层无法用法语库声音(George 是英音),
 // 故暂时直接用浏览器法语 TTS(免费、法语、单声音);接好 Google TTS 真人法语音后
 // 把开关置 true 即可切回 Worker 路径。
-const SPEAK_ENDPOINT = 'https://rucmathclass.com/api/speak'
+const SPEAK_ENDPOINT = '/api/speak' // 同域相对路径(生产由 CF Worker 路由接管;dev 走 vite proxy)
 const USE_WORKER_VOICE = false
 
 const VALID_DECK = cleanFrenchDeck(frenchVocabulary).valid
