@@ -37,9 +37,9 @@ function renderRich(text) {
   return out.join('')
 }
 
-// 班级 AI 助手 — 前端只跟同域 Worker 代理对话(/api/chat),Gemini key 在
+// AI 助手 — 前端只跟同域 Worker 代理对话(/api/chat),Gemini key 在
 // Cloudflare secret 里,前端产物永不含它。无状态:历史只存在本页 state。
-const AI_ENDPOINT = 'https://rucmathclass.com/api/chat'
+const AI_ENDPOINT = '/api/chat' // 同域相对路径(生产由 CF Worker 路由接管;dev 走 vite proxy)
 const MAX_HISTORY = 20
 
 const STARTERS = [

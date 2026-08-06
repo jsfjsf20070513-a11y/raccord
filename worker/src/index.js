@@ -12,6 +12,7 @@
 const ALLOWED_ORIGINS = new Set([
   'https://rucmathclass.com',
   'https://www.rucmathclass.com',
+  'https://raccord.rucmathclass.com',
   'http://localhost:5173',
 ])
 
