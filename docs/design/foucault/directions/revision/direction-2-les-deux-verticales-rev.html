@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Direction 2 rev · Les deux verticales</title>
+<style>
+  @font-face{font-family:'EB Garamond';font-style:italic;font-weight:400;
+    src:url('../../../../../node_modules/@fontsource/eb-garamond/files/eb-garamond-latin-400-italic.woff2') format('woff2');}
+  @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;
+    src:url('../../../../../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2') format('woff2');}
+  html,body{margin:0;padding:0;width:1440px;height:1024px;overflow:hidden;background:#0e0c0a;}
+  .stage{position:relative;width:1440px;height:1024px;}
+  svg{position:absolute;inset:0;}
+</style>
+</head>
+<body>
+<div class="stage">
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- rear wall : light grazes from high left -->
+    <radialGradient id="wall" cx="38%" cy="18%" r="98%">
+      <stop offset="0%" stop-color="#242019"/>
+      <stop offset="38%" stop-color="#171310"/>
+      <stop offset="100%" stop-color="#0a0908"/>
+    </radialGradient>
+    <!-- floor : catches a little more of the same light -->
+    <linearGradient id="floor" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1d1914"/>
+      <stop offset="55%" stop-color="#14110d"/>
+      <stop offset="100%" stop-color="#0b0a08"/>
+    </linearGradient>
+    <!-- the mass : a dark heavy body, rim-lit, not a moon -->
+    <radialGradient id="mass" cx="33%" cy="26%" r="86%">
+      <stop offset="0%" stop-color="#4d453a"/>
+      <stop offset="34%" stop-color="#2b2620"/>
+      <stop offset="72%" stop-color="#171310"/>
+      <stop offset="100%" stop-color="#0d0b09"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#efe6d2" stop-opacity="0.85"/>
+      <stop offset="45%" stop-color="#cfc3a9" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#cfc3a9" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="grain2">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="11" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.88  0 0 0 0 0.84  0 0 0 0 0.75  0 0 0 0.045 0"/>
+    </filter>
+    <filter id="blur10"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="blur3"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+
+  <!-- room -->
+  <rect width="1440" height="1024" fill="url(#wall)"/>
+  <rect x="0" y="704" width="1440" height="320" fill="url(#floor)"/>
+  <line x1="0" y1="704" x2="1440" y2="704" stroke="#cfc3a9" stroke-opacity="0.14" stroke-width="1"/>
+  <!-- floor joints, converging slightly : a room, not outer space -->
+  <g stroke="#cfc3a9" stroke-opacity="0.07" stroke-width="1">
+    <line x1="214" y1="1024" x2="416" y2="704"/>
+    <line x1="1226" y1="1024" x2="1024" y2="704"/>
+    <line x1="-40" y1="880" x2="1480" y2="866"/>
+  </g>
+
+  <!-- wire under tension -->
+  <line x1="720" y1="0" x2="720" y2="368" stroke="#d8cdb4" stroke-opacity="0.55" stroke-width="1"/>
+
+  <!-- shadow first : the mass belongs to the floor -->
+  <ellipse cx="756" cy="716" rx="188" ry="26" fill="#000" opacity="0.55" filter="url(#blur10)"/>
+  <!-- swept trace on the floor, almost edge-on -->
+  <ellipse cx="720" cy="722" rx="340" ry="17" fill="none" stroke="#d8cdb4" stroke-opacity="0.22" stroke-width="1"/>
+  <ellipse cx="720" cy="722" rx="340" ry="46" fill="none" stroke="#d8cdb4" stroke-opacity="0.07" stroke-width="1" stroke-dasharray="1 6"/>
+
+  <!-- the mass, hanging just above its shadow -->
+  <circle cx="720" cy="530" r="164" fill="url(#mass)"/>
+  <path d="M 594 425 A 164 164 0 0 1 720 366" fill="none" stroke="url(#rim)" stroke-width="3" filter="url(#blur3)"/>
+  <path d="M 588 432 A 164 164 0 0 1 714 366" fill="none" stroke="#efe6d2" stroke-opacity="0.5" stroke-width="1"/>
+  <!-- faint floor bounce on the underside -->
+  <path d="M 600 620 A 164 164 0 0 0 840 620" fill="none" stroke="#cfc3a9" stroke-opacity="0.10" stroke-width="6" filter="url(#blur10)"/>
+
+  <!-- two verticals in disagreement -->
+  <line x1="720" y1="368" x2="720" y2="930" stroke="#d8cdb4" stroke-opacity="0.20" stroke-width="1"/>
+  <line x1="712" y1="930" x2="728" y2="930" stroke="#d8cdb4" stroke-opacity="0.35" stroke-width="1"/>
+  <line x1="720" y1="368" x2="792" y2="926" stroke="#d8cdb4" stroke-opacity="0.62" stroke-width="1" stroke-dasharray="1 6"/>
+  <line x1="784" y1="926" x2="800" y2="926" stroke="#d8cdb4" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="806" y="906" fill="#a99f88" fill-opacity="0.6"
+        font-family="'JetBrains Mono', monospace" font-size="10.5" letter-spacing="3.2">&#916; 7.4&#176;</text>
+
+  <!-- typography : level, the room's own registre -->
+  <text x="720" y="118" text-anchor="middle" fill="#d9cfb8" fill-opacity="0.4"
+        font-family="'EB Garamond', serif" font-style="italic" font-weight="400"
+        font-size="26" letter-spacing="4.5">L&#8217;HORIZON IMMOBILE</text>
+  <text x="720" y="153" text-anchor="middle" fill="#a99f88" fill-opacity="0.4"
+        font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="2.4">LES DEUX VERTICALES &#183; N&#176;02</text>
+  <text x="96" y="962" fill="#a99f88" fill-opacity="0.35"
+        font-family="'JetBrains Mono', monospace" font-size="10.5" letter-spacing="3.2">02 / &#8212;</text>
+  <text x="1344" y="962" text-anchor="end" fill="#a99f88" fill-opacity="0.4"
+        font-family="'JetBrains Mono', monospace" font-size="10.5" letter-spacing="3.2">T + 58 MIN</text>
+
+  <rect width="1440" height="1024" fill="none" filter="url(#grain2)" opacity="0.55"/>
+</svg>
+</div>
+</body>
+</html>

@@ -17,6 +17,8 @@ import WorldProvider from './context/WorldProvider'
 import { hasEnteredCarnet } from './context/world-context'
 import Enter from './pages/Enter'
 import Home from './pages/Home'
+// 第二章桌面原型:与 Enter 同为直接装配的全视口界面(见 HANDOFF_2026_07_24)。
+import Horizon from './pages/Horizon'
 import './App.css'
 
 const Resources = lazy(() => import('./pages/Resources'))
@@ -116,6 +118,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/enter" element={<ReadyPage><Enter /></ReadyPage>} />
+      <Route path="/horizon" element={<ReadyPage><Horizon /></ReadyPage>} />
       <Route path="/" element={<Layout />}>
         <Route index element={<ReadyPage><Home /></ReadyPage>} />
         <Route path="recueil" element={<DeferredPage><Recueil /></DeferredPage>} />
@@ -156,6 +159,7 @@ function AppRoutes() {
 function EntryGate() {
   const location = useLocation()
   const bypassEntrance = location.pathname === '/enter'
+    || location.pathname === '/horizon'
     || location.pathname === '/login'
     || location.pathname === '/reset-password'
 
@@ -263,7 +267,7 @@ function RoutedExperience() {
     <RouteLoadingContext.Provider value={routeLoadingValue}>
       <>
         <ScrollToTop />
-        {loadingPhase !== 'hidden' && !['/', '/enter'].includes(location.pathname) ? (
+        {loadingPhase !== 'hidden' && !['/', '/enter', '/horizon'].includes(location.pathname) ? (
           <PageLoading
             fullscreen
             isLeaving={loadingPhase === 'leaving'}

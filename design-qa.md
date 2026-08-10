@@ -438,3 +438,86 @@ final result: passed
 - P3：Limite relief 仍比参考更接近天体曲面而非机翼试件；属于现有 raster asset 的造型差异，本轮不重新生成素材。
 
 final result: passed
+
+## L'horizon immobile · 第二章桌面原型（已被接管版取代）· 2026-07-24
+
+> 以下记录保留 Claude 原型的审计历史，不再描述当前实现。该版本的整图底版、克隆补丁和移动占位页已由下一节的分层双端实现取代。
+
+- Source visual truth: `docs/screenshots/foucault-selected-direction-codex-1.png`(作者选定的 Codex 原始第 1 张,严格 1440×1024)。
+- Implementation: `/horizon` 独立直达路由,desktop 1440×1024;`docs/design/foucault/qa/desktop-{dormant,gesture,released,revealed,compare-state,reduced-motion}.png`。
+- Same-frame comparison: `docs/design/foucault/qa/comparison-horizon-desktop.png`(左源右实现,2880×1024)。
+- 构成:选中原图作为房间底版(石墙/柱体/刻字标题/地面嵌环全部保真);烘焙的钢索/铜摆/铅垂线/铜绿点/T 标签以同图克隆补丁抹除;**铜摆是原图自身像素的蒙版 sprite**,由活动层按摆动平面驱动——材质与真相源逐像素同源。线的层级依交接单 §3.2:摆的竖直(活钢索)> 房间竖直(烘焙建筑线,静止属于房间)> 建筑材料线(烘焙)> 释放刻痕(铜绿点+虚线弦)。
+
+**Findings**
+
+- 无未解决 P0/P1。
+- 机制:一次释放(pointer drag → release,≥28px 才生效);释放后 pointer 不再改初始方向(实测二次拖拽方向 307.09° 不变);无 reset/score;`localStorage.foucault_horizon_v1` versioned,损坏存储实测回 dormant;不读写 `poincare_sky_v1`/`carnet_world`(实测第一章 seed 完好)。
+- 时间:领域层真实 ωp=Ω⊕·sinφ(巴黎 11.327°/h,单测锁死六条手算对拍);视觉层 `CHAPTER_TIME_SCALE = 120` 为艺术性时间压缩,对象为 **ideal maintained Foucault pendulum**;页面只显示真实经过时间(T + N MIN),不显示加速后的伪度数/伪秒表;离开-返回按时间戳恢复(实测跨刷新 revealed)。
+- 动效:RAF 仅在 released/gesture 且可见时运行;`visibilitychange` + IntersectionObserver 停帧;DPR 上限 2;reduced-motion 以静态分阶段证据呈现(定格摆位 + 双弦角差),核心关系不依赖连续动画。
+- 回归:`/enter` 与第一章 PLAN 进入实测无错误,Poincaré 状态未被污染;console 零 warning/error(修复过程中的 HMR 瞬态错误不复现于最终代码)。
+- 验证链:lint ✓ · 151 tests ✓(新增 foucaultMath 8 + foucaultState 7)· build ✓ · `git restore public/health.json` 已执行。
+
+**Comparison History**
+
+- [P1→修复] 钢索克隆补丁过宽,削去刻字标题 HORIZON 的 N/VERTICALES 的 V;收窄至 14px + 3px 羽化后字形完整。
+- [P1→修复] 标题带补丁自正上方克隆把烘焙钢索带回画面;改斜向克隆(dx+46,dy−162)。
+- [P2→修复] Canvas 手绘铜球材质弱于原图;改为原图像素蒙版 sprite,dormant 态与真相源逐像素同源。
+- [P2→修复] 球区矩形补丁在球周形成亮晕;改贴合轮廓的球形蒙版补丁(静止时环带完全被 sprite 覆盖)。
+- [P2→修复] 影子方向与光源矛盾(光自右上,影应偏左);已翻转。
+
+**Residual(P3,不阻塞)**
+
+- sprite 圆周与顶珠边缘在全分辨率下有约 1–2px 羽化痕;摆动离位时球后 8px 环带内为克隆墙面。
+- 活钢索比原图的编织质感更细瘦;T 标签为活字(JetBrains Mono),比烘焙字稍轻。
+- 释放后的铜绿点与双弦为机制新增元素,原图(单帧)自然不含。
+- mask/clip-path 语法以 Chrome 为准,Safari 待 D4 后校验。
+- 移动端为占位页(独立构图未选,依交接单 §D4 后置)。
+
+**Implementation Checklist**
+
+- [x] dormant / gesture / released / revealed 四态实测(截图 + 状态断言)。
+- [x] 只能释放一次;released 后世界按时间自主继续。
+- [x] hidden/离屏停止 RAF;返回按时间戳恢复。
+- [x] storage 损坏安全回 dormant;不伪造 revealed。
+- [x] reduced-motion 下核心关系成立。
+- [x] `/enter` 与第一章完整回归。
+- [x] 同画幅并排对照(源左实现右)。
+
+final result: passed
+
+## L'horizon immobile · 接管重构 · 2026-07-24
+
+- Source visual truth: `docs/screenshots/foucault-selected-direction-codex-1.png`（1440×1024）。
+- Current-run implementation: `docs/design/foucault/qa-v2/desktop-compare-final.png`。
+- Same-frame comparison: `docs/design/foucault/qa-v2/reference-vs-implementation.jpg`（左参考、右实机，2880×1024）。
+- Responsive evidence: `desktop-1280x720.png`、`mobile-dormant.png`、`mobile-compare.png`。
+- Interaction evidence: `desktop-keyboard-gesture.png`；同一实机另以 pointer drag 和键盘 Arrow + Enter 完成释放。
+
+**Findings**
+
+- 无未解决 P0/P1/P2。
+- 结构：彻底移除“整张参考图作底图 + 铜摆周围克隆补丁”的假动画。当前为三个独立层：房间坐标层、屏幕惯性 Canvas、透明铜摆实物层。房间、标题、房间铅垂线一起偏转；活钢索与摆保持自己的惯性关系。
+- 双端：Desktop 以 1440×1024 石厅为母构图，并在宽于 3:2 的视口单独调整纵向重心；Mobile 使用独立 780×1688 竖屏石厅与 390×844 几何，不裁桌面图、不复用桌面组件树。
+- 视觉：参考稿的低饱和暖石、EB Garamond 标题、铜摆尺度、单一侧光和地面嵌环均保留；揭示态房间最大只偏转 3.2°，没有 glow、粒子、玻璃卡片或普通 hover 放大。
+- 机制：访客只可选择一次方向并释放。刷新后释放状态仍存在；释放后箭头和 pointer 不再改写初始方向。页面只显示真实经过时间，不把加速后的章节时间伪装成现实时间。
+- 性能与可访问性：Canvas DPR 上限 2；页面隐藏或离屏后停止 RAF；`prefers-reduced-motion` 直接呈现静态双竖直证据；Canvas 可聚焦，Arrow 定向、Enter 释放，语义状态通过 live output 提供。
+- 浏览器：1440×1024、1280×720、390×844 均无横向溢出；`/enter` 回归正常；最终 console 无 warning/error。
+- 素材：石厅与铜摆由内置 Image Gen 按选定参考构图定向生成，再切成可独立运动的真实位图资产；没有 CSS/SVG 伪造可见主资产。
+
+**Comparison History**
+
+- [P1→修复] Claude 版让铜摆移动、房间与标题不动，命题方向相反。重构为房间坐标偏转、摆的惯性层固定。
+- [P1→修复] Claude 版移动端只有占位说明。新增独立竖屏石厅、独立几何与独立响应组件。
+- [P2→修复] 首轮接管揭示态偏转达到 8.5°，出现转盘感与角部露底。上限收敛到 3.2°，同时把房间铅垂线加强为唯一明确证据。
+- [P2→修复] 16:9 视口裁掉地面环，世界失去落点。宽屏桌面单独上移舞台，使标题、摆体与地面见证同时进入首屏。
+- [P2→修复] 时间标签随房间转动后容易被裁。向内收进安全区，1440×1024 与 390×844 揭示态均可读。
+
+**Validation**
+
+- `npm run lint -- --no-cache`: passed。
+- `npm test -- --run`: 16 files / 151 tests passed。
+- `npm run build`: passed（仅既有 chunk-size warning）。
+- `npm audit --omit=dev --audit-level=high`: passed；仍报告 React Router 的 2 个既有 moderate advisory，本轮未擅自改依赖。
+- `git diff --check`: passed；`public/health.json` 已恢复。
+
+final result: passed

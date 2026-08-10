@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Direction 1 rev · La rotonde</title>
+<style>
+  @font-face{font-family:'EB Garamond';font-style:italic;font-weight:400;
+    src:url('../../../../../node_modules/@fontsource/eb-garamond/files/eb-garamond-latin-400-italic.woff2') format('woff2');}
+  @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;
+    src:url('../../../../../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2') format('woff2');}
+  html,body{margin:0;padding:0;width:1440px;height:1024px;overflow:hidden;background:#0f0d0a;}
+  .stage{position:relative;width:1440px;height:1024px;}
+  svg{position:absolute;inset:0;}
+</style>
+</head>
+<body>
+<div class="stage">
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- directional light : falls from upper left -->
+    <radialGradient id="pool" cx="41%" cy="36%" r="86%">
+      <stop offset="0%" stop-color="#292219"/>
+      <stop offset="30%" stop-color="#1e1812"/>
+      <stop offset="62%" stop-color="#14100c"/>
+      <stop offset="100%" stop-color="#0a0807"/>
+    </radialGradient>
+    <radialGradient id="bob" cx="34%" cy="28%" r="80%">
+      <stop offset="0%" stop-color="#f4ecda"/>
+      <stop offset="40%" stop-color="#c9bda4"/>
+      <stop offset="100%" stop-color="#57503f"/>
+    </radialGradient>
+    <linearGradient id="swing" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ece4d0" stop-opacity="0"/>
+      <stop offset="15%" stop-color="#ece4d0" stop-opacity=".5"/>
+      <stop offset="50%" stop-color="#f6efdd" stop-opacity=".95"/>
+      <stop offset="85%" stop-color="#ece4d0" stop-opacity=".5"/>
+      <stop offset="100%" stop-color="#ece4d0" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="stone" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="3" seed="7" result="w"/>
+      <feDisplacementMap in="SourceGraphic" in2="w" scale="26"/>
+    </filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="3" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.88  0 0 0 0 0.84  0 0 0 0 0.75  0 0 0 0.05 0"/>
+    </filter>
+    <filter id="blur6"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="blur14"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+
+  <rect width="1440" height="1024" fill="url(#pool)"/>
+
+  <!-- LE MONDE : slabs, veins, mark, typography — one rigid body, 7° off square since release -->
+  <g transform="rotate(-7 720 540)">
+    <!-- stone slab joints : rectilinear, irregular — a floor, not a dial -->
+    <g stroke="#c9bda4" stroke-width="1">
+      <g stroke-opacity="0.10">
+        <line x1="-300" y1="212" x2="1740" y2="212"/>
+        <line x1="-300" y1="452" x2="1740" y2="452"/>
+        <line x1="-300" y1="638" x2="1740" y2="638"/>
+        <line x1="-300" y1="864" x2="1740" y2="864"/>
+      </g>
+      <g stroke-opacity="0.085">
+        <line x1="252" y1="-160" x2="252" y2="1184"/>
+        <line x1="588" y1="-160" x2="588" y2="1184"/>
+        <line x1="908" y1="-160" x2="908" y2="1184"/>
+        <line x1="1204" y1="-160" x2="1204" y2="1184"/>
+      </g>
+      <!-- chisel light edge under two joints -->
+      <g stroke="#060504" stroke-opacity="0.5">
+        <line x1="-300" y1="453.4" x2="1740" y2="453.4"/>
+        <line x1="-300" y1="639.4" x2="1740" y2="639.4"/>
+      </g>
+    </g>
+    <!-- organic veins in the stone, Raccord's own engraved-wall language -->
+    <g fill="none" stroke="#c9bda4" filter="url(#stone)">
+      <path d="M -80 330 C 300 292 640 366 900 330 S 1400 268 1560 300" stroke-opacity="0.16" stroke-width="1.4"/>
+      <path d="M -60 740 C 260 700 560 782 880 748 S 1380 690 1560 726" stroke-opacity="0.13" stroke-width="1.2"/>
+      <path d="M 120 -40 C 96 300 170 520 128 780 S 90 980 110 1120" stroke-opacity="0.10" stroke-width="1.2"/>
+      <path d="M 1320 -40 C 1352 260 1290 560 1336 820 S 1360 1000 1348 1120" stroke-opacity="0.09" stroke-width="1.2"/>
+    </g>
+    <!-- the release mark, engraved at the initial azimuth -->
+    <g transform="rotate(-12 720 540)" stroke="#c9bda4">
+      <line x1="404" y1="540" x2="1036" y2="540" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="1 6"/>
+      <line x1="402" y1="531" x2="402" y2="549" stroke-opacity="0.4" stroke-width="1"/>
+      <line x1="1038" y1="531" x2="1038" y2="549" stroke-opacity="0.4" stroke-width="1"/>
+    </g>
+    <!-- typography belongs to the world -->
+    <text x="720" y="132" text-anchor="middle" fill="#d9cfb8" fill-opacity="0.4"
+          font-family="'EB Garamond', serif" font-style="italic" font-weight="400"
+          font-size="26" letter-spacing="4.5">L&#8217;HORIZON IMMOBILE</text>
+    <text x="720" y="167" text-anchor="middle" fill="#a99f88" fill-opacity="0.4"
+          font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="2.4">LA ROTONDE &#183; N&#176;02</text>
+    <text x="132" y="948" fill="#a99f88" fill-opacity="0.35"
+          font-family="'JetBrains Mono', monospace" font-size="10.5" letter-spacing="3.2">02 / &#8212;</text>
+    <text x="1308" y="948" text-anchor="end" fill="#a99f88" fill-opacity="0.4"
+          font-family="'JetBrains Mono', monospace" font-size="10.5" letter-spacing="3.2">T + 58 MIN</text>
+  </g>
+
+  <!-- bob shadow, cast away from the light -->
+  <ellipse cx="762" cy="560" rx="46" ry="14" fill="#000" opacity="0.5" filter="url(#blur14)" transform="rotate(-12 720 540)"/>
+
+  <!-- THE SWING : pinned to the screen -->
+  <g transform="rotate(-12 720 540)">
+    <rect x="380" y="536" width="680" height="8" fill="url(#swing)" opacity="0.16" filter="url(#blur6)"/>
+    <rect x="380" y="538.6" width="680" height="2.8" fill="url(#swing)"/>
+  </g>
+  <circle cx="720" cy="540" r="15" fill="url(#bob)"/>
+  <circle cx="720" cy="540" r="2.4" fill="#0f0d0a" fill-opacity="0.5"/>
+
+  <rect width="1440" height="1024" fill="none" filter="url(#grain)" opacity="0.55"/>
+</svg>
+</div>
+</body>
+</html>

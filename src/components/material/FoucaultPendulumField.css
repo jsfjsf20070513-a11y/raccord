@@ -1,0 +1,99 @@
+.foucault-field-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  --foucault-room-angle: 0deg;
+}
+
+.foucault-room-coordinate {
+  position: absolute;
+  inset: 0;
+  transform: rotate(var(--foucault-room-angle)) scale(1.035);
+  transform-origin: 50% 58%;
+  will-change: transform;
+}
+
+.foucault-room-coordinate > * {
+  pointer-events: none;
+}
+
+.foucault-room-witness,
+.foucault-inertial-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.foucault-room-witness {
+  z-index: 2;
+}
+
+.foucault-inertial-field {
+  z-index: 4;
+  touch-action: none;
+  outline: none;
+  cursor: default;
+}
+
+.foucault-field-frame[data-phase='dormant'][data-near] .foucault-inertial-field,
+.foucault-field-frame[data-phase='gesture'] .foucault-inertial-field {
+  cursor: grab;
+}
+
+.foucault-field-frame[data-phase='gesture'] .foucault-inertial-field:active {
+  cursor: grabbing;
+}
+
+.foucault-inertial-field:focus-visible {
+  box-shadow: inset 0 0 0 1px rgba(77, 125, 114, 0.58);
+}
+
+.foucault-bob-sprite {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  top: 0;
+  height: auto;
+  pointer-events: none;
+  transform-origin: center;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter:
+    drop-shadow(-13px 12px 10px rgba(31, 25, 20, 0.17))
+    saturate(0.86)
+    contrast(0.98);
+}
+
+.foucault-field-frame[data-variant='mobile'] .foucault-room-coordinate {
+  inset: 0;
+  transform: rotate(var(--foucault-room-angle)) scale(1.045);
+  transform-origin: 50% 66%;
+}
+
+.foucault-field-frame[data-variant='mobile'] .foucault-room-witness,
+.foucault-field-frame[data-variant='mobile'] .foucault-inertial-field {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.foucault-field-frame[data-variant='mobile'] .foucault-bob-sprite {
+  filter:
+    drop-shadow(-8px 9px 8px rgba(31, 25, 20, 0.17))
+    saturate(0.86)
+    contrast(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foucault-room-coordinate {
+    will-change: auto;
+  }
+
+  .foucault-bob-sprite {
+    will-change: auto;
+  }
+}

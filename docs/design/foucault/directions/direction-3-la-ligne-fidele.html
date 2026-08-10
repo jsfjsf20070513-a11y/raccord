@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Direction 3 · La ligne fidèle</title>
+<style>
+  html,body{margin:0;padding:0;width:1440px;height:1024px;overflow:hidden;background:#f5f1e6;}
+  .stage{position:relative;width:1440px;height:1024px;}
+  svg{position:absolute;inset:0;}
+</style>
+</head>
+<body>
+<div class="stage">
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="paper" cx="50%" cy="44%" r="80%">
+      <stop offset="0%" stop-color="#f7f3e9"/>
+      <stop offset="70%" stop-color="#f2edE0"/>
+      <stop offset="100%" stop-color="#e9e2d1"/>
+    </radialGradient>
+    <linearGradient id="ink" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3a3028" stop-opacity="0"/>
+      <stop offset="8%" stop-color="#3a3028" stop-opacity=".75"/>
+      <stop offset="50%" stop-color="#2c241d" stop-opacity=".95"/>
+      <stop offset="92%" stop-color="#3a3028" stop-opacity=".75"/>
+      <stop offset="100%" stop-color="#3a3028" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="fibre">
+      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.5  0 0 0 0 0.42  0 0 0 0.05 0"/>
+      <feComposite operator="over" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="1024" fill="url(#paper)"/>
+
+  <!-- THE RULING : the sheet's own grid, quietly rotated 8° since release -->
+  <g transform="rotate(8 720 512)" stroke="#8f8672" stroke-width="1">
+    <g stroke-opacity="0.16">
+      <line x1="-200" y1="146" x2="1640" y2="146"/><line x1="-200" y1="238" x2="1640" y2="238"/>
+      <line x1="-200" y1="330" x2="1640" y2="330"/><line x1="-200" y1="422" x2="1640" y2="422"/>
+      <line x1="-200" y1="514" x2="1640" y2="514"/><line x1="-200" y1="606" x2="1640" y2="606"/>
+      <line x1="-200" y1="698" x2="1640" y2="698"/><line x1="-200" y1="790" x2="1640" y2="790"/>
+      <line x1="-200" y1="882" x2="1640" y2="882"/>
+    </g>
+    <line x1="318" y1="-60" x2="318" y2="1100" stroke-opacity="0.30"/>
+    <line x1="322" y1="-60" x2="322" y2="1100" stroke-opacity="0.14"/>
+    <!-- the margin's own record of where the line used to cross it -->
+    <g stroke-opacity="0.45">
+      <line x1="306" y1="514" x2="334" y2="514"/>
+    </g>
+  </g>
+
+  <!-- accumulated witnesses : each pass, a tick where the faithful line met the drifting margin -->
+  <g stroke="#5f3d31" stroke-width="1">
+    <line x1="300" y1="512" x2="336" y2="512" stroke-opacity="0.9"/>
+    <line x1="301" y1="524" x2="335" y2="519" stroke-opacity="0.55"/>
+    <line x1="302" y1="536" x2="334" y2="526" stroke-opacity="0.38"/>
+    <line x1="303" y1="548" x2="333" y2="533" stroke-opacity="0.26"/>
+    <line x1="304" y1="560" x2="332" y2="540" stroke-opacity="0.17"/>
+    <line x1="305" y1="572" x2="331" y2="547" stroke-opacity="0.10"/>
+  </g>
+
+  <!-- THE LINE : it never wavered -->
+  <rect x="150" y="510.8" width="1140" height="2.4" fill="url(#ink)"/>
+  <circle cx="720" cy="512" r="4.6" fill="#2c241d"/>
+  <circle cx="720" cy="512" r="9" fill="none" stroke="#2c241d" stroke-opacity="0.35" stroke-width="1"/>
+
+  <!-- registre header : level, it belongs to the reader -->
+  <text x="720" y="96" text-anchor="middle" fill="#2c241d" fill-opacity="0.9"
+        font-family="Didot, 'Baskerville', serif" font-style="italic" font-size="34" letter-spacing="6">L&#8217;horizon immobile</text>
+  <text x="720" y="126" text-anchor="middle" fill="#6d6353" fill-opacity="0.75"
+        font-family="Menlo, monospace" font-size="11" letter-spacing="5">LA LIGNE FID&#200;LE</text>
+  <text x="96" y="954" fill="#6d6353" fill-opacity="0.65" font-family="Menlo, monospace" font-size="11" letter-spacing="3">02 / —</text>
+  <text x="1344" y="954" text-anchor="end" fill="#6d6353" fill-opacity="0.7" font-family="Menlo, monospace" font-size="11" letter-spacing="3">PASSE 27 &#183; T + 42 MIN</text>
+
+  <rect width="1440" height="1024" fill="none" filter="url(#fibre)" opacity="0.5"/>
+</svg>
+</div>
+</body>
+</html>

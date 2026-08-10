@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Direction 2 · Les deux verticales</title>
+<style>
+  html,body{margin:0;padding:0;width:1440px;height:1024px;overflow:hidden;background:#0f0c0a;}
+  .stage{position:relative;width:1440px;height:1024px;}
+  svg{position:absolute;inset:0;}
+</style>
+</head>
+<body>
+<div class="stage">
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="air" cx="50%" cy="38%" r="85%">
+      <stop offset="0%" stop-color="#221c16"/>
+      <stop offset="45%" stop-color="#161210"/>
+      <stop offset="100%" stop-color="#0b0908"/>
+    </radialGradient>
+    <radialGradient id="sphere" cx="30%" cy="24%" r="88%">
+      <stop offset="0%" stop-color="#efe7d6"/>
+      <stop offset="22%" stop-color="#b8ac93"/>
+      <stop offset="55%" stop-color="#4a4238"/>
+      <stop offset="100%" stop-color="#15120f"/>
+    </radialGradient>
+    <linearGradient id="floorline" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d9cfb8" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#d9cfb8" stop-opacity=".42"/>
+      <stop offset="70%" stop-color="#d9cfb8" stop-opacity=".42"/>
+      <stop offset="100%" stop-color="#d9cfb8" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="grain2">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.88  0 0 0 0 0.84  0 0 0 0 0.76  0 0 0 0.045 0"/>
+      <feComposite operator="over" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="1024" fill="url(#air)"/>
+
+  <!-- the horizon : a single hairline, the room's own reference -->
+  <rect x="0" y="668" width="1440" height="1" fill="url(#floorline)"/>
+
+  <!-- wire, from beyond the frame -->
+  <line x1="720" y1="0" x2="720" y2="304" stroke="#d9cfb8" stroke-opacity="0.5" stroke-width="1"/>
+
+  <!-- the bob : human scale, edge-lit -->
+  <circle cx="720" cy="470" r="168" fill="url(#sphere)"/>
+  <ellipse cx="652" cy="392" rx="64" ry="42" fill="#f6efdf" opacity="0.10"/>
+
+  <!-- swept path on the floor : the swing seen almost edge-on, closing -->
+  <ellipse cx="720" cy="668" rx="330" ry="13" fill="none" stroke="#d9cfb8" stroke-opacity="0.22" stroke-width="1"/>
+  <ellipse cx="720" cy="668" rx="330" ry="52" fill="none" stroke="#d9cfb8" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="1 6"/>
+
+  <!-- two verticals in disagreement : the plumb dropped at release vs the room's plumb -->
+  <g>
+    <line x1="720" y1="304" x2="720" y2="960" stroke="#d9cfb8" stroke-opacity="0.16" stroke-width="1"/>
+    <line x1="720" y1="304" x2="800" y2="956" stroke="#d9cfb8" stroke-opacity="0.6" stroke-width="1" stroke-dasharray="1 7"/>
+    <line x1="712" y1="960" x2="728" y2="960" stroke="#d9cfb8" stroke-opacity="0.3" stroke-width="1"/>
+    <line x1="792" y1="956" x2="808" y2="956" stroke="#d9cfb8" stroke-opacity="0.45" stroke-width="1"/>
+  </g>
+
+  <!-- restrained witnesses -->
+  <text x="720" y="120" text-anchor="middle" fill="#ded4bf" fill-opacity="0.85"
+        font-family="Didot, 'Baskerville', serif" font-style="italic" font-size="34" letter-spacing="6">L&#8217;horizon immobile</text>
+  <text x="720" y="150" text-anchor="middle" fill="#b0a690" fill-opacity="0.5"
+        font-family="Menlo, monospace" font-size="11" letter-spacing="5">LES DEUX VERTICALES</text>
+  <text x="96" y="954" fill="#b0a690" fill-opacity="0.45" font-family="Menlo, monospace" font-size="11" letter-spacing="3">02 / —</text>
+  <text x="1344" y="954" text-anchor="end" fill="#b0a690" fill-opacity="0.5" font-family="Menlo, monospace" font-size="11" letter-spacing="3">&#916; 7.4&#176;</text>
+
+  <rect width="1440" height="1024" fill="none" filter="url(#grain2)" opacity="0.55"/>
+</svg>
+</div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+.horizon-room.horizon-room-mobile {
+  background:
+    #8f887d
+    url('/assets/foucault/v2/stone-chamber-mobile.jpg')
+    center / cover no-repeat;
+}
+
+.horizon-stage-mobile {
+  width: 390px;
+  height: 844px;
+}
+
+.horizon-plate-mobile {
+  background-image: url('/assets/foucault/v2/stone-chamber-mobile.jpg');
+}
+
+.horizon-title-mobile {
+  left: 50%;
+  top: 176px;
+  transform: translateX(-50%);
+}
+
+.horizon-title-mobile span {
+  font-size: 20px;
+  letter-spacing: 0.13em;
+}
+
+.horizon-title-mobile small {
+  margin-top: 15px;
+  font-size: 8px;
+  letter-spacing: 0.27em;
+}
+
+.horizon-elapsed-mobile {
+  right: 28px;
+  bottom: 48px;
+  font-size: 7px;
+  letter-spacing: 0.23em;
+}

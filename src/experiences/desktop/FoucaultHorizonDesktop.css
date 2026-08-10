@@ -1,0 +1,42 @@
+.horizon-room.horizon-room-desktop {
+  background:
+    #9f9a90
+    url('/assets/foucault/v2/stone-chamber-desktop.jpg')
+    center / cover no-repeat;
+}
+
+.horizon-stage-desktop {
+  width: 1440px;
+  height: 1024px;
+}
+
+.horizon-plate-desktop {
+  background-image: url('/assets/foucault/v2/stone-chamber-desktop.jpg');
+}
+
+.horizon-title-desktop {
+  left: 50%;
+  top: 294px;
+  transform: translateX(-50%);
+}
+
+.horizon-title-desktop span {
+  font-size: 32px;
+}
+
+.horizon-title-desktop small {
+  margin-top: 22px;
+  font-size: 11px;
+}
+
+.horizon-elapsed-desktop {
+  right: 84px;
+  bottom: 88px;
+  font-size: 10px;
+}
+
+@media (min-aspect-ratio: 3 / 2) {
+  .horizon-stage.horizon-stage-desktop {
+    top: 42%;
+  }
+}
