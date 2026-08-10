@@ -17,6 +17,7 @@ import WorldProvider from './context/WorldProvider'
 import { hasEnteredCarnet } from './context/world-context'
 import Enter from './pages/Enter'
 import Home from './pages/Home'
+import Horizon from './pages/Horizon'
 import './App.css'
 
 const Resources = lazy(() => import('./pages/Resources'))
@@ -116,6 +117,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/enter" element={<ReadyPage><Enter /></ReadyPage>} />
+      <Route path="/horizon" element={<ReadyPage><Horizon /></ReadyPage>} />
       <Route path="/" element={<Layout />}>
         <Route index element={<ReadyPage><Home /></ReadyPage>} />
         <Route path="recueil" element={<DeferredPage><Recueil /></DeferredPage>} />
@@ -155,9 +157,11 @@ function AppRoutes() {
 
 function EntryGate() {
   const location = useLocation()
-  const bypassEntrance = location.pathname === '/enter'
-    || location.pathname === '/login'
-    || location.pathname === '/reset-password'
+  const gatePathname = location.pathname.replace(/\/+$/, '') || '/'
+  const bypassEntrance = gatePathname === '/enter'
+    || gatePathname === '/horizon'
+    || gatePathname === '/login'
+    || gatePathname === '/reset-password'
 
   if (!bypassEntrance && !hasEnteredCarnet()) {
     return <Navigate to="/enter" state={{ from: `${location.pathname}${location.search}` }} replace />
@@ -168,6 +172,7 @@ function EntryGate() {
 
 function RoutedExperience() {
   const location = useLocation()
+  const loadingPathname = location.pathname.replace(/\/+$/, '') || '/'
   const [loadingPhase, setLoadingPhase] = useState('visible')
   const isFirstLoadRef = useRef(true)
   const previousPathnameRef = useRef(location.pathname)
@@ -263,7 +268,7 @@ function RoutedExperience() {
     <RouteLoadingContext.Provider value={routeLoadingValue}>
       <>
         <ScrollToTop />
-        {loadingPhase !== 'hidden' && !['/', '/enter'].includes(location.pathname) ? (
+        {loadingPhase !== 'hidden' && !['/', '/enter', '/horizon'].includes(loadingPathname) ? (
           <PageLoading
             fullscreen
             isLeaving={loadingPhase === 'leaving'}

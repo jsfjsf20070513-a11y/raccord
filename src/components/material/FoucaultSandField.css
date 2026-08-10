@@ -1,0 +1,65 @@
+.foucault-sand-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.foucault-sand-field__material,
+.foucault-sand-field__canvas,
+.foucault-sand-field__control {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.foucault-sand-field__material {
+  z-index: 0;
+  max-width: none;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+}
+
+.foucault-sand-field__canvas {
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+}
+
+.foucault-sand-field__control {
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  color: transparent;
+  cursor: crosshair;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.foucault-sand-field[data-released="true"] .foucault-sand-field__control {
+  cursor: default;
+}
+
+.foucault-sand-field__control:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(89, 75, 61, 0.32);
+}
+
+.horizon-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}

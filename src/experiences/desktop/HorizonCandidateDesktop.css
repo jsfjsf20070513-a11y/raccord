@@ -1,0 +1,11 @@
+.horizon-candidate--desktop .horizon-candidate__title {
+  top: 10.7svh;
+  gap: 0.3em;
+  font-size: clamp(25px, 1.85vw, 28px);
+}
+
+.horizon-candidate--desktop .horizon-candidate__folio {
+  right: 1.9vw;
+  bottom: 2.15svh;
+  font-size: 11px;
+}

@@ -1,7 +1,4 @@
 User-agent: *
 Allow: /
 
-# Hackathon judges and search engines, you may freely index any
-# public-facing page. The site has no private user data.
-
 Sitemap: https://rucmathclass.com/sitemap.xml

@@ -96,6 +96,8 @@ public/uploads/
 !docs/design/poincare/qa/comparison-desktop-final.jpg
 !docs/design/poincare/qa/comparison-continuity-final.jpg
 *.webp
+!public/assets/horizon/sand-bed-desktop.webp
+!public/assets/horizon/sand-bed-mobile.webp
 setup_admin.sql
 setup_admin_v2.sql
 

@@ -43,6 +43,75 @@ final result: passed
 
 ---
 
+# Design QA — L’horizon immobile / 第二章候选 · 2026-07-30
+
+**Comparison Target**
+
+- Source visual truth: `/var/folders/8c/l0xjn7957h94pvj_c81f9zjh0000gn/T/codex-clipboard-862c02ad-1f41-4651-96fe-15f2c333a263.png`.
+- Browser implementation: `http://localhost:5175/horizon`.
+- Implementation screenshots: `/tmp/horizon-desktop-released-qa-v9.png` and `/tmp/horizon-mobile-qa-v10.png`.
+- Released-state browser evidence: `/tmp/horizon-released-iab-v8-1280x720.png`.
+- Full-view comparison evidence: `/tmp/horizon-design-qa-comparison-released-v9.png` (source left, desktop implementation right).
+- Source pixels: `1487 × 1058`.
+- Desktop implementation: `1440 × 1024` CSS px at `deviceScaleFactor=1`.
+- Mobile implementation: `390 × 844` CSS px at `deviceScaleFactor=1`.
+- Comparison normalization: source and desktop were proportionally normalized to equal `720 × 512` panels.
+- State: source and desktop comparison are both released. The desktop capture was taken after one keyboard release and twenty real 8.21-second half-periods; mobile was captured dormant at an exact `390 × 844` CSS viewport.
+
+**Findings**
+
+- No actionable P0/P1/P2 mismatch remains.
+- Fonts and typography: the implementation uses the real French `Compagnon Light Italic` webfont from Velvetyne Type Foundry, with tightened tracking and the suspension line passing through a deliberately constructed word gap. The generated source contains non-reproducible synthetic lettering; preserving its delicate, irregular French character with a real typeface is the intentional constraint.
+- Spacing and layout rhythm: at `1440 × 1024`, the title, rim, pivot, initial mark and folio occupy the same major coordinates as the source. The mobile composition is not a crop of desktop: the circular bed is lowered and enlarged independently around a `390 × 844` portrait axis.
+- Colors and visual tokens: warm ivory, low-contrast graphite/brass and one verdigris mark preserve the source hierarchy. There is no glow, glass effect, saturated accent, vignette or extra ornament.
+- Image quality and asset fidelity: the sand beds are dedicated raster material assets rather than CSS/SVG imitation. Lossy WebP conversion reduced the two assets from 7.4 MB to 412 KB total without a visible material shift in the final comparison.
+- Copy and content: visible copy is limited to `L’horizon immobile` and folio `II`. Instructions and release status are available to assistive technology without adding explanatory prose to the composition.
+- Interaction and physical truth: the only pre-release gesture is direction choice followed by release. After release, pointer input is ignored and evidence is derived from a real timestamp. The Paris rate is `11.3269°/h`; the screen magnifies only the spacing inside a recent seven-pass material window while the entire window keeps following real precession, so evidence never freezes and no accelerated clock is stored.
+- Responsive and accessibility: desktop and mobile mount separate React trees while sharing one domain state. Arrow keys refine direction; Enter/Space releases; the semantic direction slider exposes current angle, completed center passes and real precession; `prefers-reduced-motion` removes the title settle.
+
+**Comparison History**
+
+1. [P2] The first desktop render used `object-fit: cover`; on a 16:9 browser it pulled the rim into the title and changed the source rhythm. Fixed by fitting the dedicated material asset to the full stage. Post-fix IAB and `1440 × 1024` captures restore the title-to-rim interval.
+2. [P2] The first title used flex centering, so the suspension line crossed the second word instead of the intentional inter-word void. Fixed by anchoring the two title spans independently on either side of the center axis. The final combined evidence shows the line entering the gap on both desktop and mobile.
+3. [P2] The first raw PNG material pair totalled 7.4 MB. Re-encoded the same generated assets to high-quality WebP and rechecked their natural pixel dimensions (`2880 × 2048`, `780 × 1688`) and final browser render.
+4. [P2] Initial geometry was too faint beside the source. Increased only the suspension, chosen line and dormant witness line opacities; no extra strokes, shadow or glow were introduced.
+5. [P1] The first title face was orderly but generic. Replaced it with credited `Compagnon Light Italic`, then tightened tracking and raised the ink by half a step. The final title remains irregular and slender without becoming decorative.
+6. [P1] The first capped evidence set re-sampled old history and eventually froze visually. Replaced it with a recent-pass window: older marks are swallowed by the sand, the local fan remains sparse, and its orientation continues to follow the true Paris precession indefinitely.
+7. [P2] Uniform line ends read as vector strokes. The final grooves pair a low-contrast highlight with a graphite trough, vary length and depth, and fade at different endpoints. Mobile suspension ink now dissipates faster near the top edge.
+
+**Focused Region Comparison**
+
+- No separate crop was needed: the normalized full-view panels keep the title axis, pivot, green release point, rim edge and folio legible together. Font loading was additionally checked from computed browser styles rather than inferred from the screenshot.
+
+**Browser and Functional Checks**
+
+- In-app browser opened `/horizon` directly without the entrance gate; fresh Chrome also opened `/horizon/` without being redirected.
+- ArrowRight then Enter changed the semantic control to `aria-disabled="true"`; a later capture showed accumulated grooves and an updated pass count.
+- A right click did not consume the one irreversible release. After dismissing the context menu, one primary-pointer drag-and-release did.
+- Opening `/` afterward in the same fresh browser redirected to `/enter`, confirming that Chapter II does not set the first-chapter entrance flag.
+- Browser console contained no warning or error.
+- Full test suite: `147` tests passed.
+- ESLint: passed with zero warnings.
+- Production build: passed.
+
+**Implementation Checklist**
+
+- [x] Preserve the selected ivory sand-bed composition.
+- [x] Use a real, credited French irregular italic.
+- [x] Keep physical time real and spatial magnification explicit.
+- [x] Enforce one release and ignore later pointer input.
+- [x] Mount independent desktop/mobile compositions.
+- [x] Keep Enter and Chapter I untouched.
+- [x] Verify source/implementation together and pass lint, tests and build.
+
+**Follow-up Polish**
+
+- No further P3 polish is recommended; the final independent visual review found that additional adjustment would begin to damage the current restraint and breathing room.
+
+final result: passed
+
+---
+
 # Design QA — Raccord 01 / 三世界第一版
 
 **Comparison Target**

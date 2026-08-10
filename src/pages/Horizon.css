@@ -1,0 +1,84 @@
+html[data-chapter="horizon"],
+html[data-chapter="horizon"] body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #eee8e1;
+}
+
+.horizon-candidate {
+  position: fixed;
+  inset: 0;
+  min-width: 320px;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #eee8e1;
+  color: #5f5145;
+  isolation: isolate;
+}
+
+.horizon-candidate__title {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  width: 0;
+  margin: 0;
+  color: rgba(97, 78, 60, 0.62);
+  font-family: "Spectral", "EB Garamond", serif;
+  font-style: italic;
+  font-weight: 300;
+  font-synthesis: none;
+  font-feature-settings: "kern" 1, "liga" 1;
+  font-optical-sizing: auto;
+  letter-spacing: -0.018em;
+  line-height: 1;
+  pointer-events: none;
+  text-rendering: geometricPrecision;
+}
+
+.horizon-candidate__title span {
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+}
+
+.horizon-candidate__title span:first-child {
+  right: 0.1em;
+  letter-spacing: -0.012em;
+  transform: translateY(0.025em) rotate(-0.42deg);
+  transform-origin: 100% 72%;
+}
+
+.horizon-candidate__title span:last-child {
+  left: 0.1em;
+  letter-spacing: 0.004em;
+  transform: translateY(-0.012em) rotate(0.32deg);
+  transform-origin: 0 72%;
+}
+
+.horizon-candidate__folio {
+  position: absolute;
+  z-index: 4;
+  border: 0;
+  color: rgba(84, 70, 58, 0.68);
+  font-family: "Spectral", serif;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .horizon-candidate__title {
+    animation: horizon-title-settle 210ms ease-out both;
+  }
+}
+
+@keyframes horizon-title-settle {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
