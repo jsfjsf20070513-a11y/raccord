@@ -1,6 +1,6 @@
-# AGENTS.md — MathClassWebsite-public
+# AGENTS.md — Raccord
 
-本仓是 math 主线唯一活跃代码仓与 `rucmathclass.com` 的构建来源。改代码、提交、部署只在这里进行；兄弟仓 `MathClassWebsite` 已归档，只作为私有班级照片源。
+本仓是 **Raccord**(作者数字作品站)的代码仓,2026-08-25 自 `rucmathclass` 拆出(完整保留共同历史)。**未首发**:`raccord.rucmathclass.com` 目前 301 回主站,2026-08-06 作者明示暂缓。线上 `rucmathclass.com` 属于独立的班级网站线仓 `rucmathclass`,与本仓互不部署——部署走 raccord-deploy runbook,必须显式 `MATHCLASS_DEPLOY_DIR=/var/www/raccord/dist`。归档仓 `MathClassWebsite`(GitHub `mathclass-archive`)只是历史存档,照片注入链路已整体退役(`MATHCLASS_PRIVATE_REPO=skip` 固定)。
 
 ## 产品意图正本
 
@@ -60,6 +60,6 @@ npm audit --omit=dev --audit-level=high
 
 ## 部署
 
-只运行本仓 `./deploy.sh`。它从兄弟仓固定 commit `a88bdc5` 注入私有照片、构建并 rsync 到 VPS。绝不运行 `MathClassWebsite/deploy.sh`。
+只运行本仓 `./deploy.sh`,且必须显式 `MATHCLASS_PRIVATE_REPO=skip`(照片注入链路已退役,真实班级照片永不随 Raccord)与 `MATHCLASS_DEPLOY_DIR=/var/www/raccord/dist`(漏设会落到班级站线上目录)。绝不运行 `MathClassWebsite/deploy.sh`。完整步骤见 `deployment/RACCORD_DEPLOY.md` 与 raccord-deploy skill。
 
 部署后检查 `health.json` 的新 buildTime，并比较域名与 `http://149.28.69.75/health.json`。没有明确请求时不要自行部署。
