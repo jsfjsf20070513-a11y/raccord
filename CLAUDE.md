@@ -73,7 +73,7 @@ npm audit --omit=dev --audit-level=high
 - `main`:正本与部署源,与 origin 同步。
 - `wip/horizon-immobile`(08-10):第二章《L'horizon immobile》Foucault 摆组件 + Horizon 页,约 3400 行,**唯一副本**,含两份对应交接单与 `docs/design/foucault/directions/` 方向稿。落后 main 4 个提交。
 - `codex/world-chapter-constitution`(08-10):产品宪法 v2 + 章节制作协议的文档快照,与 wip 互不包含。
-- 08-06 作者明示暂缓;**复工第一件事是裁定这两条哪条是主方向**,裁定前不合并、不删除。
+- 两条是同一章的两版:wip = Fable 的 Foucault 摆原型,codex = GPT 的宪法 v2 + 大铜球候选(codex 自己的 AGENTS 已写明该表面未获认可)。作者 09-02 回忆:**两版都不太满意,未拍板**。08-06 起暂缓;裁定前不合并、不删除,具体开发不在线级做。
 
 ## 文档导航
 
