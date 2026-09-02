@@ -23,7 +23,7 @@
 
 当前 edition 以同一件 `Raccord 01` 连续曲线贯穿三界:PLAN 用 Bézier 控制柄把两段曲线从 G⁰ 接向 C²,Limite 把同一曲线置于 A350 启发的载荷试验,Carnet 以 Cauchy / Bergson 的边注追问连续与同一。控制柄是三界共享且持久化的对象(`localStorage.raccord_artifact_v1`),数值逻辑保持在 `components/material/raccordWorldMath.js` 的可测试纯函数里。
 
-站面不出现作者姓名与班级信息(2026-07-23 拍板);Web3 前端已退役,`programs/class-anchor/` 只作历史材料。
+站面不出现作者姓名与班级信息(2026-07-23 拍板);Web3 前端已退役,链上程序与文档已于 2026-09-02 删除(历史在 git)。
 
 ## 分支
 
@@ -59,7 +59,6 @@ npm run lint && npm test && npm run build
 发布源 = 本仓 `main`。必须显式:
 
 ```bash
-MATHCLASS_PRIVATE_REPO=skip \
 MATHCLASS_DEPLOY_DIR=/var/www/raccord/dist \
 MATHCLASS_DEPLOY_HOST=<host> MATHCLASS_DEPLOY_USER=<user> MATHCLASS_DEPLOY_SSH_KEY=<key> \
 ./deploy.sh

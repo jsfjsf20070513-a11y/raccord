@@ -11,23 +11,6 @@ DEPLOY_HOST="${MATHCLASS_DEPLOY_HOST:-}"
 DEPLOY_USER="${MATHCLASS_DEPLOY_USER:-}"
 REMOTE_DIR="${MATHCLASS_DEPLOY_DIR:-/var/www/MathClassWebsite/dist}"
 SSH_KEY="${MATHCLASS_DEPLOY_SSH_KEY:-}"
-# Optional: path to a sibling private repo that holds the real plate
-# photos and album metadata. When set, scripts/prepare-private-assets.mjs
-# pulls the real albums into this build; otherwise the public-safe
-# placeholder data ships untouched.
-#
-# If unset, fall back to ../MathClassWebsite (the conventional sibling
-# layout) so a deploy from inside MathClassWebsite-public picks up real
-# plates automatically. Setting MATHCLASS_PRIVATE_REPO=skip explicitly
-# disables the injection and forces a placeholder-only build.
-PRIVATE_REPO="${MATHCLASS_PRIVATE_REPO:-}"
-if [ -z "${PRIVATE_REPO}" ] && [ -d "../MathClassWebsite/.git" ]; then
-  PRIVATE_REPO="$(cd ../MathClassWebsite && pwd)"
-fi
-if [ "${PRIVATE_REPO}" = "skip" ]; then
-  PRIVATE_REPO=""
-fi
-
 SSH_OPTS=(
   -i "${SSH_KEY}"
   -o IdentitiesOnly=yes
@@ -44,27 +27,13 @@ if [ ! -f "${SSH_KEY}" ]; then
   exit 1
 fi
 
-# Always clean up any private assets at exit, whether the build succeeds
-# or fails, so the working tree never accidentally retains real photos.
-cleanup() {
-  node scripts/cleanup-private-assets.mjs >/dev/null 2>&1 || true
-}
-trap cleanup EXIT
-
-echo "🔐 [1/4] 准备隐私资源..."
-if [ -n "${PRIVATE_REPO}" ]; then
-  MATHCLASS_PRIVATE_REPO="${PRIVATE_REPO}" node scripts/prepare-private-assets.mjs
-else
-  echo "[prepare] MATHCLASS_PRIVATE_REPO not set — using public-safe placeholders."
-fi
-
-echo "🚀 [2/4] 开始构建静态文件..."
+echo "🚀 [1/3] 开始构建静态文件..."
 npm run build
 
-echo "📦 [3/4] 正在服务器上准备目标目录..."
+echo "📦 [2/3] 正在服务器上准备目标目录..."
 ssh "${SSH_OPTS[@]}" "${DEPLOY_USER}@${DEPLOY_HOST}" "mkdir -p '${REMOTE_DIR}'"
 
-echo "📤 [4/4] 开始同步静态文件..."
+echo "📤 [3/3] 开始同步静态文件..."
 rsync -av --delete \
   -e "ssh -i '${SSH_KEY}' -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" \
   dist/ "${DEPLOY_USER}@${DEPLOY_HOST}:${REMOTE_DIR}/"

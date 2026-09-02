@@ -1,17 +1,26 @@
-# MathClassWebsite-public(双语链上版)· 文档导航
+# 文档导航 · raccord
 
-> 2026-06-09 文档治理。-public 文档已精简,这里做导航。
+> 2026-09-02 重写。旧版是 2026-06-09 的 MathClassWebsite-public 黑客松导航,所指文件已全部删除。
 
-## 从这里开始(仓库根)
-- [`../README.md`](../README.md) — 项目总览(评委 5 分钟可验证清单在顶部)
-- [`../CLAUDE.md`](../CLAUDE.md) — 给 AI 的上下文(Solana/链上/不可逆风险)
-- [`../hackathon_application_materials.md`](../hackathon_application_materials.md) — Dev3pack 最终提交材料
-- [`../GITHUB_RELEASE_CHECKLIST.md`](../GITHUB_RELEASE_CHECKLIST.md) — 开源发布清单
+## 先读(仓库根)
+- [`../CLAUDE.md`](../CLAUDE.md) —— 唯一正本:身份、产品意图、红线、分支现状(`AGENTS.md` 是软链)
+- [`../CONTEXT.md`](../CONTEXT.md) —— 领域语言(作者作品 / 出生坐标 / 世界 / 章节 / 思想化身 / 相遇)
+- [`../README.md`](../README.md) —— 对外总览
 
-## 活文档(docs/)
-- [`anchor-program.md`](anchor-program.md) — `class_anchor` Rust Anchor 程序(program ID + deploy)
-- [`dev3pack_submission_playbook.md`](dev3pack_submission_playbook.md) — Dev3pack 提交手册
-- [`demo_video_script.md`](demo_video_script.md) — Demo 视频脚本
-- [`cn-global-delivery.md`](cn-global-delivery.md) — 国内/全球访问交付
+## 现行:产品意图
+- [`design/product-constitution.md`](design/product-constitution.md) —— 三世界产品宪法 v1.0
+- [`design/author-work-transition-resolution.md`](design/author-work-transition-resolution.md) —— 作者作品转向决议 v1.0(07-23)
+- [`design/constitution-audit-2026-07-13.md`](design/constitution-audit-2026-07-13.md) —— 合宪审判
+- [`design/worlds-research-2026-07-12.md`](design/worlds-research-2026-07-12.md)、[`design/class-identity-research-2026-07-14.md`](design/class-identity-research-2026-07-14.md)、[`design/cross-disciplinary-github-atlas-2026-07-13.md`](design/cross-disciplinary-github-atlas-2026-07-13.md)、[`design/plan-center-prototypes-2026-07-14.md`](design/plan-center-prototypes-2026-07-14.md) —— 研究记录
+- [`design/audit-2026-07-16/`](design/audit-2026-07-16/) —— 07-16 视觉审计留证(只保留被 audit.md 引用的图)
 
-> 本库已 MIT 开源:`github.com/jsfjsf20070513-a11y/MathClassWebsite-public`。
+## 部署
+- [`../deployment/RACCORD_DEPLOY.md`](../deployment/RACCORD_DEPLOY.md) —— 上线 runbook(配合 raccord-deploy skill)
+- [`../deployment/nginx/`](../deployment/nginx/) —— raccord 子域 nginx 配置
+
+## 归档(只作历史,不是契约)
+- [`archive/handoff-2026-07/`](archive/handoff-2026-07/) —— 07-23 交接单 ×2 + design-qa;目标路径 `math_网站/MathClassWebsite-public` 与 `/tmp` 截图均已不存在
+
+## 在途分支(不在 main)
+- `wip/horizon-immobile`:第二章 Foucault 摆代码 + `docs/design/foucault/` 方向稿 + 两份 HANDOFF
+- `codex/world-chapter-constitution`:宪法 v2 + 章节制作协议

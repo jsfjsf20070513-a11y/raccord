@@ -35,7 +35,6 @@ ssh <user>@149.28.69.75 'ln -sf /etc/nginx/sites-available/raccord.conf /etc/ngi
 ## 3. 构建 + 部署(本地,发布源只能是 public 仓的 main)
 
 ```bash
-MATHCLASS_PRIVATE_REPO=skip \
 MATHCLASS_DEPLOY_DIR=/var/www/raccord/dist \
 MATHCLASS_DEPLOY_HOST=149.28.69.75 \
 MATHCLASS_DEPLOY_USER=<user> \
@@ -43,7 +42,7 @@ MATHCLASS_DEPLOY_SSH_KEY=<key路径> \
 ./deploy.sh
 ```
 
-- **`MATHCLASS_PRIVATE_REPO=skip` 是 Raccord 站的固定口径**:不注入真实班级照片
+- 照片注入链路已于 2026-09-02 从 deploy.sh 删除,`MATHCLASS_PRIVATE_REPO` 不再被读取;真实班级照片永不随 Raccord。
   (占位图构建)。班级照片只属于旧站——这与"站面不出现班级信息"的拍板一致。
 - `MATHCLASS_DEPLOY_DIR` 必须是 `/var/www/raccord/dist`。**漏设会写进旧站目录、
   把班级站覆盖成 Raccord——这是本 runbook 的头号事故位。**
