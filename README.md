@@ -1,71 +1,56 @@
 # Raccord
 
-> 同一件作品,三种目光。⬜ 未首发。
+Raccord 是一个独立的交互作品。目前只有入口和《Le ciel de Poincaré》这一章。
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square)](LICENSE)
+入口可以选择 PLAN、Carnet 或 Limite。PLAN 改变初始位置，Carnet 展示留下的记录，Limite 施加载荷并留下痕迹。三者读取同一份章节状态，切换时也使用这份状态绘制过场。
 
-**Raccord** 是一个作者数字作品站——数学班是它的出生坐标,但它不再是"班级官网"。
-目前**没有上线**:`raccord.rucmathclass.com` 是 301 跳回主站的占位,2026-08-06 作者明示暂缓首发。
-第一章 **《Le ciel de Poincaré》** 已于 2026-07-23 获作者认可成立。
+这是纯静态 React 应用，没有账号、数据库、AI 接口或后台。图片和字体随站点一起提供。浏览器存储不可用时仍能体验，只是不保证刷新后保留记录。
 
-> 本仓 2026-08-25 自 [`rucmathclass`](https://github.com/jsfjsf20070513-a11y/rucmathclass) 拆出(完整保留共同历史)。
-> 线上 `rucmathclass.com` 属于那边的班级网站线,与本仓互不部署。
+## 开发
 
-## 三个世界
-
-三个世界不是三个功能部门,而是同一件作品当前使用的三种表现形式:
-
-| 世界 | 表现语言 | 谱系 |
-|---|---|---|
-| **Carnet** | 纸页:边注、驻留显影 | `#fbfaf6 / #201d1a / #7f302b`,EB Garamond + Noto Serif SC |
-| **PLAN ℝ** | 工程图:方格与制图结构 | `#efede6 / #171716 / #2e3fbd`,主标题 Archivo 900 |
-| **Limite** | 暗色仪器:无量纲载荷试验 | `#12100e / #e9e3d9 / #d9614d`,Archivo + JetBrains Mono |
-
-当前 edition 以同一件 `Raccord 01` 连续曲线贯穿三界:PLAN 用 Bézier 控制柄把两段曲线从 G⁰ 接向 C²,Limite 把同一曲线置于 A350 启发的载荷试验,Carnet 以 Cauchy / Bergson 的边注追问连续与同一。控制柄是三界共享且持久化的对象(`localStorage.raccord_artifact_v1`),数值逻辑保持在 `components/material/raccordWorldMath.js` 的可测试纯函数里。
-
-站面不出现作者姓名与班级信息(2026-07-23 拍板);Web3 前端已退役,链上程序与文档已于 2026-09-02 删除(历史在 git)。
-
-## 分支
-
-- `main` — 干净基线(2026-08-06 切换改造合并后),留作首发发布源。
-- `wip/horizon-immobile`、`codex/world-chapter-constitution` — 2026-08-10 停工时的两个平行方向快照(Horizon 页 vs 产品宪法 v2),复工第一件事是裁定主方向。
-
-## 本地开发
+使用 `.nvmrc` 指定的 Node 版本。
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-质量闸:
+提交前运行：
 
 ```bash
-npm run lint && npm test && npm run build
+npm run check
+npm run build
 ```
 
-`predev` / `prebuild` 自动运行定理预渲染与 health 生成。
+`check` 包含架构检查、lint 和测试。构建结果在 `dist/`，不会改动源码。`npm run preview` 可以预览构建结果。
 
-## 数据库与安全
+## 代码怎么找
 
-与 `rucmathclass` **共用同一个 Supabase 项目**,RLS 是唯一且共享的安全边界:
+| 目录 | 放什么 |
+| --- | --- |
+| `src/app/` | 路由、页面外壳、404，以及入口和章节的组合 |
+| `src/entrance/` | 选世界的入口；桌面、手机各有自己的组件 |
+| `src/chapters/poincare/` | 庞加莱章节、三界页面、绘图和状态保存 |
+| `src/chapters/poincare/domain/` | 轨迹计算和状态变化；不依赖 React 或浏览器 |
+| `src/shared/` | 世界选择、屏幕尺寸、本地存储适配、通用指针与材质、全局样式 |
+| `scripts/` | 架构检查、构建元信息和静态发布 |
 
-- 权威 RLS 状态是 [`harden_rls.sql`](harden_rls.sql);建表按需执行 `setup_*.sql`。
-- `comments.user_email` 对 anon 遮蔽;角色提升只经 `public.is_super_admin()`。
-- 寄语表未创建时 `/testimonials` 优雅降级为只读。
-- AI / 语音密钥只存在于共享 Cloudflare Worker(`mathclass-ai`)的 secrets;**Worker 配置正本在班级侧仓**,本仓首发前需把 raccord 路由与 CORS 源合并进那边的配置再部署。
+依赖方向由 `scripts/check-architecture.mjs` 检查：应用层组合入口和章节；入口、章节可以使用共享代码；共享代码不能反向依赖页面。不同章节不能直接引用彼此的实现。纯计算目录不访问浏览器。
 
-## 部署(首发时)
+桌面与手机以 760px 为界，每次只挂载一套页面。章节状态由路由上方持有，切换世界、返回入口、调整窗口都使用同一份状态。
 
-发布源 = 本仓 `main`。必须显式:
+## 本地记录
 
-```bash
-MATHCLASS_DEPLOY_DIR=/var/www/raccord/dist \
-MATHCLASS_DEPLOY_HOST=<host> MATHCLASS_DEPLOY_USER=<user> MATHCLASS_DEPLOY_SSH_KEY=<key> \
-./deploy.sh
-```
+- `raccord_world_v1`：最近的世界。
+- `raccord_visited_v1`：是否已进入作品。
+- `poincare_sky_v1`：初始位置、最近七次记录和第一道痕迹。
 
-`MATHCLASS_DEPLOY_DIR` 漏设会落到班级站的线上目录——绝不允许;真实班级照片永不随 Raccord 部署。完整步骤见 [`deployment/RACCORD_DEPLOY.md`](deployment/RACCORD_DEPLOY.md)。
+旧版本的 `carnet_world`、`carnet_visited` 只用于读取已有选择，之后写入新键。没有迁移或删除任何云端数据。
 
-## License
+## 发布
 
-[MIT](LICENSE)
+普通开发不需要环境变量。正式域名通过 `RACCORD_SITE_URL` 提供；配置后构建会生成对应的 canonical 和 sitemap。未配置时不猜测域名。
+
+发布步骤见 [deployment/RACCORD_DEPLOY.md](deployment/RACCORD_DEPLOY.md)。`health.json` 在构建时生成，包含应用名、版本、源码提交和构建时间。仓库中的模板不代表线上已经部署。
+
+历史实现和旧设计记录留在 Git 历史中，不作为当前代码说明。现在的代码事实以实现和检查结果为准。

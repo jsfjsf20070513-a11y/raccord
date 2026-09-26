@@ -1,0 +1,16 @@
+# Replace work.example.org before installing. Serve only this site's directory.
+server {
+    listen 80;
+    server_name work.example.org;
+    root /var/www/raccord/dist;
+    index index.html;
+
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" always;
+
+    location = /health.json { expires -1; try_files $uri =404; }
+    location /assets/ { try_files $uri =404; }
+    location /fonts/ { try_files $uri =404; }
+    location / { try_files $uri $uri/ /index.html; }
+}

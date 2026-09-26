@@ -1,77 +1,30 @@
-# Raccord 上线 runbook — raccord.rucmathclass.com
+# 发布 Raccord
 
-> 背景(2026-08-06):math 线切分为 Raccord / 班级网站 两线。旧站 `rucmathclass.com`
-> 与其线上构建**永久归班级网站线,全程不动**;Raccord 上子域名成为独立新站。
-> Cloudflare DNS 已加 `raccord` A 记录 → 149.28.69.75(橙云,HTTPS 在边缘终止)。
->
-> **授权闸**:以下每个生产动作都须作者原文点名(同 mathclass-deploy 第 0 闸),
-> 概括性"上线吧/发个版"不算。
+这里发布的是静态文件，不包含数据库、账号服务或 Worker。当前仓库不能证明服务器或域名已经配置好。
 
-## 0. 前提
+## 准备
 
-- 本分支(域名改造 + Worker 路由 + 本 runbook)已合并 main,从 main 发布。
-- 本地预检三连绿:`npm ci && npm run lint && npm test`,`npm run build` 通过。
+先取得用户明确的发布授权。检查待发布分支和提交，确认工作区干净，再运行 `npm ci`。
 
-## 1. Worker 路由(Cloudflare 边缘)
+服务器需要为作品配置独立的域名和目录。`nginx/raccord.conf.example` 是模板，安装前替换示例域名，并由实际托管环境提供 HTTPS。不要安装其他项目的配置。SSH 主机指纹须事先核对并加入 known_hosts；脚本不会自动接受新指纹。
+
+发布脚本只接受以下变量，不读取其他项目的配置：
 
 ```bash
-cd worker && npx wrangler deploy
-```
-
-- `wrangler.toml` 已含 `raccord.rucmathclass.com` 的 `/api/chat`、`/api/speak*` 两条路由;
-  与旧域名路由同一个 Worker、同一套 secret(GEMINI/ELEVENLABS),**不需重设 secret**。
-- 需要 wrangler 已登录该 Cloudflare 账号(`npx wrangler whoami` 自查)。
-
-## 2. nginx(VPS 149.28.69.75)
-
-```bash
-scp deployment/nginx/raccord-security-headers.conf <user>@149.28.69.75:/etc/nginx/snippets/
-scp deployment/nginx/raccord.conf <user>@149.28.69.75:/etc/nginx/sites-available/
-ssh <user>@149.28.69.75 'ln -sf /etc/nginx/sites-available/raccord.conf /etc/nginx/sites-enabled/raccord.conf && nginx -t && systemctl reload nginx'
-```
-
-- `nginx -t` 不过就停,别 reload。reload 平滑,不影响旧站与青协。
-
-## 3. 构建 + 部署(本地,发布源只能是 public 仓的 main)
-
-```bash
-MATHCLASS_DEPLOY_DIR=/var/www/raccord/dist \
-MATHCLASS_DEPLOY_HOST=149.28.69.75 \
-MATHCLASS_DEPLOY_USER=<user> \
-MATHCLASS_DEPLOY_SSH_KEY=<key路径> \
+export RACCORD_SITE_URL=https://作品域名
+export RACCORD_DEPLOY_HOST=服务器地址
+export RACCORD_DEPLOY_USER=发布用户
+export RACCORD_DEPLOY_SSH_KEY=/密钥的绝对路径
+export RACCORD_DEPLOY_DIR=/var/www/raccord/dist
 ./deploy.sh
 ```
 
-- 照片注入链路已于 2026-09-02 从 deploy.sh 删除,`MATHCLASS_PRIVATE_REPO` 不再被读取;真实班级照片永不随 Raccord。
-  (占位图构建)。班级照片只属于旧站——这与"站面不出现班级信息"的拍板一致。
-- `MATHCLASS_DEPLOY_DIR` 必须是 `/var/www/raccord/dist`。**漏设会写进旧站目录、
-  把班级站覆盖成 Raccord——这是本 runbook 的头号事故位。**
+目标目录固定为 `/var/www/raccord/dist`。漏配、错误目录、无效主机或密钥会在联网前被拒绝。脚本从自身目录运行检查和构建，确认产物属于 Raccord 后才同步 `dist/`。同步使用 `rsync --delete`，因此这个目录必须只存本站的构建产物，不能存用户文件或其他服务的数据。
 
-## 4. 验证(两站都要查)
+## 验证与回退
 
-```bash
-# 新站活了:buildTime 应是"刚刚"
-curl -fsS https://raccord.rucmathclass.com/health.json
-curl -fsS -o /dev/null -w "%{http_code}\n" https://raccord.rucmathclass.com/
-# 旧站没被动过:buildTime 应仍是 2026-06-24
-curl -fsS https://rucmathclass.com/health.json
-```
+发布前保存当前站点的构建产物及 `health.json`，用于回退。发布后访问作品域名的 `/health.json`，确认 `app` 为 `raccord`，`buildTime` 与本次 `dist/health.json` 一致。不要拿其他域名或裸 IP 的默认站点作比较。
 
-- `/api` 通不通:打开 `https://raccord.rucmathclass.com/assistant` 发一条消息
-  (请求体结构以 `worker/src/index.js` 为准,别用猜的 curl 体)。
-- 肉眼确认新站**没有**真实班级照片(应为占位图/无照片)。
+再打开入口，走完 PLAN → Carnet → Limite → PLAN，并检查手机页面。没有账号或 API 可供验证。
 
-## 5. Supabase(工具页登录/找回密码)
-
-Dashboard → Authentication → URL Configuration → Additional Redirect URLs 添加:
-
-```
-https://raccord.rucmathclass.com/reset-password
-```
-
-- REST / realtime 不按 Origin 拦,anon key + RLS 照常,无其他改动。
-
-## 回滚
-
-新站出问题:`rm /etc/nginx/sites-enabled/raccord.conf && nginx -t && systemctl reload nginx`
-即回到"子域名 301 到旧站"的状态;旧站从头到尾不受影响。
+需要回退时，把发布前保存的本站构建重新同步到同一目录，再核对 health。不要删除或改动其他站点来代替回退。
