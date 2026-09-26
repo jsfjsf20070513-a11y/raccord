@@ -148,13 +148,6 @@ export default function PoincareLimitField({ compact = false, artifact, onThresh
     event.preventDefault()
     playback.pause()
   }
-  const result = observation.crossing !== null
-    ? `发现分岔：在 ${Math.round(observation.crossing * 100)}% 处，间距首次达到起始的 18 倍。`
-    : observation.complete
-      ? '这段轨迹走完了，间距始终没有达到起始的 18 倍。换个起点，还会这样吗？'
-      : sky.thresholdProgress === null
-        ? '这次没有红线。推进到末尾，看看两条轨迹会怎样。'
-        : '试着停在红线附近，看看细小的差别什么时候被放大。'
 
   return (
     <>
@@ -176,33 +169,24 @@ export default function PoincareLimitField({ compact = false, artifact, onThresh
       onLostPointerCapture={release}
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
-      onBlur={(event) => { if (!event.relatedTarget?.closest('.poincare-playback')) release() }}
+      onBlur={(event) => { if (!event.relatedTarget?.closest('.poincare-field-tools')) release() }}
     >
       <canvas ref={canvasRef} aria-hidden="true" />
 
     </section>
-    <div className="poincare-playback" data-playing={playback.playing}>
-      <div className="poincare-readings" aria-live="off">
-        <span>进度 <strong>{Math.round(playback.progress * 100)}%</strong></span>
-        <span>间距 <strong>{observation.ratio.toFixed(1)}×</strong></span>
-        <span>已见最大 <strong>{observation.maxRatio.toFixed(1)}×</strong></span>
-      </div>
+    <div className="poincare-field-tools" data-playing={playback.playing} data-crossing={observation.crossing ?? 'none'}>
+      <button type="button" onClick={playback.toggle} disabled={passageActive || playback.progress === 1}>
+        {playback.playing ? '暂停' : playback.progress === 1 ? '终点' : '推进'}
+      </button>
       <input
         type="range" min="0" max="1000" step="1"
         value={Math.round(playback.progress * 1000)}
         style={{ '--playback-progress': `${playback.progress * 100}%` }}
         onChange={(event) => playback.seek(Number(event.target.value) / 1000)}
-        aria-label="轨迹进度" aria-valuetext={`${Math.round(playback.progress * 100)}%`}
+        aria-label="轨迹进度" aria-valuetext={`${Math.round(playback.progress * 100)}%，间距为起始的 ${observation.ratio.toFixed(1)} 倍`}
         disabled={passageActive}
       />
-      <div className="poincare-playback-actions">
-        <button type="button" onClick={playback.toggle} disabled={passageActive || playback.progress === 1}>
-          {playback.playing ? '暂停' : playback.progress === 1 ? '已看完' : playback.progress > 0 ? '继续推进' : '开始推进'}
-        </button>
-        <button type="button" onClick={playback.restart} disabled={passageActive || playback.progress === 0}>从头重放</button>
-      </div>
-      <p className="poincare-result" role="status">{result}</p>
-      <p className="poincare-reading-note">倍数来自模型中的距离；画面是它的另一种表达。</p>
+      <button type="button" onClick={playback.restart} disabled={passageActive || playback.progress === 0}>重来</button>
     </div>
     </>
   )

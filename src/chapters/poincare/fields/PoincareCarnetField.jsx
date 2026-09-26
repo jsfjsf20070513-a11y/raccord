@@ -70,7 +70,7 @@ function drawWitness(context, signature, artifact, width, height, padding, compa
   context.stroke()
 }
 
-export default function PoincareCarnetField({ compact = false, artifact, passageActive = false }) {
+export default function PoincareCarnetField({ compact = false, artifact, onRecall, passageActive = false }) {
   const [revealed, setRevealed] = useState(false)
   const canvasRef = useRef(null)
   const hostRef = useRef(null)
@@ -78,6 +78,10 @@ export default function PoincareCarnetField({ compact = false, artifact, passage
   const readingRef = useRef({ active: false, x: 0, y: 0 })
   const drawRef = useRef(() => {})
   const memory = useMemo(() => artifact?.memory || [], [artifact?.memory])
+  const choices = memory.filter((entry, index) => memory.findLastIndex((other) => other.seed.x === entry.seed.x && other.seed.y === entry.seed.y) === index)
+  const selectedIndex = choices.findIndex((entry) => entry.seed.x === artifact.seed.x && entry.seed.y === artifact.seed.y)
+  const previous = selectedIndex < 0 ? choices.at(-1) : choices[selectedIndex - 1]
+  const next = choices[selectedIndex + 1]
   const seed = useMemo(() => normalizePoincareSeed(artifact?.seed), [artifact?.seed])
   const currentSky = useMemo(() => createPoincareSky(seed), [seed])
   const currentSignature = useMemo(() => createPoincareSignature(currentSky, 7), [currentSky])
@@ -190,11 +194,12 @@ export default function PoincareCarnetField({ compact = false, artifact, passage
       <canvas ref={canvasRef} aria-hidden="true" />
 
     </section>
-    <div className="poincare-reveal-control">
+    <div className="poincare-field-tools">
+      <button type="button" onClick={() => onRecall(previous.id)} disabled={passageActive || !previous} aria-label="找回上一个起点">上一笔</button>
       <button type="button" onClick={() => setRevealed((current) => !current)} aria-pressed={revealed} disabled={passageActive}>
-        {revealed ? '收起笔迹' : '展开全部笔迹'}
+        {revealed ? '收起' : '显影'}
       </button>
-      <span>{memory.length ? `${memory.length} 个起点留在这里` : '你的选择会留下笔迹'}</span>
+      <button type="button" onClick={() => onRecall(next.id)} disabled={passageActive || !next} aria-label="找回下一个起点">下一笔</button>
     </div>
     </>
   )

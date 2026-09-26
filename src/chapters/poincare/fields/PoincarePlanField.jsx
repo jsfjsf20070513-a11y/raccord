@@ -214,8 +214,6 @@ export default function PoincarePlanField({ compact = false, artifact, seed, onS
       onKeyDown={handleKeyDown}
     >
       <canvas ref={canvasRef} aria-hidden="true" />
-      <output className="poincare-coordinate">x₀ {safeSeed.x.toFixed(3)} · y₀ {safeSeed.y.toFixed(3)}</output>
-      {artifact?.memory?.length === 0 && <span className="poincare-pin-hint" style={{ left: `${safeSeed.x * 100}%`, top: `${safeSeed.y * 100}%` }}>拖动这个点</span>}
     </section>
   )
 }

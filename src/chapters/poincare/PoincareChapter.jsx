@@ -35,7 +35,6 @@ export default function PoincareChapter({ poincare }) {
       artifact: poincare.artifact,
       onSeedChange: poincare.changeSeed,
       onSeedCommit: poincare.rememberSeed,
-      onPassage: () => beginPassage('carnet'),
     }
   } else if (world === 'limite') {
     WorldHome = isMobile ? LimiteHomeMobile : LimiteHomeDesktop
@@ -43,14 +42,12 @@ export default function PoincareChapter({ poincare }) {
       artifact: poincare.artifact,
       onThreshold: poincare.recordThreshold,
       onObserve: poincare.recordObservation,
-      onPassage: () => beginPassage('plan'),
     }
   } else {
     WorldHome = isMobile ? CarnetHomeMobile : CarnetHomeDesktop
     worldProps = {
       artifact: poincare.artifact,
       onRecall: poincare.recallMemory,
-      onPassage: () => beginPassage('limite'),
     }
   }
   worldProps.onWorld = beginPassage

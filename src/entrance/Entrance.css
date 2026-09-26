@@ -84,7 +84,7 @@
   border: 0;
   color: var(--enter-ink);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.2em;
   line-height: 1;
@@ -302,26 +302,6 @@
   background-size: 21px 21px;
 }
 
-.poster-plan-index,
-.poster-plan-coordinate,
-.poster-carnet-folio,
-.poster-carnet-formula,
-.poster-limite-index,
-.poster-limite-readout,
-.poster-limite-threshold {
-  position: absolute;
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-}
-
-.poster-plan-index {
-  left: 13px;
-  top: 11px;
-  color: #1a23e6;
-  font-size: 11px;
-  letter-spacing: 0.15em;
-}
-
 .poster-plan-r {
   position: absolute;
   right: 11px;
@@ -346,26 +326,10 @@
 .poster-plan-axis-x { width: 38%; height: 1px; }
 .poster-plan-axis-y { width: 1px; height: 46%; }
 
-.poster-plan-coordinate {
-  left: 19px;
-  bottom: 7px;
-  color: #121211;
-  font-size: 7px;
-  letter-spacing: 0.12em;
-}
-
 /* Le Carnet — French: authored book, memory, ink and imprint. */
 .enter-page.enter-portal .world-poster-carnet {
   color: #1a1a1a;
   box-shadow: inset 0 0 0 7px rgba(111, 17, 22, 0.025);
-}
-
-.poster-carnet-folio {
-  left: 13px;
-  top: 11px;
-  color: rgba(26, 26, 26, 0.5);
-  font-size: 7px;
-  letter-spacing: 0.15em;
 }
 
 .poster-carnet-c {
@@ -378,15 +342,6 @@
   font-weight: 500;
   line-height: 1;
   transform: translate(-50%, -50%);
-}
-
-.poster-carnet-formula {
-  right: 13px;
-  bottom: 9px;
-  color: rgba(26, 26, 26, 0.58);
-  font-size: 7px;
-  letter-spacing: 0.08em;
-  text-transform: none;
 }
 
 .poster-carnet-rule {
@@ -407,14 +362,6 @@
   background: #100d0b;
 }
 
-.poster-limite-index {
-  left: 13px;
-  top: 11px;
-  color: #ff4d2e;
-  font-size: 7px;
-  letter-spacing: 0.15em;
-}
-
 .poster-limite-epsilon {
   position: absolute;
   left: 15px;
@@ -427,35 +374,11 @@
   transform: translateY(-50%);
 }
 
-.poster-limite-readout {
-  right: 14px;
-  top: 34%;
-  color: rgba(236, 231, 221, 0.58);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  font-variant-numeric: tabular-nums;
-}
-
-.poster-limite-threshold {
-  right: 14px;
-  bottom: 10px;
-  color: #ff4d2e;
-  font-size: 8px;
-  letter-spacing: 0.1em;
-}
-
 .enter-page.enter-portal .world-portal-meta {
   display: flex;
   align-items: baseline;
   gap: 10px;
   padding: 10px 1px 0;
-}
-
-.enter-page.enter-portal .world-portal-number {
-  color: var(--world-accent);
-  font-family: var(--font-mono);
-  font-size: 8px;
-  letter-spacing: 0.13em;
 }
 
 .enter-page.enter-portal .world-portal-meta strong {
@@ -570,15 +493,3 @@
     background-position: 50% 0;
   }
 }
-
-.enter-invitation {
-  margin: 0 auto 24px;
-  padding: 0 24px;
-  color: var(--enter-ink);
-  font: 400 13px/1.9 "Noto Serif SC", serif;
-  text-align: center;
-  letter-spacing: .06em;
-}
-.enter-invitation span { display: block; font-size: 11px; opacity: .65; }
-.world-portal-action { display: block; margin-top: 8px; color: var(--enter-ink); font: 500 11px/1.5 "Noto Sans SC", sans-serif; opacity: .7; }
-.enter-mobile .world-portal-action { text-align: center; }

@@ -1,33 +1,16 @@
-import ExplorationGuide from '../ExplorationGuide.jsx'
+import { Link } from 'react-router-dom'
+import ChapterControls from '../ChapterControls.jsx'
 import PoincarePlanField from '../fields/PoincarePlanField.jsx'
 import './PoincareChapterDesktop.css'
 
-export default function PlanHomeDesktop({
-  artifact,
-  onWorld,
-  onSeedChange,
-  onSeedCommit,
-  onPassage,
-  passageActive,
-}) {
+export default function PlanHomeDesktop({ artifact, onWorld, onSeedChange, onSeedCommit, passageActive }) {
   return (
     <article className="world-home poincare-chapter-desktop poincare-plan-desktop">
       <header className="poincare-chapter-heading">
-        <span>PLAN ℝ</span>
-        <h1 lang="fr">Le ciel de Poincaré</h1>
-        <span>t = 0</span>
+        <h1><Link to="/enter" lang="fr" aria-label="Le ciel de Poincaré，返回入口">Le ciel de Poincaré</Link></h1>
       </header>
-      <ExplorationGuide world="plan" artifact={artifact} onWorld={onWorld} disabled={passageActive} />
-      <PoincarePlanField
-        artifact={artifact}
-        passageActive={passageActive}
-        onSeedChange={onSeedChange}
-        onSeedCommit={onSeedCommit}
-      />
-      <footer className="poincare-chapter-passage">
-        <span>01 / 03</span>
-        <button type="button" onClick={onPassage} disabled={passageActive}>去找回过去 →</button>
-      </footer>
+      <PoincarePlanField artifact={artifact} passageActive={passageActive} onSeedChange={onSeedChange} onSeedCommit={onSeedCommit} />
+      <ChapterControls world="plan" artifact={artifact} onWorld={onWorld} disabled={passageActive} />
     </article>
   )
 }

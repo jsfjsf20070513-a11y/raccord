@@ -4,7 +4,7 @@ import { WORLD_LABELS } from '../shared/world/worlds'
 export default function DesktopLayout({ world, isHome }) {
   return (
     <div className={`site-shell world-site-shell site-layout-desktop has-quiet-header${isHome ? ' is-world-home' : ''}`} data-site-world={world}>
-      <header className="site-header world-site-header">
+      {!isHome && <header className="site-header world-site-header">
         <div className="site-header-inner world-site-header-inner">
           <div className="site-brand-lockup">
             <Link to="/" className="site-wordmark">Raccord</Link>
@@ -15,7 +15,7 @@ export default function DesktopLayout({ world, isHome }) {
             <Link to="/enter" className="site-world-switch" aria-label="切换视觉世界">⇄ <span>changer</span></Link>
           </div>
         </div>
-      </header>
+      </header>}
       <main className="site-main world-site-main"><Outlet /></main>
     </div>
   )

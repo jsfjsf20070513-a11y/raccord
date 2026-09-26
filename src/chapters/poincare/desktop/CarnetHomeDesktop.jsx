@@ -1,23 +1,16 @@
-import PoincareMemory from '../PoincareMemory.jsx'
-import ExplorationGuide from '../ExplorationGuide.jsx'
+import { Link } from 'react-router-dom'
+import ChapterControls from '../ChapterControls.jsx'
 import PoincareCarnetField from '../fields/PoincareCarnetField.jsx'
 import './PoincareChapterDesktop.css'
 
-export default function CarnetHomeDesktop({ artifact, onWorld, onRecall, onPassage, passageActive }) {
+export default function CarnetHomeDesktop({ artifact, onWorld, onRecall, passageActive }) {
   return (
     <article className="world-home poincare-chapter-desktop poincare-carnet-desktop">
       <header className="poincare-chapter-heading">
-        <span>LE CARNET</span>
-        <h1 lang="fr">Le ciel de Poincaré</h1>
-        <span>mémoire</span>
+        <h1><Link to="/enter" lang="fr" aria-label="Le ciel de Poincaré，返回入口">Le ciel de Poincaré</Link></h1>
       </header>
-      <ExplorationGuide world="carnet" artifact={artifact} onWorld={onWorld} disabled={passageActive} />
-      <PoincareCarnetField artifact={artifact} passageActive={passageActive} />
-      <PoincareMemory artifact={artifact} onRecall={onRecall} onWorld={onWorld} disabled={passageActive} />
-      <footer className="poincare-chapter-passage">
-        <span>02 / 03</span>
-        <button type="button" onClick={onPassage} disabled={passageActive}>带它去看未来 →</button>
-      </footer>
+      <PoincareCarnetField artifact={artifact} passageActive={passageActive} onRecall={onRecall} />
+      <ChapterControls world="carnet" artifact={artifact} onWorld={onWorld} disabled={passageActive} />
     </article>
   )
 }
