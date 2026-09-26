@@ -2,7 +2,7 @@
   position: relative;
   left: 50%;
   width: 100vw;
-  min-height: calc(100svh - 58px);
+  min-height: max(650px, calc(100svh - 58px));
   margin-left: -50vw;
   overflow: hidden;
 }
@@ -64,8 +64,8 @@
   border-top: 1px solid currentColor;
   background: transparent;
   color: inherit;
-  font: 400 10px/1 "JetBrains Mono", monospace;
-  letter-spacing: .16em;
+  font: 500 12px/1.5 "Noto Sans SC", sans-serif;
+  letter-spacing: .06em;
   text-align: right;
   cursor: pointer;
   pointer-events: auto;
@@ -78,9 +78,9 @@
   outline: none;
 }
 
-.poincare-plan-desktop { min-height: calc(100svh - 58px); color: #2e3fbd; background: #efede6; }
-.poincare-carnet-desktop { color: #7f302b; background: #fbfaf6; }
-.poincare-limite-desktop { color: #d9614d; background: #12100e; }
+.poincare-plan-desktop { min-height: max(650px, calc(100svh - 58px)); color: #2e3fbd; background: #efede6 url('/assets/poincare/plan-relief.png') center / cover; }
+.poincare-carnet-desktop { color: #7f302b; background: #fbfaf6 url('/assets/poincare/carnet-relief.png') center / cover; }
+.poincare-limite-desktop { color: #d9614d; background: #12100e url('/assets/poincare/limite-relief.png') center / cover; }
 
 .poincare-plan-desktop .poincare-chapter-heading h1 { color: #171716; }
 .poincare-carnet-desktop .poincare-chapter-heading h1 { color: #7f302b; }

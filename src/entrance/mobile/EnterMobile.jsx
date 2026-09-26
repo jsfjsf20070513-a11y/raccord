@@ -41,6 +41,7 @@ export default function EnterMobile({ worlds, onSelect }) {
             {activeWorld ? activeWorld.hero : <><span>TROIS</span><span>MONDES</span></>}
           </h1>
         </main>
+        <p className="enter-invitation">移动一个起点，看看它如何穿过三个世界。<span>第一次来，可以从 PLAN 开始。</span></p>
         <nav className="enter-worlds" aria-label="Trois mondes">
           {worlds.map((entry, index) => (
             <ScrollAwaken key={entry.id} index={index}>

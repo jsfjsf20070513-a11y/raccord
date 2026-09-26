@@ -2,6 +2,8 @@ import { useCallback } from 'react'
 import WorldMaterialField from './WorldMaterialField.jsx'
 import usePointerField from '../../shared/material/usePointerField.js'
 
+const ACTIONS = { plan: '改变起点', carnet: '找回过去', limite: '推进未来' }
+
 function PosterArtwork({ world }) {
   if (world === 'plan') {
     return (
@@ -62,7 +64,7 @@ export default function WorldPortalCard({
       data-stage-quiet={isStageQuiet ? 'true' : 'false'}
       style={{ '--awaken-progress': awakenProgress }}
       onClick={() => onSelect(world.id)}
-      aria-label={world.name}
+      aria-label={`${world.name} · ${ACTIONS[world.id]}`}
     >
       <span className="world-material-frame">
         <PosterArtwork world={world.id} />
@@ -77,6 +79,7 @@ export default function WorldPortalCard({
         <span className="world-portal-number">{world.number}</span>
         <strong>{world.name}</strong>
       </span>
+      <span className="world-portal-action">{ACTIONS[world.id]} →</span>
     </button>
   )
 }

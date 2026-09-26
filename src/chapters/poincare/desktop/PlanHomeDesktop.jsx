@@ -1,8 +1,10 @@
+import ExplorationGuide from '../ExplorationGuide.jsx'
 import PoincarePlanField from '../fields/PoincarePlanField.jsx'
 import './PoincareChapterDesktop.css'
 
 export default function PlanHomeDesktop({
   artifact,
+  onWorld,
   onSeedChange,
   onSeedCommit,
   onPassage,
@@ -15,6 +17,7 @@ export default function PlanHomeDesktop({
         <h1 lang="fr">Le ciel de Poincaré</h1>
         <span>t = 0</span>
       </header>
+      <ExplorationGuide world="plan" artifact={artifact} onWorld={onWorld} disabled={passageActive} />
       <PoincarePlanField
         artifact={artifact}
         passageActive={passageActive}
@@ -23,7 +26,7 @@ export default function PlanHomeDesktop({
       />
       <footer className="poincare-chapter-passage">
         <span>01 / 03</span>
-        <button type="button" onClick={onPassage}>LE CARNET</button>
+        <button type="button" onClick={onPassage} disabled={passageActive}>去找回过去 →</button>
       </footer>
     </article>
   )

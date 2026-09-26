@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { createPoincareSignature, createPoincareSky, separationAtProgress } from '../domain/poincareSkyMath.js'
+import { useEffect, useMemo, useRef } from 'react'
+import { createPoincareSignature, createPoincareSky, observePoincareSky } from '../domain/poincareSkyMath.js'
 import usePointerField from '../../../shared/material/usePointerField.js'
+import usePoincarePlayback from '../usePoincarePlayback.js'
 import './PoincareSkyFields.css'
 
 const BONE = '#e9e3d9'
@@ -11,19 +12,19 @@ function rgba(hex, alpha) {
   return `rgba(${(value >> 16) & 255}, ${(value >> 8) & 255}, ${value & 255}, ${alpha})`
 }
 
-export default function PoincareLimitField({ compact = false, artifact, onThreshold, passageActive = false }) {
+export default function PoincareLimitField({ compact = false, artifact, onThreshold, onObserve, passageActive = false }) {
   const seed = artifact?.seed
   const sky = useMemo(() => createPoincareSky(seed), [seed])
   const signature = useMemo(() => createPoincareSignature(sky, 9), [sky])
   const pointerField = usePointerField({ smoothing: compact ? 0.3 : 0.22 })
   const canvasRef = useRef(null)
   const drawRef = useRef(() => {})
-  const frameRef = useRef(0)
-  const lastTimeRef = useRef(0)
-  const pressingRef = useRef(false)
-  const crossedRef = useRef(false)
+  const playback = usePoincarePlayback({ sky, disabled: passageActive, onThreshold, onObserve })
   const progressRef = useRef(0)
-  const [view, setView] = useState({ progress: 0, pressing: false })
+  progressRef.current = playback.progress
+  const observation = observePoincareSky(sky, playback.progress)
+
+  useEffect(() => { drawRef.current(pointerField.getField(), playback.progress) }, [playback.progress, pointerField])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -81,14 +82,17 @@ export default function PoincareLimitField({ compact = false, artifact, onThresh
       context.arc(left, originY, compact ? 1.8 : 2.2, 0, Math.PI * 2)
       context.fill()
 
-      const thresholdProgress = artifact?.scar?.progress || sky.thresholdProgress
-      const thresholdX = left + thresholdProgress * (right - left)
-      context.strokeStyle = rgba(VERMILION, artifact?.scar ? 0.82 : 0.42)
-      context.lineWidth = artifact?.scar ? 0.9 : 0.65
-      context.beginPath()
-      context.moveTo(thresholdX, height * 0.17)
-      context.lineTo(thresholdX, height * 0.82)
-      context.stroke()
+      if (sky.thresholdProgress !== null) {
+        const thresholdX = left + sky.thresholdProgress * (right - left)
+        context.strokeStyle = rgba(VERMILION, progress >= sky.thresholdProgress ? 0.82 : 0.28)
+        context.lineWidth = 0.8
+        context.setLineDash(progress >= sky.thresholdProgress ? [] : [3, 7])
+        context.beginPath()
+        context.moveTo(thresholdX, height * 0.17)
+        context.lineTo(thresholdX, height * 0.82)
+        context.stroke()
+        context.setLineDash([])
+      }
 
       if (field.active > 0.02) {
         const radius = Math.min(width, height) * 0.23
@@ -104,15 +108,7 @@ export default function PoincareLimitField({ compact = false, artifact, onThresh
         }
       }
 
-      const railY = height * 0.89
-      context.strokeStyle = rgba(BONE, 0.25)
-      context.lineWidth = 0.65
-      context.beginPath(); context.moveTo(left, railY); context.lineTo(right, railY); context.stroke()
-      context.strokeStyle = rgba(progress >= sky.thresholdProgress ? VERMILION : BONE, 0.86)
-      context.lineWidth = 1.15
-      context.beginPath(); context.moveTo(left, railY); context.lineTo(left + (right - left) * progress, railY); context.stroke()
-      context.fillStyle = progress >= sky.thresholdProgress ? VERMILION : BONE
-      context.beginPath(); context.arc(left + (right - left) * progress, railY, compact ? 2.4 : 2.8, 0, Math.PI * 2); context.fill()
+
     }
 
     drawRef.current = draw
@@ -133,94 +129,81 @@ export default function PoincareLimitField({ compact = false, artifact, onThresh
     return () => { observer.disconnect(); unsubscribe() }
   }, [artifact?.scar, compact, passageActive, pointerField, signature, sky])
 
-  const animateRef = useRef(() => {})
-  animateRef.current = (time) => {
-    const elapsed = Math.min(48, lastTimeRef.current ? time - lastTimeRef.current : 16)
-    lastTimeRef.current = time
-    if (pressingRef.current) {
-      progressRef.current = Math.min(1, progressRef.current + elapsed / (compact ? 3000 : 3600))
-      if (!crossedRef.current && progressRef.current >= sky.thresholdProgress) {
-        crossedRef.current = true
-        onThreshold?.({
-          progress: sky.thresholdProgress,
-          divergence: separationAtProgress(sky, sky.thresholdProgress),
-          seed: sky.seed,
-        })
-      }
-    } else {
-      progressRef.current = Math.max(0, progressRef.current - elapsed / 720)
-    }
-    drawRef.current(pointerField.getField(), progressRef.current)
-    setView({ progress: progressRef.current, pressing: pressingRef.current })
-    if ((pressingRef.current && progressRef.current < 1) || (!pressingRef.current && progressRef.current > 0)) {
-      frameRef.current = window.requestAnimationFrame(animateRef.current)
-    } else {
-      frameRef.current = 0
-      lastTimeRef.current = 0
-    }
-  }
-
-  const requestFrame = useCallback(() => {
-    if (!frameRef.current) frameRef.current = window.requestAnimationFrame(animateRef.current)
-  }, [])
-
-  useEffect(() => () => window.cancelAnimationFrame(frameRef.current), [])
-
   const begin = (event) => {
-    if (event?.button != null && event.button !== 0) return
-    event?.preventDefault()
-    if (event?.pointerId != null) event.currentTarget.setPointerCapture?.(event.pointerId)
-    pressingRef.current = true
-    crossedRef.current = progressRef.current >= sky.thresholdProgress
-    setView((current) => ({ ...current, pressing: true }))
-    requestFrame()
-  }
-  const release = (event) => {
-    if (event?.pointerId != null && event.currentTarget.hasPointerCapture?.(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId)
-    }
-    pressingRef.current = false
-    setView((current) => ({ ...current, pressing: false }))
-    requestFrame()
-  }
-  const handleKeyDown = (event) => {
-    if (![' ', 'Enter'].includes(event.key) || event.repeat) return
+    if (event.button !== 0 || passageActive) return
     event.preventDefault()
-    if (event.key === 'Enter') {
-      if (pressingRef.current) release()
-      else begin()
-      return
-    }
-    begin()
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+    playback.play()
+  }
+  const release = () => playback.pause()
+  const handleKeyDown = (event) => {
+    if (![' ', 'Enter'].includes(event.key)) return
+    event.preventDefault()
+    if (event.repeat) return
+    if (event.key === 'Enter') playback.toggle()
+    else playback.play()
   }
   const handleKeyUp = (event) => {
     if (event.key !== ' ') return
-    event.preventDefault(); release()
+    event.preventDefault()
+    playback.pause()
   }
+  const result = observation.crossing !== null
+    ? `发现分岔：在 ${Math.round(observation.crossing * 100)}% 处，间距首次达到起始的 18 倍。`
+    : observation.complete
+      ? '这段轨迹走完了，间距始终没有达到起始的 18 倍。换个起点，还会这样吗？'
+      : sky.thresholdProgress === null
+        ? '这次没有红线。推进到末尾，看看两条轨迹会怎样。'
+        : '试着停在红线附近，看看细小的差别什么时候被放大。'
 
   return (
+    <>
     <section
       ref={pointerField.elementRef}
       className={`poincare-field poincare-limit-field${compact ? ' is-compact' : ''}`}
-      data-phase={view.pressing ? 'loading' : view.progress > 0 ? 'unloading' : 'dormant'}
+      data-phase={playback.playing ? 'loading' : playback.progress > 0 ? 'paused' : 'dormant'}
       data-scar={artifact?.scar ? 'present' : 'absent'}
       data-seed={`${sky.seed.x.toFixed(3)},${sky.seed.y.toFixed(3)}`}
       data-passage={passageActive ? 'active' : 'dormant'}
-      data-threshold={sky.thresholdProgress.toFixed(3)}
+      data-threshold={sky.thresholdProgress?.toFixed(3) ?? 'none'}
       role="button"
       tabIndex={0}
-      aria-pressed={view.pressing}
-      aria-label={`Maintenir pour avancer le temps. Entrée verrouille la pression. t ${view.progress.toFixed(2)}`}
+      aria-pressed={playback.playing}
+      aria-label="推进未来：按住画面或空格，松开暂停；回车切换播放"
       onPointerDown={begin}
       onPointerUp={release}
       onPointerCancel={release}
       onLostPointerCapture={release}
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
-      onBlur={release}
+      onBlur={(event) => { if (!event.relatedTarget?.closest('.poincare-playback')) release() }}
     >
       <canvas ref={canvasRef} aria-hidden="true" />
-      <output className="poincare-time">t {view.progress < 0.01 ? '= 0' : `→ ${view.progress.toFixed(2)}`}</output>
+
     </section>
+    <div className="poincare-playback" data-playing={playback.playing}>
+      <div className="poincare-readings" aria-live="off">
+        <span>进度 <strong>{Math.round(playback.progress * 100)}%</strong></span>
+        <span>间距 <strong>{observation.ratio.toFixed(1)}×</strong></span>
+        <span>已见最大 <strong>{observation.maxRatio.toFixed(1)}×</strong></span>
+      </div>
+      <input
+        type="range" min="0" max="1000" step="1"
+        value={Math.round(playback.progress * 1000)}
+        style={{ '--playback-progress': `${playback.progress * 100}%` }}
+        onChange={(event) => playback.seek(Number(event.target.value) / 1000)}
+        aria-label="轨迹进度" aria-valuetext={`${Math.round(playback.progress * 100)}%`}
+        disabled={passageActive}
+      />
+      <div className="poincare-playback-actions">
+        <button type="button" onClick={playback.toggle} disabled={passageActive || playback.progress === 1}>
+          {playback.playing ? '暂停' : playback.progress === 1 ? '已看完' : playback.progress > 0 ? '继续推进' : '开始推进'}
+        </button>
+        <button type="button" onClick={playback.restart} disabled={passageActive || playback.progress === 0}>从头重放</button>
+      </div>
+      <p className="poincare-result" role="status">{result}</p>
+      <p className="poincare-reading-note">倍数来自模型中的距离；画面是它的另一种表达。</p>
+    </div>
+    </>
   )
 }

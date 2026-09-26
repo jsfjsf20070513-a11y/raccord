@@ -5,6 +5,7 @@ import {
   createPoincareSignature,
   createPoincareSky,
   normalizePoincareSeed,
+  observePoincareSky,
   pathBounds,
   separationAtProgress,
 } from './poincareSkyMath.js'
@@ -28,9 +29,34 @@ describe('poincare sky flow', () => {
     const sky = createPoincareSky(POINCARE_DEFAULT_SEED)
     expect(sky.pathA.length).toBe(sky.pathB.length)
     expect(sky.maxDivergence).toBeGreaterThan(POINCARE_DIVERGENCE_THRESHOLD)
-    expect(sky.thresholdProgress).toBeGreaterThanOrEqual(0.38)
-    expect(sky.thresholdProgress).toBeLessThanOrEqual(0.86)
+    expect(sky.thresholdProgress).toBe(sky.thresholdIndex / (sky.separation.length - 1))
     expect(separationAtProgress(sky, 1)).toBeGreaterThan(separationAtProgress(sky, 0))
+  })
+
+  it('reports early and late crossings at their real samples, and never invents a crossing', () => {
+    const early = createPoincareSky({ x: 0.34, y: 0.5 })
+    const late = createPoincareSky({ x: 0.325, y: 0.6 })
+    const quiet = createPoincareSky({ x: 0.325, y: 0.55 })
+    expect(early.thresholdProgress).toBeLessThan(0.38)
+    expect(late.thresholdProgress).toBeGreaterThan(0.86)
+    for (const sky of [early, late]) {
+      expect(sky.separation[sky.thresholdIndex - 1]).toBeLessThan(18)
+      expect(separationAtProgress(sky, sky.thresholdProgress)).toBeGreaterThanOrEqual(18)
+    }
+    expect(quiet.thresholdIndex).toBe(-1)
+    expect(quiet.thresholdProgress).toBeNull()
+    expect(observePoincareSky(quiet, 1)).toMatchObject({ complete: true, crossing: null })
+    const fractional = createPoincareSky({ x: 0.16, y: 0.275 })
+    expect(observePoincareSky(fractional, fractional.thresholdProgress).crossing).toBe(fractional.thresholdProgress)
+  })
+
+  it('only reveals reached samples, including contractions below the initial distance', () => {
+    const sky = { separation: [1, 0.25, 20, 2], thresholdIndex: 2, thresholdProgress: 2 / 3 }
+    expect(observePoincareSky(sky, 1 / 3)).toMatchObject({ ratio: 0.25, maxRatio: 1, crossing: null, complete: false })
+    expect(observePoincareSky(sky, 2 / 3)).toMatchObject({ ratio: 20, maxRatio: 20, crossing: 2 / 3 })
+    expect(observePoincareSky(sky, 5)).toMatchObject({ ratio: 2, maxRatio: 20, complete: true })
+    expect(observePoincareSky(sky, NaN)).toMatchObject({ progress: 0, ratio: 1 })
+    expect(observePoincareSky(sky, -1)).toMatchObject({ progress: 0, ratio: 1 })
   })
 
   it('returns finite projection bounds', () => {

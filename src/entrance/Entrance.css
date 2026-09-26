@@ -570,3 +570,15 @@
     background-position: 50% 0;
   }
 }
+
+.enter-invitation {
+  margin: 0 auto 24px;
+  padding: 0 24px;
+  color: var(--enter-ink);
+  font: 400 13px/1.9 "Noto Serif SC", serif;
+  text-align: center;
+  letter-spacing: .06em;
+}
+.enter-invitation span { display: block; font-size: 11px; opacity: .65; }
+.world-portal-action { display: block; margin-top: 8px; color: var(--enter-ink); font: 500 11px/1.5 "Noto Sans SC", sans-serif; opacity: .7; }
+.enter-mobile .world-portal-action { text-align: center; }
