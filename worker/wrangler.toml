@@ -1,4 +1,4 @@
-name = "mathclass-ai"
+name = "raccord-ai"
 main = "src/index.js"
 compatibility_date = "2025-06-01"
 workers_dev = false
@@ -9,18 +9,7 @@ workers_dev = false
 [vars]
 TTS_VOICE = "Kore"
 
-# 路由:生产域名下的 /api/chat 绑到本 Worker(同域,前端同源调用)。
-# 静态站其余路径仍由 Vultr 源站经 Cloudflare 代理提供;只有 /api/chat 走 Worker。
-[[routes]]
-pattern = "rucmathclass.com/api/chat"
-zone_name = "rucmathclass.com"
-
-# 带通配符,否则 ?text=… 的请求不会匹配路由(会漏到源站)。
-[[routes]]
-pattern = "rucmathclass.com/api/speak*"
-zone_name = "rucmathclass.com"
-
-# Raccord 站(raccord.rucmathclass.com,2026-08-06 切分上线)同一 Worker、同一套 secret:
+# 独立发布目标，仅接管 Raccord 子域；不复用班级站 Worker 或 secret。
 [[routes]]
 pattern = "raccord.rucmathclass.com/api/chat"
 zone_name = "rucmathclass.com"
@@ -34,7 +23,7 @@ zone_name = "rucmathclass.com"
 [[unsafe.bindings]]
 name = "RATE_LIMITER"
 type = "ratelimit"
-namespace_id = "1001"
+namespace_id = "1002"
 simple = { limit = 30, period = 60 }
 
 # ⚠️ API key 绝不写进本文件。它们是 secret:

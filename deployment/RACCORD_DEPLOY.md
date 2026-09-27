@@ -1,77 +1,36 @@
-# Raccord 上线 runbook — raccord.rucmathclass.com
+# Raccord 的运行和发布边界
 
-> 背景(2026-08-06):math 线切分为 Raccord / 班级网站 两线。旧站 `rucmathclass.com`
-> 与其线上构建**永久归班级网站线,全程不动**;Raccord 上子域名成为独立新站。
-> Cloudflare DNS 已加 `raccord` A 记录 → 149.28.69.75(橙云,HTTPS 在边缘终止)。
->
-> **授权闸**:以下每个生产动作都须作者原文点名(同 mathclass-deploy 第 0 闸),
-> 概括性"上线吧/发个版"不算。
+Raccord 与班级网站是两个仓库。下面的目标由当前代码和配置固定，不根据旧说明推断线上状态。
 
-## 0. 前提
+| 项目 | Raccord 的目标 |
+| --- | --- |
+| Git | `raccord` 仓库的 `main` 分支 |
+| 网页 | `raccord.rucmathclass.com` |
+| 静态目录 | `/var/www/raccord/dist` |
+| 构建标记 | `health.json` 中的 `app: Raccord` |
+| Worker | `raccord-ai`，只绑定 Raccord 子域的聊天和语音路由 |
+| 数据库 | 独立 Supabase 项目，使用 `VITE_RACCORD_SUPABASE_URL` 和 `VITE_RACCORD_SUPABASE_ANON_KEY` |
 
-- 本分支(域名改造 + Worker 路由 + 本 runbook)已合并 main,从 main 发布。
-- 本地预检三连绿:`npm ci && npm run lint && npm test`,`npm run build` 通过。
+班级站保留原库。Raccord 不复制其中的账号、对话、背词进度或其他个人记录。旧的 `VITE_SUPABASE_*` 配置不会被读取；即使把已知班级站地址填进新变量，客户端和发布检查也会拒绝它。
 
-## 1. Worker 路由(Cloudflare 边缘)
+## 新数据库
 
-```bash
-cd worker && npx wrangler deploy
-```
+只在确认过项目身份的新 Supabase 项目中执行 [初始化 SQL](../sql/initialize_independent_database.sql)。脚本在一个事务里建立当前路由需要的六张表及行策略：个人进度、个人对话、公开书目、私有资源增补队列、来源附录和账号角色。它不创建旧相册或存储桶，不复制数据，也不自动指定管理员。已有目标表时会停止，避免在旧库上误跑。
 
-- `wrangler.toml` 已含 `raccord.rucmathclass.com` 的 `/api/chat`、`/api/speak*` 两条路由;
-  与旧域名路由同一个 Worker、同一套 secret(GEMINI/ELEVENLABS),**不需重设 secret**。
-- 需要 wrangler 已登录该 Cloudflare 账号(`npx wrangler whoami` 自查)。
+新项目关闭新表自动公开授权，并开启自动行隔离。公开书架和来源附录只读；个人记录按账号限制；资源增补只有本人和原管理员规则可见。注册资料不能授予管理员权限。初始化结果需要从实际数据库再次核对，文件存在不代表已经执行。
 
-## 2. nginx(VPS 149.28.69.75)
+## 本地运行
 
-```bash
-scp deployment/nginx/raccord-security-headers.conf <user>@149.28.69.75:/etc/nginx/snippets/
-scp deployment/nginx/raccord.conf <user>@149.28.69.75:/etc/nginx/sites-available/
-ssh <user>@149.28.69.75 'ln -sf /etc/nginx/sites-available/raccord.conf /etc/nginx/sites-enabled/raccord.conf && nginx -t && systemctl reload nginx'
-```
+复制 `.env.example` 为本地环境文件，填独立项目的公开客户端配置。运行 `npm run dev`；需要本地 AI 接口时另运行 `npm run worker:dev`。开发代理只连接 `127.0.0.1:8787`，不会把请求送进班级站。Worker 密钥放在未跟踪的 `worker/.dev.vars`，不要复制班级站的生产密钥。
 
-- `nginx -t` 不过就停,别 reload。reload 平滑,不影响旧站与青协。
+`npm run lint`、`npm test`、`npm run build` 是基础检查；Worker 还跑 `npm run worker:check`，只打包不部署。测试覆盖错误仓库、分支、发布目录、数据库配置和构建标记，以及独立库的访问规则。测试使用构造数据，不连接生产。
 
-## 3. 构建 + 部署(本地,发布源只能是 public 仓的 main)
+## 发布
 
-```bash
-MATHCLASS_DEPLOY_DIR=/var/www/raccord/dist \
-MATHCLASS_DEPLOY_HOST=149.28.69.75 \
-MATHCLASS_DEPLOY_USER=<user> \
-MATHCLASS_DEPLOY_SSH_KEY=<key路径> \
-./deploy.sh
-```
+`bash deploy.sh` 和 `npm run deploy:check` 默认只检查本地。提供 `RACCORD_DEPLOY_HOST`、`RACCORD_DEPLOY_USER`、`RACCORD_DEPLOY_SSH_KEY`，密钥必须是文件的绝对路径。目录固定，旧的 `MATHCLASS_DEPLOY_*` 变量不会被采用。
 
-- 照片注入链路已于 2026-09-02 从 deploy.sh 删除,`MATHCLASS_PRIVATE_REPO` 不再被读取;真实班级照片永不随 Raccord。
-  (占位图构建)。班级照片只属于旧站——这与"站面不出现班级信息"的拍板一致。
-- `MATHCLASS_DEPLOY_DIR` 必须是 `/var/www/raccord/dist`。**漏设会写进旧站目录、
-  把班级站覆盖成 Raccord——这是本 runbook 的头号事故位。**
+检查要求正确仓库、`main` 分支、干净工作区和独立数据库配置；数据库必须使用 HTTPS，不能指向本机开发地址。随后运行 lint、测试及新构建。构建后还原自动生成的 health 时间戳，检查期间提交发生变化或构建标记不符就停止。
 
-## 4. 验证(两站都要查)
+只有用户明确授权发布后才能使用 `bash deploy.sh --publish`；它才会执行 SSH 和 rsync。Worker 单独发布到 `raccord-ai`，必须单独配置密钥，不能使用班级站的 Worker 名称或路由。两站的限流 namespace 也不同，因为同账号下相同 namespace 会共享计数，见 [Cloudflare 官方说明](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)。
 
-```bash
-# 新站活了:buildTime 应是"刚刚"
-curl -fsS https://raccord.rucmathclass.com/health.json
-curl -fsS -o /dev/null -w "%{http_code}\n" https://raccord.rucmathclass.com/
-# 旧站没被动过:buildTime 应仍是 2026-06-24
-curl -fsS https://rucmathclass.com/health.json
-```
-
-- `/api` 通不通:打开 `https://raccord.rucmathclass.com/assistant` 发一条消息
-  (请求体结构以 `worker/src/index.js` 为准,别用猜的 curl 体)。
-- 肉眼确认新站**没有**真实班级照片(应为占位图/无照片)。
-
-## 5. Supabase(工具页登录/找回密码)
-
-Dashboard → Authentication → URL Configuration → Additional Redirect URLs 添加:
-
-```
-https://raccord.rucmathclass.com/reset-password
-```
-
-- REST / realtime 不按 Origin 拦,anon key + RLS 照常,无其他改动。
-
-## 回滚
-
-新站出问题:`rm /etc/nginx/sites-enabled/raccord.conf && nginx -t && systemctl reload nginx`
-即回到"子域名 301 到旧站"的状态;旧站从头到尾不受影响。
+2026-09-27 只读核查服务器时，班级站静态目录存在，Raccord 的静态目录和 Nginx 站点尚未启用；默认站点会把未匹配的域名跳回班级站。仓库中的 Raccord 配置是待发布配置，不能据此声称 Raccord 已上线。新库建立、网页发布和 Worker 发布是不同步骤，分别核对实际结果。

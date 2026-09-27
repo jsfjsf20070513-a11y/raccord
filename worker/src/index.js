@@ -1,4 +1,4 @@
-// Cloudflare Worker — 班级后端代理 for rucmathclass.com.
+// Cloudflare Worker — Raccord 独立后端代理。
 //
 // 两个无状态端点,持有的 API key 都是 Wrangler secret,浏览器永远拿不到:
 //   POST /api/chat   → Gemini(GEMINI_API_KEY)双语数学/法语答疑,返回 { text }。
@@ -10,8 +10,6 @@
 // 部署见 ../README.md。
 
 const ALLOWED_ORIGINS = new Set([
-  'https://rucmathclass.com',
-  'https://www.rucmathclass.com',
   'https://raccord.rucmathclass.com',
   'http://localhost:5173',
 ])
@@ -40,7 +38,7 @@ const SYSTEM_PROMPT = [
 ].join('\n')
 
 function corsHeaders(origin) {
-  const allow = ALLOWED_ORIGINS.has(origin) ? origin : 'https://rucmathclass.com'
+  const allow = ALLOWED_ORIGINS.has(origin) ? origin : 'https://raccord.rucmathclass.com'
   return {
     'Access-Control-Allow-Origin': allow,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -150,7 +148,7 @@ async function handleSpeak(request, env, ctx, url, origin) {
 
   // 边缘缓存:key 含 voice/model,换声音/模型自动失效。
   const cache = caches.default
-  const cacheKey = new Request(`https://rucmathclass.com/api/speak?v=${voice}&m=${model}&text=${encodeURIComponent(text)}`, { method: 'GET' })
+  const cacheKey = new Request(`https://raccord.rucmathclass.com/api/speak?v=${voice}&m=${model}&text=${encodeURIComponent(text)}`, { method: 'GET' })
   const hit = await cache.match(cacheKey)
   if (hit) return hit
 

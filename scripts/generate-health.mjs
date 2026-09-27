@@ -6,7 +6,7 @@ const targetPath = resolve('public/health.json')
 
 const payload = {
   status: 'ok',
-  app: 'MathClassWebsite',
+  app: 'Raccord',
   version: packageJson.version,
   buildTime: new Date().toISOString(),
   mode: 'static-spa',

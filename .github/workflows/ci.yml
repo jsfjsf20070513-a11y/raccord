@@ -35,3 +35,8 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Check independent Worker bundle (no deployment)
+        run: npm run worker:check
+        env:
+          WRANGLER_SEND_METRICS: 'false'

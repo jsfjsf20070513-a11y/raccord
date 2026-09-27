@@ -4,7 +4,7 @@
 > 主工作树 `line_math/Raccord/` 停在 **`main`**;`Raccord-发布/` worktree 已撤销。
 > 本文 2026-08-26 随拆仓写成,2026-09-02 AI 协作债清理:删黑客松材料、链上残留、照片注入链路、103 张无引用 QA 截图,交接单归档。
 
-本仓是 **Raccord**(作者数字作品站)的代码仓,2026-08-25 自 `rucmathclass` 拆出(完整保留共同历史)。**未首发**:`raccord.rucmathclass.com` 目前 301 回主站,2026-08-06 作者明示暂缓。线上 `rucmathclass.com` 属于独立的班级网站线仓 `rucmathclass`,与本仓互不部署——部署走 raccord-deploy runbook,必须显式 `MATHCLASS_DEPLOY_DIR=/var/www/raccord/dist`。归档仓 `MathClassWebsite`(GitHub `mathclass-archive`)只是历史存档,照片注入链路已整体退役,deploy.sh 的注入段与 prepare/cleanup-private-assets 脚本已于 2026-09-02 删除。
+本仓是 **Raccord** 的代码仓，班级网站由独立的 `rucmathclass` 仓库维护。2026-09-27 核查时 Raccord 尚未首发，域名仍跳回班级站。当前发布脚本固定目标 `/var/www/raccord/dist`，Worker 目标为 `raccord-ai`，数据库也必须独立。先读代码和现场判断运行状态；本文和旧 SQL 都不能代替实际核验。边界与发布步骤见 [部署说明](deployment/RACCORD_DEPLOY.md)。
 
 ## 产品意图正本
 
@@ -44,13 +44,11 @@ npm audit --omit=dev --audit-level=high
 
 ## 数据库与安全红线
 
-- 本仓与归档仓共用 Supabase 项目 `xfwkjhajrqxsakzovcwx`；RLS 是唯一安全边界。
-- 权威 RLS 状态是 `harden_rls.sql`。新增表/策略时同步其独立 setup 脚本与 `harden_rls.sql`。
-- 寄语簿首次上线前执行 `setup_testimonials.sql`；未执行时前端必须只读降级。
-- `comments.album_id = 0` 是 ops queue；`__mathclass_ops__::` 审核回执属于“文本当协议”，不得放松 moderation 双守卫。
-- `comments.user_email` 对 anon 遮蔽；查询必须显式列名，禁止 `select('*')`。
-- 角色提升只允许 `super_admin`，继续通过 `public.is_super_admin()` 的 security-definer 边界。
-- Gemini / ElevenLabs key 只放 Cloudflare Worker secret，绝不进入前端环境变量或产物。
+- 班级站保留原库；Raccord 使用独立项目，不复制账号和个人记录。客户端只读取 `VITE_RACCORD_SUPABASE_*`，拒绝已知班级站地址。
+- 新库初始化见 `sql/initialize_independent_database.sql`，已有目标表时脚本会停止。根目录旧 SQL 不作为新库安装或迁移顺序；线上状态仍需实际查询。
+- 新库的个人表按账号隔离。`comments` 只承载资源增补私有队列，匿名用户不能读；`album_id = 0` 和 `__mathclass_ops__::` 是现有协议，不是恢复相册的依据。普通用户不能写审核回执。
+- 注册只创建普通角色，前端不能修改角色。公开书目由管理员写入，来源附录仅开放读取；不因旧函数存在而增加入口。
+- Gemini / ElevenLabs key 只放独立 Worker 的 secret，绝不进入前端。当前 Worker 缺少登录校验，打包通过不代表已具备上线条件。
 
 ## 视觉约束
 
@@ -64,9 +62,9 @@ npm audit --omit=dev --audit-level=high
 
 ## 部署
 
-只运行本仓 `./deploy.sh`,且必须显式 `MATHCLASS_DEPLOY_DIR=/var/www/raccord/dist`(漏设会落到班级站线上目录)。照片注入已从脚本移除,真实班级照片永不随 Raccord。绝不运行 `MathClassWebsite/deploy.sh`。完整步骤见 `deployment/RACCORD_DEPLOY.md` 与 raccord-deploy skill。
+只运行本仓 `bash deploy.sh`，默认离线检查。使用 `RACCORD_DEPLOY_HOST`、`RACCORD_DEPLOY_USER`、`RACCORD_DEPLOY_SSH_KEY`；目录固定，旧的 `MATHCLASS_DEPLOY_*` 不再采用。脚本校验仓库、分支、独立数据库和构建标记，具体见 `deployment/RACCORD_DEPLOY.md`。
 
-部署后检查 `health.json` 的新 buildTime，并比较域名与 `http://149.28.69.75/health.json`。没有明确请求时不要自行部署。
+没有用户明确授权，不执行 `--publish` 或发布 Worker。部署后核对 Raccord 域名与带正确 Host 的源站响应，以及 `health.json` 的 `app: Raccord` 和本次 buildTime；直接访问服务器 IP 可能进入班级站的默认站点，不能作为 Raccord 验收。
 
 ## 分支现状(2026-09-02)
 

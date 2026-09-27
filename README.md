@@ -47,24 +47,22 @@ npm run lint && npm test && npm run build
 
 ## 数据库与安全
 
-与 `rucmathclass` **共用同一个 Supabase 项目**,RLS 是唯一且共享的安全边界:
+Raccord 使用独立 Supabase 项目。班级站保留原库，账号和个人记录不复制。客户端只读取 `.env.example` 中的 `VITE_RACCORD_SUPABASE_*`，拒绝已知的班级站数据库地址；新库未配置时，个人数据功能不可用。
 
-- 权威 RLS 状态是 [`harden_rls.sql`](harden_rls.sql);建表按需执行 `setup_*.sql`。
-- `comments.user_email` 对 anon 遮蔽;角色提升只经 `public.is_super_admin()`。
-- 寄语表未创建时 `/testimonials` 优雅降级为只读。
-- AI / 语音密钥只存在于共享 Cloudflare Worker(`mathclass-ai`)的 secrets;**Worker 配置正本在班级侧仓**,本仓首发前需把 raccord 路由与 CORS 源合并进那边的配置再部署。
+新库只执行 [`sql/initialize_independent_database.sql`](sql/initialize_independent_database.sql)，当前六张表的访问规则由这份脚本建立并通过隔离数据库测试。根目录旧 SQL 是历史文件，不能作为新库安装顺序，也不能据此判断生产权限。
+
+AI / 语音使用本仓的独立 Worker `raccord-ai`，密钥只放该 Worker 的 secrets。当前 Worker 尚未加入登录校验，不能把前端要求登录当作服务端鉴权；见 [`worker/README.md`](worker/README.md)。
 
 ## 部署(首发时)
 
-发布源 = 本仓 `main`。必须显式:
+发布源是本仓 `main`，静态目录固定为 `/var/www/raccord/dist`。默认命令只检查，不连接服务器：
 
 ```bash
-MATHCLASS_DEPLOY_DIR=/var/www/raccord/dist \
-MATHCLASS_DEPLOY_HOST=<host> MATHCLASS_DEPLOY_USER=<user> MATHCLASS_DEPLOY_SSH_KEY=<key> \
-./deploy.sh
+RACCORD_DEPLOY_HOST=<host> RACCORD_DEPLOY_USER=<user> RACCORD_DEPLOY_SSH_KEY=<absolute-key-path> \
+bash deploy.sh --check
 ```
 
-`MATHCLASS_DEPLOY_DIR` 漏设会落到班级站的线上目录——绝不允许;真实班级照片永不随 Raccord 部署。完整步骤见 [`deployment/RACCORD_DEPLOY.md`](deployment/RACCORD_DEPLOY.md)。
+用户明确授权后才使用 `--publish`。脚本拒绝班级站仓库、非主分支、脏工作区、共享数据库和其他发布目录。新库初始化、网页发布与 Worker 发布分别核验，详见 [`deployment/RACCORD_DEPLOY.md`](deployment/RACCORD_DEPLOY.md)。
 
 ## License
 
