@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { createPoincareSignature, createPoincareSky, normalizePoincareSeed } from '../domain/poincareSkyMath.js'
 import './PoincareSkyFields.css'
 
@@ -70,18 +70,13 @@ function drawWitness(context, signature, artifact, width, height, padding, compa
   context.stroke()
 }
 
-export default function PoincareCarnetField({ compact = false, artifact, onRecall, passageActive = false }) {
-  const [revealed, setRevealed] = useState(false)
+export default function PoincareCarnetField({ compact = false, artifact, passageActive = false }) {
   const canvasRef = useRef(null)
   const hostRef = useRef(null)
   const stillTimerRef = useRef(0)
   const readingRef = useRef({ active: false, x: 0, y: 0 })
   const drawRef = useRef(() => {})
   const memory = useMemo(() => artifact?.memory || [], [artifact?.memory])
-  const choices = memory.filter((entry, index) => memory.findLastIndex((other) => other.seed.x === entry.seed.x && other.seed.y === entry.seed.y) === index)
-  const selectedIndex = choices.findIndex((entry) => entry.seed.x === artifact.seed.x && entry.seed.y === artifact.seed.y)
-  const previous = selectedIndex < 0 ? choices.at(-1) : choices[selectedIndex - 1]
-  const next = choices[selectedIndex + 1]
   const seed = useMemo(() => normalizePoincareSeed(artifact?.seed), [artifact?.seed])
   const currentSky = useMemo(() => createPoincareSky(seed), [seed])
   const currentSignature = useMemo(() => createPoincareSignature(currentSky, 7), [currentSky])
@@ -103,15 +98,15 @@ export default function PoincareCarnetField({ compact = false, artifact, onRecal
       if (passageActive) return
       const padding = compact ? 26 : Math.min(92, width * 0.07)
       rememberedSignatures.forEach((entry, index) => {
-        strokeSignature(context, entry.signature, width, height, padding, OXBLOOD, 0.35 + index * 0.025, revealed ? null : {
+        strokeSignature(context, entry.signature, width, height, padding, OXBLOOD, 0.2 + index * 0.016, {
           ...readingRef.current,
           radius: Math.min(width, height) * (compact ? 0.42 : 0.34),
           progress: readingRef.current.active ? 1 : 0,
         }, (index - rememberedSignatures.length * 0.5) * 2.4)
       })
       strokeSignature(context, currentSignature, width, height, padding, INK, compact ? 0.3 : 0.36)
-      if (readingRef.current.active || revealed) {
-        strokeSignature(context, currentSignature, width, height, padding, OXBLOOD, 0.5, revealed ? null : {
+      if (readingRef.current.active) {
+        strokeSignature(context, currentSignature, width, height, padding, OXBLOOD, 0.5, {
           ...readingRef.current,
           radius: Math.min(width, height) * (compact ? 0.42 : 0.34),
           progress: 1,
@@ -135,12 +130,11 @@ export default function PoincareCarnetField({ compact = false, artifact, onRecal
     observer.observe(canvas)
     resize()
     return () => observer.disconnect()
-  }, [artifact, compact, currentSignature, passageActive, rememberedSignatures, revealed])
+  }, [artifact, compact, currentSignature, passageActive, rememberedSignatures])
 
   useEffect(() => () => window.clearTimeout(stillTimerRef.current), [])
 
   const placeReading = (event) => {
-    if (passageActive || (event.type === 'pointermove' && event.pointerType !== 'mouse')) return
     const rect = event.currentTarget.getBoundingClientRect()
     readingRef.current = {
       active: false,
@@ -153,7 +147,7 @@ export default function PoincareCarnetField({ compact = false, artifact, onRecal
       readingRef.current.active = true
       drawRef.current()
       hostRef.current?.setAttribute('data-reading', 'awake')
-    }, event.type === 'pointerdown' ? 0 : 520)
+    }, 520)
   }
   const sleep = () => {
     window.clearTimeout(stillTimerRef.current)
@@ -164,8 +158,6 @@ export default function PoincareCarnetField({ compact = false, artifact, onRecal
   const handleKeyDown = (event) => {
     if (!['Enter', ' '].includes(event.key)) return
     event.preventDefault()
-    if (event.repeat || passageActive) return
-    setRevealed((current) => !current)
     const rect = event.currentTarget.getBoundingClientRect()
     readingRef.current = { active: true, x: rect.width * 0.56, y: rect.height * 0.5 }
     event.currentTarget.setAttribute('data-reading', 'awake')
@@ -173,7 +165,6 @@ export default function PoincareCarnetField({ compact = false, artifact, onRecal
   }
 
   return (
-    <>
     <section
       ref={hostRef}
       className={`poincare-field poincare-carnet-field${compact ? ' is-compact' : ''}`}
@@ -181,26 +172,17 @@ export default function PoincareCarnetField({ compact = false, artifact, onRecal
       data-seed={`${seed.x.toFixed(3)},${seed.y.toFixed(3)}`}
       data-scar={artifact?.scar ? 'present' : 'absent'}
       data-passage={passageActive ? 'active' : 'dormant'}
-      data-reading={revealed ? 'awake' : 'dormant'}
+      data-reading="dormant"
       role="group"
       tabIndex={0}
-      aria-label="记忆画面：点按或停留显影，回车展开全部笔迹"
-      onPointerDown={placeReading}
+      aria-label="Mémoire du ciel. Rester immobile pour révéler les trajectoires conservées."
       onPointerMove={placeReading}
       onPointerLeave={sleep}
       onBlur={sleep}
       onKeyDown={handleKeyDown}
     >
       <canvas ref={canvasRef} aria-hidden="true" />
-
+      <output className="poincare-memory-count">mémoire {String(memory.length).padStart(2, '0')}</output>
     </section>
-    <div className="poincare-field-tools">
-      <button type="button" onClick={() => onRecall(previous.id)} disabled={passageActive || !previous} aria-label="找回上一个起点">上一笔</button>
-      <button type="button" onClick={() => setRevealed((current) => !current)} aria-pressed={revealed} disabled={passageActive}>
-        {revealed ? '收起' : '显影'}
-      </button>
-      <button type="button" onClick={() => onRecall(next.id)} disabled={passageActive || !next} aria-label="找回下一个起点">下一笔</button>
-    </div>
-    </>
   )
 }

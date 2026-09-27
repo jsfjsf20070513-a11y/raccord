@@ -155,7 +155,7 @@ export default function PoincarePlanField({ compact = false, artifact, seed, onS
   }
 
   const handlePointerDown = (event) => {
-    if (event.button !== 0 || passageActive) return
+    if (event.button !== 0) return
     event.preventDefault()
     event.currentTarget.setPointerCapture?.(event.pointerId)
     dragRef.current = event.pointerId
@@ -189,7 +189,7 @@ export default function PoincarePlanField({ compact = false, artifact, seed, onS
       ArrowUp: [0, -delta],
       ArrowDown: [0, delta],
     }[event.key]
-    if (!offset || passageActive) return
+    if (!offset) return
     event.preventDefault()
     const next = normalizePoincareSeed({ x: safeSeed.x + offset[0], y: safeSeed.y + offset[1] })
     onSeedChange?.(next)
@@ -205,15 +205,15 @@ export default function PoincarePlanField({ compact = false, artifact, seed, onS
       data-passage={passageActive ? 'active' : 'dormant'}
       role="application"
       tabIndex={0}
-      aria-label="改变起点：拖动蓝点或按方向键，松手留下记录"
+      aria-label="Déplacer la condition initiale. Les flèches ajustent le point."
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={finishPointer}
       onPointerCancel={cancelPointer}
-      onLostPointerCapture={cancelPointer}
       onKeyDown={handleKeyDown}
     >
       <canvas ref={canvasRef} aria-hidden="true" />
+      <output className="poincare-coordinate">x₀ {safeSeed.x.toFixed(3)} · y₀ {safeSeed.y.toFixed(3)}</output>
     </section>
   )
 }

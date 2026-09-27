@@ -100,7 +100,7 @@ export function createPoincareSky(seed, {
   }
 
   const thresholdProgress = thresholdIndex < 0
-    ? null
+    ? 0.72
     : thresholdIndex / Math.max(1, separation.length - 1)
 
   return {
@@ -110,7 +110,7 @@ export function createPoincareSky(seed, {
     separation,
     initialDistance,
     thresholdIndex,
-    thresholdProgress,
+    thresholdProgress: clamp(thresholdProgress, 0.38, 0.86),
     maxDivergence: Math.max(...separation),
   }
 }
@@ -146,21 +146,6 @@ export function separationAtProgress(sky, progress) {
   const safeProgress = clamp(finite(progress, 0))
   const index = Math.min(sky.separation.length - 1, Math.round(safeProgress * (sky.separation.length - 1)))
   return sky.separation[index]
-}
-
-// Only report samples the visitor has actually reached. The display uses a
-// stylized projection; these ratios measure distance in the three-dimensional model.
-export function observePoincareSky(sky, progress) {
-  const safeProgress = clamp(finite(progress, 0))
-  const samples = sky?.separation || [1]
-  const index = Math.min(samples.length - 1, Math.floor(safeProgress * (samples.length - 1) + 1e-9))
-  return {
-    progress: safeProgress,
-    ratio: samples[index] ?? 1,
-    maxRatio: Math.max(...samples.slice(0, index + 1)),
-    crossing: sky?.thresholdIndex >= 0 && index >= sky.thresholdIndex ? sky.thresholdProgress : null,
-    complete: safeProgress === 1,
-  }
 }
 
 /**

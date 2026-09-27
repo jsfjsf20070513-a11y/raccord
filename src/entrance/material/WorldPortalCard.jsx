@@ -2,15 +2,15 @@ import { useCallback } from 'react'
 import WorldMaterialField from './WorldMaterialField.jsx'
 import usePointerField from '../../shared/material/usePointerField.js'
 
-const ACTIONS = { plan: '改变起点', carnet: '找回过去', limite: '推进未来' }
-
 function PosterArtwork({ world }) {
   if (world === 'plan') {
     return (
       <span className="world-poster-art world-poster-plan" aria-hidden="true">
+        <span className="poster-plan-index">01—25</span>
         <span className="poster-plan-r">ℝ</span>
         <span className="poster-plan-axis poster-plan-axis-x" />
         <span className="poster-plan-axis poster-plan-axis-y" />
+        <span className="poster-plan-coordinate">x₀ / y₀</span>
       </span>
     )
   }
@@ -18,7 +18,9 @@ function PosterArtwork({ world }) {
   if (world === 'carnet') {
     return (
       <span className="world-poster-art world-poster-carnet" aria-hidden="true">
+        <span className="poster-carnet-folio">N°02 · MMXXVI</span>
         <span className="poster-carnet-c">C</span>
+        <span className="poster-carnet-formula">∫ f · dμ</span>
         <span className="poster-carnet-rule" />
       </span>
     )
@@ -26,7 +28,10 @@ function PosterArtwork({ world }) {
 
   return (
     <span className="world-poster-art world-poster-limite" aria-hidden="true">
+      <span className="poster-limite-index">03</span>
       <span className="poster-limite-epsilon">ε</span>
+      <span className="poster-limite-readout">0.03125</span>
+      <span className="poster-limite-threshold">0⁺</span>
     </span>
   )
 }
@@ -57,7 +62,7 @@ export default function WorldPortalCard({
       data-stage-quiet={isStageQuiet ? 'true' : 'false'}
       style={{ '--awaken-progress': awakenProgress }}
       onClick={() => onSelect(world.id)}
-      aria-label={`${world.name} · ${ACTIONS[world.id]}`}
+      aria-label={world.name}
     >
       <span className="world-material-frame">
         <PosterArtwork world={world.id} />
@@ -69,6 +74,7 @@ export default function WorldPortalCard({
       </span>
 
       <span className="world-portal-meta">
+        <span className="world-portal-number">{world.number}</span>
         <strong>{world.name}</strong>
       </span>
     </button>

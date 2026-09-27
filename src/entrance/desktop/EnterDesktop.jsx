@@ -30,6 +30,7 @@ export default function EnterDesktop({ worlds, onSelect }) {
       <div className="enter-content">
         <header className="enter-header">
           <span>Raccord</span>
+          <span>MMXXVI</span>
         </header>
         <main className="enter-hero" aria-live="polite">
           <h1

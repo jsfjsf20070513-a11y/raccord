@@ -17,10 +17,8 @@ export default function PoincareChapter({ poincare }) {
   const [passage, setPassage] = useState(null)
 
   const beginPassage = useCallback((to) => {
-    // Saving a paused observation may update the live artifact during passage.
-    // Keep this animation on its starting snapshot instead of restarting it.
-    if (to !== world) setPassage((current) => current || { from: world, to, artifact: poincare.artifact })
-  }, [poincare.artifact, world])
+    setPassage((current) => current || { from: world, to })
+  }, [world])
   const crossPassage = useCallback(() => {
     if (passage) setWorld(passage.to)
   }, [passage, setWorld])
@@ -35,22 +33,22 @@ export default function PoincareChapter({ poincare }) {
       artifact: poincare.artifact,
       onSeedChange: poincare.changeSeed,
       onSeedCommit: poincare.rememberSeed,
+      onPassage: () => beginPassage('carnet'),
     }
   } else if (world === 'limite') {
     WorldHome = isMobile ? LimiteHomeMobile : LimiteHomeDesktop
     worldProps = {
       artifact: poincare.artifact,
       onThreshold: poincare.recordThreshold,
-      onObserve: poincare.recordObservation,
+      onPassage: () => beginPassage('plan'),
     }
   } else {
     WorldHome = isMobile ? CarnetHomeMobile : CarnetHomeDesktop
     worldProps = {
       artifact: poincare.artifact,
-      onRecall: poincare.recallMemory,
+      onPassage: () => beginPassage('limite'),
     }
   }
-  worldProps.onWorld = beginPassage
   worldProps.passageActive = Boolean(passage)
 
   const Passage = isMobile ? PoincarePassageMobile : PoincarePassageDesktop
@@ -59,7 +57,7 @@ export default function PoincareChapter({ poincare }) {
       <WorldHome {...worldProps} />
       {passage && (
         <Passage
-          artifact={passage.artifact}
+          artifact={poincare.artifact}
           from={passage.from}
           to={passage.to}
           onMidpoint={crossPassage}
