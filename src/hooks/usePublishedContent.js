@@ -106,16 +106,6 @@ export function usePublishedContent() {
         .channel('public:official-content')
         .on(
           'postgres_changes',
-          { event: '*', schema: 'public', table: 'albums' },
-          () => scheduleSync(true),
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'album_photos' },
-          () => scheduleSync(true),
-        )
-        .on(
-          'postgres_changes',
           { event: '*', schema: 'public', table: 'resources' },
           () => scheduleSync(true),
         )

@@ -138,3 +138,6 @@ dist
 # Claude Code local worktrees (launch.json is tracked on purpose)
 .claude/worktrees/
 .vercel
+.wrangler/
+.dev.vars*
+worker/.dev.vars*

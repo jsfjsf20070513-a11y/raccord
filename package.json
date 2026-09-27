@@ -1,5 +1,5 @@
 {
-  "name": "math-class-website",
+  "name": "raccord",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -14,10 +14,13 @@
     "health:generate": "node scripts/generate-health.mjs",
     "theorems:render": "node scripts/render-theorems.mjs",
     "vocab:import": "node scripts/import-vocabulary.mjs",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --ext js,jsx,mjs --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:check": "node scripts/deploy.mjs --check",
+    "worker:dev": "wrangler dev --config worker/wrangler.toml --port 8787",
+    "worker:check": "wrangler deploy --dry-run --config worker/wrangler.toml --outdir .wrangler/check"
   },
   "dependencies": {
     "@fontsource/archivo": "^5.2.8",
@@ -35,6 +38,7 @@
     "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.3.16",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",

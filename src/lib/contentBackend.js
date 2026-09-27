@@ -53,46 +53,6 @@ async function ensureOfficialTables(tables) {
   return { ready: true, mode: 'official' }
 }
 
-function groupPhotosByAlbum(photoRows) {
-  return photoRows.reduce((accumulator, row) => {
-    const key = row.album_id
-    if (!accumulator[key]) {
-      accumulator[key] = []
-    }
-
-    accumulator[key].push({
-      src: row.src,
-      caption: row.caption || '',
-    })
-
-    return accumulator
-  }, {})
-}
-
-function mapOfficialAlbum(row, photosByAlbum) {
-  const photos = photosByAlbum[row.id] || []
-
-  return {
-    id: `official-album-${row.id}`,
-    commentScopeId: row.id,
-    title: row.title,
-    featured: Boolean(row.featured),
-    count: photos.length || 1,
-    date: row.date,
-    updatedAt: normalizeDate(row.updated_at),
-    cover: row.cover || photos[0]?.src || FALLBACK_COVER,
-    description: row.description || '',
-    recordedBy: row.recorded_by || '站点协作',
-    location: row.location || '待补充',
-    photos: photos.length ? photos : [{ src: row.cover || FALLBACK_COVER, caption: '正式发布封面' }],
-    cloud: true,
-    published: true,
-    official: true,
-    previewLabel: '正式发布',
-    sourceSubmissionId: row.source_submission_id,
-  }
-}
-
 function mapOfficialResource(row) {
   return {
     id: `official-resource-${row.id}`,
@@ -120,34 +80,14 @@ export async function fetchOfficialContent() {
     }
   }
 
-  const tableState = await ensureOfficialTables(['albums', 'album_photos', 'resources'])
-  if (!tableState.ready) {
-    return {
-      mode: tableState.mode,
-      albums: [],
-      resources: [],
-    }
+  // Current routes only publish the bookshelf. Retired albums must not be
+  // prerequisites for loading resources from an independent database.
+  const { data, error } = await supabase.from('resources').select('*').order('created_at', { ascending: false })
+  if (error) {
+    if (isMissingTableError(error)) return { mode: 'compat', albums: [], resources: [] }
+    throw error
   }
-
-  const [albumsResult, photosResult, resourcesResult] = await Promise.all([
-    supabase.from('albums').select('*').order('updated_at', { ascending: false }),
-    supabase.from('album_photos').select('*').order('position', { ascending: true }),
-    supabase.from('resources').select('*').order('created_at', { ascending: false }),
-  ])
-
-  const results = [albumsResult, photosResult, resourcesResult]
-  const fatal = results.find((result) => result.error)
-  if (fatal) {
-    throw fatal.error
-  }
-
-  const photosByAlbum = groupPhotosByAlbum(photosResult.data || [])
-
-  return {
-    mode: 'official',
-    albums: (albumsResult.data || []).map((row) => mapOfficialAlbum(row, photosByAlbum)),
-    resources: (resourcesResult.data || []).map(mapOfficialResource),
-  }
+  return { mode: 'official', albums: [], resources: (data || []).map(mapOfficialResource) }
 }
 
 export async function publishOfficialContent(kind, submission, user) {
