@@ -49,7 +49,7 @@ npm run lint && npm test && npm run build
 
 Raccord 使用独立 Supabase 项目。班级站保留原库，账号和个人记录不复制。客户端只读取 `.env.example` 中的 `VITE_RACCORD_SUPABASE_*`，拒绝已知的班级站数据库地址；新库未配置时，个人数据功能不可用。
 
-新库只执行 [`sql/initialize_independent_database.sql`](sql/initialize_independent_database.sql)，当前六张表的访问规则由这份脚本建立并通过隔离数据库测试。根目录旧 SQL 是历史文件，不能作为新库安装顺序，也不能据此判断生产权限。
+独立项目已于 2026-09-27 使用 [`sql/initialize_independent_database.sql`](sql/initialize_independent_database.sql) 初始化，实际表权限与匿名接口已核验，结果和首发前的认证检查见 [部署说明](deployment/RACCORD_DEPLOY.md#新数据库)。这份脚本不能作为日常迁移重复执行。根目录旧 SQL 是历史文件，不能作为新库安装顺序，也不能据此判断生产权限。
 
 AI / 语音使用本仓的独立 Worker `raccord-ai`，密钥只放该 Worker 的 secrets。当前 Worker 尚未加入登录校验，不能把前端要求登录当作服务端鉴权；见 [`worker/README.md`](worker/README.md)。
 
