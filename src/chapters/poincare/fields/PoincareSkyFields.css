@@ -62,25 +62,25 @@
   left: 50%;
   bottom: 3.2%;
   transform: translateX(-50%);
-  color: rgba(46, 63, 189, .78);
+  color: #59618c;
 }
 
 .poincare-memory-count {
   left: 50%;
   bottom: 3.2%;
   transform: translateX(-50%);
-  color: rgba(127, 48, 43, .68);
+  color: #865f56;
 }
 
 .poincare-time {
   right: 18%;
   bottom: 4.4%;
-  color: rgba(233, 227, 217, .76);
+  color: #a49d93;
 }
 
 .poincare-limit-field[data-phase="loading"] .poincare-time,
 .poincare-limit-field[data-scar="present"] .poincare-time {
-  color: #d9614d;
+  color: #b58276;
 }
 
 .poincare-field.is-compact::before { background-position: center; }

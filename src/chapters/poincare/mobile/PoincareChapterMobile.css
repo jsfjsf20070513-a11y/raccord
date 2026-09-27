@@ -30,12 +30,12 @@
   font: italic 400 clamp(18px, 5.2vw, 22px)/1 "EB Garamond", serif;
   letter-spacing: .025em;
   text-align: center;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
 }
 
 .poincare-mobile-heading > span {
-  font: 400 8px/1 "JetBrains Mono", monospace;
+  font: 300 8px/1 "JetBrains Mono", monospace;
   letter-spacing: .09em;
   text-transform: uppercase;
 }
@@ -55,7 +55,7 @@
 }
 
 .poincare-mobile-passage > span {
-  font: 400 8px/1 "JetBrains Mono", monospace;
+  font: 300 8px/1 "JetBrains Mono", monospace;
   letter-spacing: .12em;
 }
 
@@ -66,19 +66,19 @@
   border-top: 1px solid currentColor;
   background: transparent;
   color: inherit;
-  font: 400 9px/1 "JetBrains Mono", monospace;
+  font: 300 9px/1 "JetBrains Mono", monospace;
   letter-spacing: .13em;
   text-align: right;
   pointer-events: auto;
 }
 
-.poincare-plan-mobile { color: #2e3fbd; background: #efede6; }
-.poincare-carnet-mobile { color: #7f302b; background: #fbfaf6; }
-.poincare-limite-mobile { color: #d9614d; background: #12100e; }
+.poincare-plan-mobile { color: #59618c; background: #efede6; }
+.poincare-carnet-mobile { color: #865f56; background: #fbfaf6; }
+.poincare-limite-mobile { color: #b58276; background: #12100e; }
 
-.poincare-plan-mobile .poincare-mobile-heading h1 { color: #171716; }
-.poincare-carnet-mobile .poincare-mobile-heading h1 { color: #7f302b; }
-.poincare-limite-mobile .poincare-mobile-heading h1 { color: #d9614d; }
+.poincare-plan-mobile .poincare-mobile-heading h1 { color: #605b55; }
+.poincare-carnet-mobile .poincare-mobile-heading h1 { color: #865f56; }
+.poincare-limite-mobile .poincare-mobile-heading h1 { color: #b58276; }
 
 .poincare-passage-mobile {
   position: fixed;

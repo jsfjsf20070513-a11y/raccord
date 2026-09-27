@@ -28,12 +28,12 @@
 .poincare-chapter-heading h1 {
   margin: 0;
   font: italic 400 clamp(25px, 2vw, 32px)/1 "EB Garamond", serif;
-  letter-spacing: .04em;
-  text-transform: uppercase;
+  letter-spacing: .025em;
+  text-transform: none;
 }
 
 .poincare-chapter-heading > span {
-  font: 400 10px/1 "JetBrains Mono", monospace;
+  font: 300 10px/1 "JetBrains Mono", monospace;
   letter-spacing: .18em;
   text-transform: uppercase;
 }
@@ -53,7 +53,7 @@
 }
 
 .poincare-chapter-passage > span {
-  font: 400 9px/1 "JetBrains Mono", monospace;
+  font: 300 9px/1 "JetBrains Mono", monospace;
   letter-spacing: .14em;
 }
 
@@ -64,7 +64,7 @@
   border-top: 1px solid currentColor;
   background: transparent;
   color: inherit;
-  font: 400 10px/1 "JetBrains Mono", monospace;
+  font: 300 10px/1 "JetBrains Mono", monospace;
   letter-spacing: .16em;
   text-align: right;
   cursor: pointer;
@@ -78,13 +78,13 @@
   outline: none;
 }
 
-.poincare-plan-desktop { min-height: calc(100svh - 58px); color: #2e3fbd; background: #efede6; }
-.poincare-carnet-desktop { color: #7f302b; background: #fbfaf6; }
-.poincare-limite-desktop { color: #d9614d; background: #12100e; }
+.poincare-plan-desktop { min-height: calc(100svh - 58px); color: #59618c; background: #efede6; }
+.poincare-carnet-desktop { color: #865f56; background: #fbfaf6; }
+.poincare-limite-desktop { color: #b58276; background: #12100e; }
 
-.poincare-plan-desktop .poincare-chapter-heading h1 { color: #171716; }
-.poincare-carnet-desktop .poincare-chapter-heading h1 { color: #7f302b; }
-.poincare-limite-desktop .poincare-chapter-heading h1 { color: #d9614d; }
+.poincare-plan-desktop .poincare-chapter-heading h1 { color: #605b55; }
+.poincare-carnet-desktop .poincare-chapter-heading h1 { color: #865f56; }
+.poincare-limite-desktop .poincare-chapter-heading h1 { color: #b58276; }
 
 .poincare-passage-desktop {
   position: fixed;
