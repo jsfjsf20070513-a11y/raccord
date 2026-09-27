@@ -27,6 +27,7 @@
 
 .poincare-mobile-heading h1 {
   margin: 0;
+  opacity: .72;
   font: italic 400 clamp(18px, 5.2vw, 22px)/1 "EB Garamond", serif;
   letter-spacing: .025em;
   text-align: center;
