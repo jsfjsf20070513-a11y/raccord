@@ -4,15 +4,22 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { parse } from 'espree'
 
 export function allowsImport(from, to) {
-  if (from.startsWith('shared/')) return to.startsWith('shared/')
+  const device = path => path.match(/(?:^|\/)(desktop|mobile)(?:\/|[A-Z])/i)?.[1]?.toLowerCase()
+  if (device(from) && device(to) && device(from) !== device(to)) return false
+  if (from.startsWith('shared/')) {
+    const area = from.split('/')[1]
+    return to.startsWith(`shared/${area}/`) || (['world', 'material'].includes(area) && to.startsWith('shared/browser/'))
+  }
   if (from.startsWith('entrance/')) return to.startsWith('entrance/') || to.startsWith('shared/')
   if (from.startsWith('chapters/')) {
     const chapter = from.split('/')[1]
-    if (from.startsWith(`chapters/${chapter}/domain/`)) return to.startsWith(`chapters/${chapter}/domain/`)
+    if (from.startsWith(`chapters/${chapter}/domain/`)) return to.startsWith(`chapters/${chapter}/domain/`) && /\.(?:js|mjs)$/.test(to)
+    if (from.startsWith(`chapters/${chapter}/fields/`)) return to.startsWith(`chapters/${chapter}/fields/`) || to.startsWith(`chapters/${chapter}/domain/`) || to.startsWith('shared/')
     return to.startsWith(`chapters/${chapter}/`) || to.startsWith('shared/')
   }
   if (from === 'main.jsx') return to.startsWith('app/') || to.startsWith('shared/styles/')
-  return from.startsWith('app/')
+  if (from.startsWith('app/')) return to.startsWith('app/') || to.startsWith('shared/') || to === 'entrance/Entrance.jsx' || /^chapters\/[^/]+\/[^/]+\.(?:js|jsx|mjs)$/.test(to)
+  return false
 }
 
 function walkNode(node, visit) {
@@ -44,6 +51,7 @@ export function checkArchitecture(root) {
 
   for (const file of runtime) {
     const name = relative(source, file).split(sep).join('/')
+    if (name !== 'main.jsx' && !/^(?:app|entrance|shared\/(?:browser|material|styles|world)|chapters\/[^/]+)\//.test(name)) errors.push(`${name} 不在已定义的代码目录中`)
     const text = readFileSync(file, 'utf8')
     if (retired.test(text)) errors.push(`${name} 含已退出作品的服务引用`)
     const imports = []
@@ -55,9 +63,10 @@ export function checkArchitecture(root) {
           if (typeof node.source.value !== 'string') errors.push(`${name} 的动态导入必须可静态检查`)
           else imports.push(node.source.value)
         }
+        if (node.type === 'CallExpression' && (node.callee.name === 'require' || (node.callee.object?.type === 'MetaProperty' && node.callee.property?.name?.startsWith('glob')))) errors.push(`${name} 必须使用明确的 import 路径`)
       })
     } else if (extname(file) === '.css') {
-      for (const match of text.matchAll(/@import\s+(?:url\(\s*)?["']([^"']+)["']/g)) imports.push(match[1])
+      for (const match of text.matchAll(/@import\s+(?:url\(\s*)?(?:"([^"]+)"|'([^']+)'|([^\s);]+))/g)) imports.push(match[1] || match[2] || match[3])
       if (/url\(\s*["']?(?:https?:)?\/\//i.test(text)) errors.push(`${name} 不得加载站外样式资源`)
     }
     if (!['.js', '.jsx', '.mjs', '.css'].includes(extname(file))) errors.push(`${name} 使用未检查的运行文件类型`)
@@ -69,7 +78,7 @@ export function checkArchitecture(root) {
         continue
       }
       const base = resolve(dirname(file), specifier)
-      const target = [base, `${base}.js`, `${base}.jsx`, `${base}.css`].find(p => {
+      const target = [base, `${base}.js`, `${base}.jsx`, `${base}.mjs`, `${base}.css`].find(p => {
         try { return statSync(p).isFile() } catch { return false }
       })
       if (!target) { errors.push(`${name} 的导入不存在：${specifier}`); continue }
@@ -92,6 +101,20 @@ export function checkArchitecture(root) {
   }
   visit(resolve(source, 'main.jsx'))
   for (const file of runtime) if (!reachable.has(file)) errors.push(`没有入口引用：${relative(source, file)}`)
+  const finished = new Set()
+  const active = []
+  function findCycles(file) {
+    if (active.includes(file)) {
+      errors.push(`循环引用：${[...active.slice(active.indexOf(file)), file].map(path => relative(source, path)).join(' → ')}`)
+      return
+    }
+    if (finished.has(file)) return
+    active.push(file)
+    for (const child of edges.get(file) || []) findCycles(child)
+    active.pop()
+    finished.add(file)
+  }
+  for (const file of edges.keys()) findCycles(file)
   for (const file of ['vite.config.js', 'index.html', 'deploy.sh']) {
     if (retired.test(readFileSync(resolve(root, file), 'utf8'))) errors.push(`${file} 含旧项目执行配置`)
   }
@@ -101,5 +124,5 @@ export function checkArchitecture(root) {
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const { errors, fileCount } = checkArchitecture(fileURLToPath(new URL('..', import.meta.url)))
   if (errors.length) { console.error(errors.join('\n')); process.exitCode = 1 }
-  else console.log(`架构检查通过：${fileCount} 个运行文件；依赖方向和入口引用正常。`)
+  else console.log(`架构检查通过：${fileCount} 个运行文件；依赖方向、双端分离、循环引用和入口引用均已检查。`)
 }

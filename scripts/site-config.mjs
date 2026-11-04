@@ -22,8 +22,8 @@ export function siteMetadata(origin) {
     generateBundle() {
       const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
       let revision = null
-      try { revision = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' }).trim() } catch { /* Source archives may have no Git metadata. */ }
-      this.emitFile({ type: 'asset', fileName: 'health.json', source: JSON.stringify({ app: 'raccord', version, revision, buildTime: new Date().toISOString(), mode: 'static-spa' }, null, 2) + '\n' })
+      try { revision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' }).trim() } catch { /* 源码压缩包可能没有 Git 记录。 */ }
+      this.emitFile({ type: 'asset', fileName: 'health.json', source: JSON.stringify({ app: 'Raccord', version, revision, siteOrigin: origin, buildTime: new Date().toISOString(), mode: 'static-spa' }, null, 2) + '\n' })
       this.emitFile({ type: 'asset', fileName: 'robots.txt', source: `User-agent: *\nAllow: /\n${origin ? `Sitemap: ${origin}/sitemap.xml\n` : ''}` })
       if (origin) this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/</loc></url><url><loc>${origin}/enter</loc></url></urlset>\n` })
     },

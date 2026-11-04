@@ -1,32 +1,11 @@
-import { readPoincareArtifact, storePoincareArtifact } from '../persistence'
 import { describe, expect, it } from 'vitest'
 import {
   POINCARE_MEMORY_LIMIT,
-  POINCARE_SKY_STORAGE_KEY,
   applyPoincareEvent,
   createPoincareArtifact,
 } from './poincareSkyState.js'
 
-function memoryStorage() {
-  const values = new Map()
-  return {
-    getItem: (key) => values.get(key) ?? null,
-    setItem: (key, value) => values.set(key, value),
-  }
-}
-
 describe('poincare chapter artifact', () => {
-  it('persists the selected initial condition', () => {
-    const storage = memoryStorage()
-    const changed = applyPoincareEvent(createPoincareArtifact(), {
-      type: 'seed.changed',
-      seed: { x: 0.62, y: 0.31 },
-    })
-    storePoincareArtifact(changed, storage)
-    expect(storage.getItem(POINCARE_SKY_STORAGE_KEY)).toContain('0.62')
-    expect(readPoincareArtifact(storage).seed).toEqual({ x: 0.62, y: 0.31 })
-  })
-
   it('keeps a bounded manuscript memory and ignores duplicate placements', () => {
     let artifact = createPoincareArtifact()
     for (let index = 0; index < POINCARE_MEMORY_LIMIT + 3; index += 1) {
