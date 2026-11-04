@@ -1,69 +1,76 @@
 # Raccord
 
-> 同一件作品,三种目光。⬜ 未首发。
+Raccord 是一个独立的交互作品。目前只有入口和《Le ciel de Poincaré》这一章。
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square)](LICENSE)
+入口可以选择 PLAN、Carnet 或 Limite。PLAN 改变初始位置，Carnet 展示留下的记录，Limite 施加载荷并留下痕迹。三个世界读取同一份章节记录，切换时也使用这份记录绘制过场。
 
-**Raccord** 是一个作者数字作品站——数学班是它的出生坐标,但它不再是"班级官网"。
-目前**没有上线**:`raccord.rucmathclass.com` 是 301 跳回主站的占位,2026-08-06 作者明示暂缓首发。
-第一章 **《Le ciel de Poincaré》** 已于 2026-07-23 获作者认可成立。
+2026-11-04，用户确认只保留纯静态作品：没有账号、背词、数据库、AI 接口或后台。图片和字体随站点提供。浏览器不允许保存数据时仍能体验，只是不保证刷新后保留记录。此次整理没有发布网站，也没有操作已有云端服务或数据。
 
-> 本仓 2026-08-25 自 [`rucmathclass`](https://github.com/jsfjsf20070513-a11y/rucmathclass) 拆出(完整保留共同历史)。
-> 线上 `rucmathclass.com` 属于那边的班级网站线,与本仓互不部署。
+## 作品约定
 
-## 三个世界
+作品表达作者的想法，不代表班级的共同意志。站面和网页元信息不出现作者姓名与班级信息；这是用户在 2026-07-23 确认的决定。
 
-三个世界不是三个功能部门,而是同一件作品当前使用的三种表现形式:
+第一章也在同日获得认可。保持原有的画面和探索方式：Carnet 需要停留，Limite 需要长按，不自行增加提示。三个世界各有自己的材质、节奏和布局，不套用同一张首页。后续章节可以改变题材和形式，须由用户决定。
 
-| 世界 | 表现语言 | 谱系 |
-|---|---|---|
-| **Carnet** | 纸页:边注、驻留显影 | `#fbfaf6 / #201d1a / #7f302b`,EB Garamond + Noto Serif SC |
-| **PLAN ℝ** | 工程图:方格与制图结构 | `#efede6 / #171716 / #2e3fbd`,主标题 Archivo 900 |
-| **Limite** | 暗色仪器:无量纲载荷试验 | `#12100e / #e9e3d9 / #d9614d`,Archivo + JetBrains Mono |
+每屏只突出一个主要对象，颜色、字体和间距保持一致。指针停下后，材质完成过渡便停止绘制；离开或松手后逐渐恢复。作品文字不能冒充历史人物的原话。
 
-当前 edition 以同一件 `Raccord 01` 连续曲线贯穿三界:PLAN 用 Bézier 控制柄把两段曲线从 G⁰ 接向 C²,Limite 把同一曲线置于 A350 启发的载荷试验,Carnet 以 Cauchy / Bergson 的边注追问连续与同一。控制柄是三界共享且持久化的对象(`localStorage.raccord_artifact_v1`),数值逻辑保持在 `components/material/raccordWorldMath.js` 的可测试纯函数里。
+## 开发与检查
 
-站面不出现作者姓名与班级信息(2026-07-23 拍板);Web3 前端已退役,链上程序与文档已于 2026-09-02 删除(历史在 git)。
-
-## 分支
-
-- `main` — 干净基线(2026-08-06 切换改造合并后),留作首发发布源。
-- `wip/horizon-immobile`、`codex/world-chapter-constitution` — 2026-08-10 停工时的两个平行方向快照(Horizon 页 vs 产品宪法 v2),复工第一件事是裁定主方向。
-
-## 本地开发
+使用 `.nvmrc` 指定的 Node 24。
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-质量闸:
+提交前运行：
 
 ```bash
-npm run lint && npm test && npm run build
+npm run check
+npm run build
+npm audit --omit=dev --audit-level=high
 ```
 
-`predev` / `prebuild` 自动运行定理预渲染与 health 生成。
+`check` 检查代码引用、语法和测试。构建结果在 `dist/`，不会改动源码。`npm run preview` 可以预览构建结果。CI 会执行同样的检查。
 
-## 数据库与安全
+## 代码怎么找
 
-Raccord 使用独立 Supabase 项目。班级站保留原库，账号和个人记录不复制。客户端只读取 `.env.example` 中的 `VITE_RACCORD_SUPABASE_*`，拒绝已知的班级站数据库地址；新库未配置时，个人数据功能不可用。
+| 目录 | 内容 |
+| --- | --- |
+| `src/app/` | 路由、页面外壳、找不到页面时的出口，以及入口和章节的组合 |
+| `src/entrance/` | 选择世界的入口，桌面和手机各有组件 |
+| `src/chapters/poincare/` | 第一章的页面、绘图和记录保存 |
+| `src/chapters/poincare/domain/` | 轨迹计算和记录变化，不使用 React、浏览器或样式 |
+| `src/shared/browser/` | 屏幕尺寸与浏览器存储 |
+| `src/shared/world/` | 世界选择与首访记录 |
+| `src/shared/material/` | 通用指针响应和材质计算 |
+| `src/shared/styles/` | 字体与全局样式 |
+| `scripts/` | 代码引用检查、构建信息和静态发布 |
 
-独立项目已于 2026-09-27 使用 [`sql/initialize_independent_database.sql`](sql/initialize_independent_database.sql) 初始化，实际表权限与匿名接口已核验，结果和首发前的认证检查见 [部署说明](deployment/RACCORD_DEPLOY.md#新数据库)。这份脚本不能作为日常迁移重复执行。根目录旧 SQL 是历史文件，不能作为新库安装顺序，也不能据此判断生产权限。
+应用层负责组合页面，通过入口组件和章节目录第一层的文件使用它们。入口和章节可以引用通用代码；通用代码不能反过来引用页面。章节之间不能直接引用彼此的实现。绘图组件可以使用本章计算和通用代码，不引用桌面或手机页面。通用代码的不同目录也各有职责：世界选择和材质可以使用浏览器适配，浏览器适配不依赖它们。
 
-AI / 语音使用本仓的独立 Worker `raccord-ai`，密钥只放该 Worker 的 secrets。当前 Worker 尚未加入登录校验，不能把前端要求登录当作服务端鉴权；见 [`worker/README.md`](worker/README.md)。
+桌面与手机以 760px 为界，每次只显示和挂载一套页面，两套组件不互相引用。章节记录由路由上方持有，切换世界、返回入口、调整窗口都沿用同一份记录。
 
-## 部署(首发时)
+`scripts/check-architecture.mjs` 会检查这些引用方向，并拒绝循环引用、缺失文件、没有入口使用的源码，以及旧服务引用。测试文件放在各自负责的代码旁边。
 
-发布源是本仓 `main`，静态目录固定为 `/var/www/raccord/dist`。默认命令只检查，不连接服务器：
+## 本地记录
 
-```bash
-RACCORD_DEPLOY_HOST=<host> RACCORD_DEPLOY_USER=<user> RACCORD_DEPLOY_SSH_KEY=<absolute-key-path> \
-bash deploy.sh --check
-```
+- `raccord_world_v1`：最近选择的世界。
+- `raccord_visited_v1`：是否已进入作品。
+- `poincare_sky_v1`：初始位置、最近七次记录、越过阈值的次数和第一道痕迹。
 
-用户明确授权后才使用 `--publish`。脚本拒绝班级站仓库、非主分支、脏工作区、共享数据库和其他发布目录。新库初始化、网页发布与 Worker 发布分别核验，详见 [`deployment/RACCORD_DEPLOY.md`](deployment/RACCORD_DEPLOY.md)。
+旧版本的 `carnet_world`、`carnet_visited` 只用于读取已有选择，之后写入新键。章节记录继续使用原来的键，不清空旧记录。
 
-## License
+## 发布
 
-[MIT](LICENSE)
+普通开发不需要环境变量。正式域名通过 `RACCORD_SITE_URL` 提供；配置后构建会生成网页地址标记和站点地图。未配置时不猜测域名。
+
+`bash deploy.sh` 默认只检查。只有用户明确授权后，才能运行 `bash deploy.sh --publish`。发布仅接受本仓干净的 `main`，目标目录固定为 `/var/www/raccord/dist`。详细步骤见 [部署说明](deployment/RACCORD_DEPLOY.md)。
+
+`health.json` 在构建时生成，包含应用名、版本、完整提交号、域名和构建时间。仓库中的代码和模板不能证明线上状态。
+
+## 保留的历史
+
+旧实现和旧设计文档保存在 Git 历史及 `backup/2026-11-04-before-integration/` 下的备份标签中，不再作为当前开发说明。
+
+`wip/horizon-immobile` 和 `codex/world-chapter-constitution` 是第二章的两条实验分支，尚未获得认可。2026-11-04，用户确认此次先保留它们。不要把其中的页面、规则或旧服务混入当前作品。

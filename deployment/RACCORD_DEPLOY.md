@@ -1,42 +1,46 @@
-# Raccord 的运行和发布边界
+# 发布 Raccord
 
-Raccord 与班级网站是两个仓库。下面的目标由当前代码和配置固定，不根据旧说明推断线上状态。
+这里只发布静态文件，不包含数据库、账号服务或 Worker。2026-11-04 的合并与整理没有发布网站，也没有删除或迁移云端数据。实际服务器和域名状态须在发布前核对。
 
-| 项目 | Raccord 的目标 |
-| --- | --- |
-| Git | `raccord` 仓库的 `main` 分支 |
-| 网页 | `raccord.rucmathclass.com` |
-| 静态目录 | `/var/www/raccord/dist` |
-| 构建标记 | `health.json` 中的 `app: Raccord` |
-| Worker | `raccord-ai`，只绑定 Raccord 子域的聊天和语音路由 |
-| 数据库 | 独立 Supabase 项目，使用 `VITE_RACCORD_SUPABASE_URL` 和 `VITE_RACCORD_SUPABASE_ANON_KEY` |
+## 准备
 
-班级站保留原库。Raccord 不复制其中的账号、对话、背词进度或其他个人记录。旧的 `VITE_SUPABASE_*` 配置不会被读取；即使把已知班级站地址填进新变量，客户端和发布检查也会拒绝它。
+先取得用户明确的发布授权。确认本仓 `main` 已同步、工作区没有未保存文件，再运行 `npm ci`。删除分支和合并代码的授权不包含发布。
 
-## 新数据库
+服务器需要为作品配置独立的域名和目录。[Nginx 模板](nginx/raccord.conf.example) 安装前必须替换示例域名，并由实际托管环境提供 HTTPS。不要安装其他项目的配置。SSH 主机指纹须事先核对并加入 `known_hosts`；脚本不会自动接受新指纹。
 
-只在确认过项目身份的新 Supabase 项目中执行 [初始化 SQL](../sql/initialize_independent_database.sql)。脚本在一个事务里建立当前路由需要的六张表及行策略：个人进度、个人对话、公开书目、私有资源增补队列、来源附录和账号角色。它不创建旧相册或存储桶，不复制数据，也不自动指定管理员。已有目标表时会停止，避免在旧库上误跑。
+在终端设置以下变量；密钥内容不能写进仓库：
 
-公开书架和来源附录只读；个人记录按账号限制；资源增补只有本人和管理员可见。注册资料不能授予管理员权限。不要只看控制台的“新表自动公开”开关：此次查到默认授权仍含 TRUNCATE 等操作，初始化脚本会逐表撤销多余授权，后续新表也要明确处理。
+```bash
+export RACCORD_SITE_URL=https://作品域名
+export RACCORD_DEPLOY_HOST=服务器地址
+export RACCORD_DEPLOY_USER=发布用户
+export RACCORD_DEPLOY_SSH_KEY=/密钥的绝对路径
+```
 
-2026-09-27 已在独立项目 `zkjwiljxgiockkzrkjui`（新加坡，PostgreSQL 17.6）执行这份初始化 SQL。执行前没有业务表和账号；执行后六张表都开启 RLS，96 项匿名与登录角色表权限符合预期，没有额外列授权或 PUBLIC 授权。注册触发器固定创建普通用户，实时订阅只发布 `resources`。
+目标目录固定为 `/var/www/raccord/dist`，无需配置。若设置 `RACCORD_DEPLOY_DIR`，也只能是这个值。脚本不读取其他项目的部署变量。
 
-使用该项目公开客户端配置实际请求接口：`resources`、`testimonials` 的匿名 HEAD 返回 200，其余四张表返回 401。六张表和 Auth 的记录数仍全部为零，没有搬迁数据或指定管理员。本机 `.env.local` 已改为新项目并移除旧共享变量，该文件不入库。使用这份配置的构建已打开书架和登录页核对，无控制台错误。
+## 先检查，再发布
 
-认证回调尚保持新项目默认值：Site URL 为 `http://localhost:3000`，没有额外 Redirect URLs。Raccord 域名当前仍跳往班级站，首发时再设置自己的域名与 `/reset-password` 回调，并核验真实注册、邮件确认和找回密码；此次没有发送邮件或创建测试账号。数据库初始化完成不代表这些登录流程已经验收。
+```bash
+bash deploy.sh --check
+```
 
-## 本地运行
+不写参数也只做检查。脚本先核对仓库、main 分支、工作区和配置，再运行代码检查、测试和构建；结束时再次核对分支与提交。它还会核对构建中的应用名、提交号、域名、时间和入口文件。任何一步失败都会停止。检查模式不连接服务器。
 
-复制 `.env.example` 为本地环境文件，填独立项目的公开客户端配置。运行 `npm run dev`；需要本地 AI 接口时另运行 `npm run worker:dev`。开发代理只连接 `127.0.0.1:8787`，不会把请求送进班级站。Worker 密钥放在未跟踪的 `worker/.dev.vars`，不要复制班级站的生产密钥。
+用户已明确授权本次发布、检查也通过后，才运行：
 
-`npm run lint`、`npm test`、`npm run build` 是基础检查；Worker 还跑 `npm run worker:check`，只打包不部署。测试覆盖错误仓库、分支、发布目录、数据库配置和构建标记，以及独立库的访问规则。测试使用构造数据，不连接生产。
+```bash
+bash deploy.sh --publish
+```
 
-## 发布
+发布会重新执行全部检查，再通过 SSH 和 rsync 同步文件。同步使用 `--delete`，因此 `/var/www/raccord/dist` 必须只存本站的构建产物，不能存用户文件或其他服务的数据。不要用其他目录试跑。
 
-`bash deploy.sh` 和 `npm run deploy:check` 默认只检查本地。提供 `RACCORD_DEPLOY_HOST`、`RACCORD_DEPLOY_USER`、`RACCORD_DEPLOY_SSH_KEY`，密钥必须是文件的绝对路径。目录固定，旧的 `MATHCLASS_DEPLOY_*` 变量不会被采用。
+## 验证与回退
 
-检查要求正确仓库、`main` 分支、干净工作区和独立数据库配置；数据库必须使用 HTTPS，不能指向本机开发地址。随后运行 lint、测试及新构建。构建后还原自动生成的 health 时间戳，检查期间提交发生变化或构建标记不符就停止。
+发布前保存当前站点的构建产物及 `health.json`，作为回退副本。
 
-只有用户明确授权发布后才能使用 `bash deploy.sh --publish`；它才会执行 SSH 和 rsync。Worker 单独发布到 `raccord-ai`，必须单独配置密钥，不能使用班级站的 Worker 名称或路由。两站的限流 namespace 也不同，因为同账号下相同 namespace 会共享计数，见 [Cloudflare 官方说明](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)。
+发布后访问作品域名的 `/health.json`，并检查使用正确 Host 的源站响应。确认 `app` 为 `Raccord`，`revision`、`siteOrigin` 和 `buildTime` 与本次 `dist/health.json` 一致。直接访问服务器 IP 可能进入默认站点，不能代替这一步。
 
-2026-09-27 只读核查服务器时，班级站静态目录存在，Raccord 的静态目录和 Nginx 站点尚未启用；默认站点会把未匹配的域名跳回班级站。仓库中的 Raccord 配置是待发布配置，不能据此声称 Raccord 已上线。新库建立、网页发布和 Worker 发布是不同步骤，分别核对实际结果。
+再打开入口，走完 PLAN → Carnet → Limite → PLAN，检查手机页面、返回入口和刷新后的记录。纯静态作品没有账号或 API 需要验证。
+
+需要回退时，把发布前保存的本站构建重新同步到同一目录，再核对 `health.json` 和页面。不要通过改动其他站点来回退。

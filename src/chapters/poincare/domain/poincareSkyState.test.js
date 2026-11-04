@@ -1,0 +1,44 @@
+import { describe, expect, it } from 'vitest'
+import {
+  POINCARE_MEMORY_LIMIT,
+  applyPoincareEvent,
+  createPoincareArtifact,
+} from './poincareSkyState.js'
+
+describe('poincare chapter artifact', () => {
+  it('keeps a bounded manuscript memory and ignores duplicate placements', () => {
+    let artifact = createPoincareArtifact()
+    for (let index = 0; index < POINCARE_MEMORY_LIMIT + 3; index += 1) {
+      artifact = applyPoincareEvent(artifact, {
+        type: 'seed.committed',
+        at: index + 1,
+        seed: { x: 0.2 + index * 0.03, y: 0.5 },
+      })
+    }
+    expect(artifact.memory).toHaveLength(POINCARE_MEMORY_LIMIT)
+    const duplicate = applyPoincareEvent(artifact, {
+      type: 'seed.committed',
+      at: 99,
+      seed: artifact.memory.at(-1).seed,
+    })
+    expect(duplicate.memory).toEqual(artifact.memory)
+  })
+
+  it('records one irreversible scar while counting later crossings', () => {
+    let artifact = applyPoincareEvent(createPoincareArtifact(), {
+      type: 'threshold.crossed',
+      at: 10,
+      progress: 0.64,
+      divergence: 21,
+    })
+    const firstScar = artifact.scar
+    artifact = applyPoincareEvent(artifact, {
+      type: 'threshold.crossed',
+      at: 20,
+      progress: 0.72,
+      divergence: 42,
+    })
+    expect(artifact.thresholdCrossings).toBe(2)
+    expect(artifact.scar).toEqual(firstScar)
+  })
+})

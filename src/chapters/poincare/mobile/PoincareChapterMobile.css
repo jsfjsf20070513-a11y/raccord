@@ -1,0 +1,99 @@
+.poincare-chapter-mobile {
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  min-height: calc(100svh - 52px);
+  margin-left: -50vw;
+  overflow: hidden;
+}
+
+.poincare-chapter-mobile > .poincare-field {
+  position: absolute;
+  inset: 0;
+}
+
+.poincare-mobile-heading {
+  position: absolute;
+  z-index: 5;
+  top: 19px;
+  right: 18px;
+  left: 18px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.poincare-mobile-heading h1 {
+  margin: 0;
+  opacity: .72;
+  font: italic 400 clamp(18px, 5.2vw, 22px)/1 "EB Garamond", serif;
+  letter-spacing: .025em;
+  text-align: center;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.poincare-mobile-heading > span {
+  font: 300 8px/1 "JetBrains Mono", monospace;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.poincare-mobile-heading > span:last-child { text-align: right; }
+
+.poincare-mobile-passage {
+  position: absolute;
+  z-index: 6;
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.poincare-mobile-passage > span {
+  font: 300 8px/1 "JetBrains Mono", monospace;
+  letter-spacing: .12em;
+}
+
+.poincare-mobile-passage button {
+  min-width: 112px;
+  padding: 9px 0 6px;
+  border: 0;
+  border-top: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font: 300 9px/1 "JetBrains Mono", monospace;
+  letter-spacing: .13em;
+  text-align: right;
+  pointer-events: auto;
+}
+
+.poincare-plan-mobile { color: #59618c; background: #efede6; }
+.poincare-carnet-mobile { color: #865f56; background: #fbfaf6; }
+.poincare-limite-mobile { color: #b58276; background: #12100e; }
+
+.poincare-plan-mobile .poincare-mobile-heading h1 { color: #605b55; }
+.poincare-carnet-mobile .poincare-mobile-heading h1 { color: #865f56; }
+.poincare-limite-mobile .poincare-mobile-heading h1 { color: #b58276; }
+
+.poincare-passage-mobile {
+  position: fixed;
+  z-index: 30;
+  inset: 49px 0 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+@media (max-width: 360px) {
+  .poincare-mobile-heading { grid-template-columns: auto 1fr auto; }
+  .poincare-mobile-heading h1 { font-size: 17px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poincare-chapter-mobile * { transition-duration: .01ms !important; }
+}
