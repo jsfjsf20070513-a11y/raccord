@@ -142,6 +142,7 @@ export default function PoincareCarnetField({ compact = false, artifact, passage
       y: event.clientY - rect.top,
     }
     window.clearTimeout(stillTimerRef.current)
+    hostRef.current?.setAttribute('data-reading', 'dormant')
     drawRef.current()
     stillTimerRef.current = window.setTimeout(() => {
       readingRef.current.active = true
@@ -176,7 +177,10 @@ export default function PoincareCarnetField({ compact = false, artifact, passage
       role="group"
       tabIndex={0}
       aria-label="Mémoire du ciel. Rester immobile pour révéler les trajectoires conservées."
+      onPointerDown={placeReading}
       onPointerMove={placeReading}
+      onPointerUp={(event) => { if (event.pointerType !== 'mouse') sleep() }}
+      onPointerCancel={sleep}
       onPointerLeave={sleep}
       onBlur={sleep}
       onKeyDown={handleKeyDown}
